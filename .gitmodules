@@ -1,0 +1,6 @@
+[submodule "EVEIndustry"]
+	path = EVEIndustry
+	url = https://github.com/EXTER7/EVEIndustry.git
+[submodule "TSL"]
+	path = TSL
+	url = https://github.com/EXTER7/TSL.git
