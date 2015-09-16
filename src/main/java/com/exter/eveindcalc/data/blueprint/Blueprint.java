@@ -87,7 +87,7 @@ public class Blueprint implements IBlueprint
     
     public Invention(TSLObject tsl) throws EveDataException
     {
-      ArrayList<ItemStack> matlist = new ArrayList<ItemStack>();
+      ArrayList<ItemStack> matlist = new ArrayList<>();
       if(tsl == null)
       {
         throw new EveDataException();
@@ -100,7 +100,7 @@ public class Blueprint implements IBlueprint
       {
         throw new EveDataException();
       }
-      Set<Integer> dskills = new HashSet<Integer>(tsl.getStringAsIntegerList("dskill"));
+      Set<Integer> dskills = new HashSet<>(tsl.getStringAsIntegerList("dskill"));
       DatacoreSkills = Collections.unmodifiableSet(dskills);
       List<TSLObject> tsl_materials = tsl.getObjectList("material");
       if(tsl_materials == null)
@@ -121,8 +121,8 @@ public class Blueprint implements IBlueprint
       List<TSLObject> tsl_relics = tsl.getObjectList("relic");
       if(tsl_relics != null && tsl_relics.size() > 0)
       {
-        Relics = new SparseArray<Relic>();
-        RelicList = new TreeSet<Integer>(new RelicComparator());
+        Relics = new SparseArray<>();
+        RelicList = new TreeSet<>(new RelicComparator());
         for(TSLObject tr: tsl_relics)
         {
           Relic r = new Relic(tr);
@@ -207,14 +207,14 @@ public class Blueprint implements IBlueprint
   
   public Blueprint(TSLObject tsl) throws EveDataException
   {
-    List<ItemStack> matlist = new ArrayList<ItemStack>();
+    List<ItemStack> matlist = new ArrayList<>();
     if(tsl == null)
     {
       throw new EveDataException();
     }
     Product = new ItemStack(InventoryDA.getItem(tsl.getStringAsInt("id", -1)),tsl.getStringAsInt("amount",-1));
     ManufactureTime = tsl.getStringAsInt("time",-1);
-    if(Product == null || ManufactureTime < 0)
+    if(ManufactureTime < 0)
     {
       throw new EveDataException();
     }
@@ -248,7 +248,7 @@ public class Blueprint implements IBlueprint
     List<Integer> sk = tsl.getStringAsIntegerList("skill");
     if(sk != null)
     {
-      Skills = Collections.unmodifiableSet(new HashSet<Integer>(sk));
+      Skills = Collections.unmodifiableSet(new HashSet<>(sk));
     } else
     {
       Skills = Collections.emptySet();

@@ -147,23 +147,19 @@ public class Index
       items.add(it.getID());
     }
   }
-  public List<Entry> GetEntries()
+  public List<Entry> getEntries()
   {
     return entries;
   }
   
-  public List<Integer> GetItems()
+  public List<Integer> getItems()
   {
     return items;
   }
 
-  public List<Group> GetGroups()
+  public List<Group> getGroups()
   {
     return groups_list;
   }
 
-  public Group GetGroup(int id)
-  {
-    return groups.get(id);
-  }
 }

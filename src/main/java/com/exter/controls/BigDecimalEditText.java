@@ -12,7 +12,7 @@ public class BigDecimalEditText
 {
   public interface ValueListener
   {
-    void ValueChanged(int tag,BigDecimal value);
+    void valueChanged(int tag, BigDecimal value);
   }
   
   public interface FocusListener
@@ -47,7 +47,7 @@ public class BigDecimalEditText
     public void afterTextChanged(Editable s)
     {
       String str = s.toString();
-      listener.ValueChanged(tag,GetValue(str));
+      listener.valueChanged(tag, GetValue(str));
     }
 
     @Override
@@ -107,7 +107,7 @@ public class BigDecimalEditText
     editor.setOnFocusChangeListener(new FocusChangeListener());
   }
 
-  public void SetValue(BigDecimal value)
+  public void setValue(BigDecimal value)
   {
     TextWatcher w = (TextWatcher)editor.getTag();
     editor.removeTextChangedListener(w);

@@ -193,6 +193,7 @@ public class EICFragmentActivity extends FragmentActivity
     }
   }
 
+  //Pager adapter for tablets
   private class LargePagerAdapter extends PagerAdapter
   {
     public LargePagerAdapter(FragmentManager fm)
@@ -307,6 +308,7 @@ public class EICFragmentActivity extends FragmentActivity
       return false;
     }
 
+    //Loads the tasks from storage
     @Override
     public void run()
     {
@@ -439,7 +441,7 @@ public class EICFragmentActivity extends FragmentActivity
       }
     }
     getTask().registerListener(listener);
-    OnTaskChanged();
+    onTaskChanged();
   }
 
   @Override
@@ -593,7 +595,7 @@ public class EICFragmentActivity extends FragmentActivity
     switch(item.getItemId())
     {
       case R.id.menu_import:
-        if(EICApplication.IsChrome())
+        if(EICApplication.isChrome())
         {
           Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
           intent.setType("text/eic");
@@ -608,10 +610,10 @@ public class EICFragmentActivity extends FragmentActivity
         startActivity(new Intent(EICFragmentActivity.this, AboutActivity.class));
         return true;
       case R.id.menu_addtask:
-        ((GroupFragment)pager_adapter.fragments[0]).AddTask();
+        ((GroupFragment)pager_adapter.fragments[0]).addTask();
         return true;
       case R.id.menu_addgroup:
-        ((GroupFragment)pager_adapter.fragments[0]).AddGroup();
+        ((GroupFragment)pager_adapter.fragments[0]).addGroup();
         return true;
       case R.id.menu_settings:
         SettingsDialogFragment sdialog = new SettingsDialogFragment();
@@ -632,7 +634,7 @@ public class EICFragmentActivity extends FragmentActivity
     }
     listener = null;
     EICApplication.saveTasks();
-    EveDatabase.CloseDatabase();
+    EveDatabase.closeDatabase();
     super.onDestroy();
   }
 
@@ -806,7 +808,7 @@ public class EICFragmentActivity extends FragmentActivity
     return task_path.peek().first;
   }
 
-  private void OnTaskChanged()
+  private void onTaskChanged()
   {
     if(pager == null)
     {
@@ -826,19 +828,20 @@ public class EICFragmentActivity extends FragmentActivity
     onProfitChanged();
   }
 
-  public boolean IsMainTask()
+  public boolean isMainTask()
   {
     return task_path.isEmpty();
   }
 
-  public void Descend(String name)
+  //Called when the user selects a task in a group.
+  public void descend(String name)
   {
     GroupTask group = (GroupTask) getTask();
     Task t = group.getTask(name);
     group.unregisterListener(listener);
     task_path.push(new Pair<>(name, t));
     t.registerListener(listener);
-    OnTaskChanged();
+    onTaskChanged();
   }
 
   @Override
@@ -866,6 +869,6 @@ public class EICFragmentActivity extends FragmentActivity
     }
     getTask().unregisterListener(listener);
     task_path.pop().second.registerListener(listener);
-    OnTaskChanged();
+    onTaskChanged();
   }
 }

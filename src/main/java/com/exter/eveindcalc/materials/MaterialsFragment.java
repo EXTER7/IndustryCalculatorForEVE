@@ -144,7 +144,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         for(ItemStack m : prod.Materials)
         {
           int i;
-          PlanetProduct sub = PlanetProductDA.GetProduct(m.item.getID());
+          PlanetProduct sub = PlanetProductDA.getProduct(m.item.getID());
           long amount = m.amount / sub.ProductItem.amount;
           if(m.amount % sub.ProductItem.amount > 0)
           {
@@ -196,11 +196,11 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
             t.setSolarSystem(sp.getInt("manufacturing.system", 30000142));
 
             t.setRuns((int)XUtil.DivCeil(material.amount,t.getBlueprint().getProduct().amount * group.getScale()));
-            BlueprintHistoryDA.Entry histent = BlueprintHistoryDA.GetEntry(t.getBlueprint().getID());
+            BlueprintHistoryDA.Entry histent = BlueprintHistoryDA.getEntry(t.getBlueprint().getID());
             if(histent != null)
             {
-              t.setME(histent.GetME());
-              t.setTE(histent.GetTE());
+              t.setME(histent.getME());
+              t.setTE(histent.getTE());
             }
 
             group.addTask(((Item)t.getBlueprint().getProduct().item).Name, t);
@@ -211,7 +211,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
             GroupTask group = (GroupTask)calc.getTask();
             int i;
             PlanetTask t = new PlanetTask(PlanetDA.getPlanet(11));
-            PlanetProduct p = PlanetProductDA.GetProduct(material.item.getID());
+            PlanetProduct p = PlanetProductDA.getProduct(material.item.getID());
             t.addBuilding(p);
             t.setRunTime((int)XUtil.DivCeil( material.amount,p.ProductItem.amount * 24 * group.getScale()));
             SparseIntArray raw = new SparseIntArray();
@@ -223,7 +223,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
               for(i = 0; i < raw.size(); i++)
               {
                 int j;
-                PlanetProduct rp = PlanetProductDA.GetProduct(raw.keyAt(i));
+                PlanetProduct rp = PlanetProductDA.getProduct(raw.keyAt(i));
                 long amount = raw.valueAt(i) / rp.getProduct().amount;
                 if(raw.valueAt(i) % rp.getProduct().amount > 0)
                 {
@@ -241,8 +241,8 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           case Group_Reaction:
           {
             GroupTask group = (GroupTask)calc.getTask();
-            ReactionTask t = new ReactionTask(StarbaseTowerDA.GetTower(StarbaseTowerDA.GetTowerIDs().get(0)));
-            Reaction r = ReactionDA.GetReaction(material.item.getID());
+            ReactionTask t = new ReactionTask(StarbaseTowerDA.getTower(StarbaseTowerDA.getTowerIDs().get(0)));
+            Reaction r = ReactionDA.getReaction(material.item.getID());
             t.addReaction(r);
             t.setRunTime((int)XUtil.DivCeil(material.amount,r.GetMainOutputAmount() * 24 * group.getScale()));
             group.addTask(((Item)material.item).Name, t);
@@ -252,7 +252,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           case Planet_Factory:
           {
             PlanetTask t = (PlanetTask)calc.getTask();
-            PlanetProduct p = PlanetProductDA.GetProduct(material.item.getID());
+            PlanetProduct p = PlanetProductDA.getProduct(material.item.getID());
             int times = (int)XUtil.DivCeil(material.amount, p.ProductItem.amount * t.getRunTime() * 24);
             int i;
             for(i = 0; i < times; i++)
@@ -265,7 +265,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           case Reaction_Reactor:
           {
             ReactionTask t = (ReactionTask)calc.getTask();
-            Reaction r = ReactionDA.GetReaction(material.item.getID());
+            Reaction r = ReactionDA.getReaction(material.item.getID());
             int times = (int)XUtil.DivCeil(material.amount, r.GetMainOutputAmount() * t.getRunTime() * 24);
             int i;
             for(i = 0; i < times; i++)
@@ -352,7 +352,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
 
       bt_component.setOnClickListener(null);
       bt_component.setVisibility(View.GONE);
-      if(required && !calc.IsMainTask())
+      if(required && !calc.isMainTask())
       {
         Task task = calc.getTask();
         Drawable dr = ContextCompat.getDrawable(MaterialsFragment.this.getActivity(), R.drawable.cost_blank);
@@ -362,7 +362,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           {
             type = ItemType.Group_Blueprint;
             dr = ContextCompat.getDrawable(MaterialsFragment.this.getActivity(), R.drawable.cost_manufacuring);
-          } else if(ReactionDA.IsItemReaction(mat.item.getID()))
+          } else if(ReactionDA.isItemReaction(mat.item.getID()))
           {
             type = ItemType.Group_Reaction;
             dr = ContextCompat.getDrawable(MaterialsFragment.this.getActivity(), R.drawable.cost_reaction);
@@ -377,7 +377,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         } else if(task instanceof PlanetTask)
         {
           PlanetTask t = (PlanetTask)task;
-          PlanetProduct p = PlanetProductDA.GetProduct(mat.item.getID());
+          PlanetProduct p = PlanetProductDA.getProduct(mat.item.getID());
           if(p == null)
           {
             type = ItemType.Market;
@@ -398,7 +398,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           }
         } else if(task instanceof ReactionTask)
         {
-          Reaction r = ReactionDA.GetReaction(mat.item.getID());
+          Reaction r = ReactionDA.getReaction(mat.item.getID());
           if(r == null)
           {
             type = ItemType.Market;
@@ -461,7 +461,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         Bundle args = new Bundle();
         MarketFetchDialogFragment dialog = new MarketFetchDialogFragment();
         args.putInt("type", produced?MarketFetchDialogFragment.TYPE_PRODUCED:MarketFetchDialogFragment.TYPE_REQUIRED);
-        TaskHelper.PriceToBundle(produced?EveDatabase.GetDefaultProducedPrice():EveDatabase.GetDefaultRequiredPrice(),args);
+        TaskHelper.PriceToBundle(produced?EveDatabase.GetDefaultProducedPrice():EveDatabase.getDefaultRequiredPrice(),args);
         dialog.setArguments(args);
         dialog.setOnAcceptListener(calc.new EveCalculatorMarketFetchAcceptListener());
         dialog.show(calc.getSupportFragmentManager(), "MarketFetchDialogFragment");

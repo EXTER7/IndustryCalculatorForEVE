@@ -121,17 +121,17 @@ public class InventoryDA
     return items.get(id);
   }
 
-  static public ItemCategory GetCategory(int id)
+  static public ItemCategory getCategory(int id)
   {
     return groups.get(id);
   }
 
-  static public ItemGroup GetGroup(int id)
+  static public ItemGroup getGroup(int id)
   {
     return categories.get(id);
   }
 
-  static public ItemMetaGroup GetMetaGroup(int id)
+  static public ItemMetaGroup getMetaGroup(int id)
   {
     return metagroups.get(id);
   }
@@ -243,7 +243,7 @@ public class InventoryDA
     }
   }
 
-  static public List<Integer> BlueprintGroups()
+  static public List<Integer> blueprintGroups()
   {
     if(blueprint_groups == null)
     {
@@ -264,12 +264,12 @@ public class InventoryDA
     return Collections.unmodifiableList(blueprint_groups);
   }
 
-  static public List<Integer> BlueprintCategories(int group)
+  static public List<Integer> blueprintCategories(int group)
   {
     return category_groups.get(group);
   }
   
-  static public List<Integer> MetaGroups()
+  static public List<Integer> metaGroups()
   {
     SQLiteDatabase database = EveDatabase.getDatabase();
 

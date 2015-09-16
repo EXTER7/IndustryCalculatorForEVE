@@ -16,31 +16,31 @@ public class BlueprintHistoryDA
     private int te_level;
     private boolean changed;
     
-    public int GetME()
+    public int getME()
     {
       return me_level;
     }
 
-    public void SetME(int me)
+    public void setME(int me)
     {
       me_level = me;
       changed = true;
     }
 
     
-    public int GetTE()
+    public int getTE()
     {
       return te_level;
     }
 
-    public void SetTE(int te)
+    public void setTE(int te)
     {
       te_level = te;
       changed = true;
     }
 
     
-    public void Update()
+    public void update()
     {
       if(!changed)
       {
@@ -69,7 +69,7 @@ public class BlueprintHistoryDA
   
   static private SparseArray<Entry> cache;
   
-  static public Entry GetEntry(int item)
+  static public Entry getEntry(int item)
   {
     if(cache == null)
     {

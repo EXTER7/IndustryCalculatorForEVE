@@ -160,7 +160,7 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
           planet_task.setPlanet(PlanetDA.getPlanet(data.getIntExtra("planet", -1)));
           break;
         case REQUEST_PROCESS:
-          planet_task.addBuilding(PlanetProductDA.GetProduct(data.getIntExtra("planetproduct", -1)));
+          planet_task.addBuilding(PlanetProductDA.getProduct(data.getIntExtra("planetproduct", -1)));
           break;
       }
       onTaskChanged();
@@ -178,7 +178,7 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
     tx_planet_name.setText(p.TypeName);
     TaskHelper.setImageViewItemIcon(im_planet_icon, InventoryDA.getItem(p.ID));
     ed_runtime.setValue(planet_task.getRunTime());
-    ed_tax.SetValue(planet_task.getCustomsOfficeTax());
+    ed_tax.setValue(planet_task.getCustomsOfficeTax());
 
     holders = new ArrayList<>();
 

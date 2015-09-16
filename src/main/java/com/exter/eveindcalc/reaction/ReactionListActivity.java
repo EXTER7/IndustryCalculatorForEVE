@@ -28,7 +28,7 @@ public class ReactionListActivity extends ItemListActivity
   @Override
   protected Index loadIndex()
   {
-    return ReactionDA.GetIndex();
+    return ReactionDA.getIndex();
   }
 
 }

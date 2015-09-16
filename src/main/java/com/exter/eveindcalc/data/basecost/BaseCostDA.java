@@ -42,7 +42,7 @@ public class BaseCostDA
 
   static private final Cache<Integer, BigDecimal> cache = new InfiniteCache<>(new CacheMissListener());
 
-  static public boolean IsExpired()
+  static public boolean isExpired()
   {
     synchronized(cache)
     {
@@ -60,7 +60,7 @@ public class BaseCostDA
     }
   }
 
-  static private void SetExpire(long exp)
+  static private void setExpire(long exp)
   {
     synchronized(cache)
     {
@@ -144,16 +144,16 @@ public class BaseCostDA
       retryUpdate(30 * 60);
     } finally
     {
-      SetExpire((System.currentTimeMillis() / 1000) + 24 * 60 * 60);
+      setExpire((System.currentTimeMillis() / 1000) + 24 * 60 * 60);
     }
   }
 
   static public void retryUpdate(long time)
   {
-    SetExpire((System.currentTimeMillis() / 1000) + time);
+    setExpire((System.currentTimeMillis() / 1000) + time);
   }
 
-  static public BigDecimal GetCost(IItem item)
+  static public BigDecimal getCost(IItem item)
   {
     synchronized(cache)
     {

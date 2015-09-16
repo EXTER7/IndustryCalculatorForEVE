@@ -53,7 +53,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
       if(!long_pressed)
       {
         String name = (String)tasks_adapter.getItem(position);
-        activity.Descend(name);
+        activity.descend(name);
       }
       long_pressed = false;
     }
@@ -71,7 +71,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     @Override
     public void onClick(View v)
     {
-      ShowTaskMenu(task_name);
+      showTaskMenu(task_name);
     }
   }
 
@@ -81,7 +81,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
     {
       long_pressed = true;
-      ShowTaskMenu((String)tasks_adapter.getItem(position));
+      showTaskMenu((String) tasks_adapter.getItem(position));
       return false;
     }
   }
@@ -265,7 +265,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     }
     
     
-    public void UpdateTaskList()
+    public void updateTaskList()
     {
       task_names.clear();
       GroupTask g = (GroupTask)activity.getTask();
@@ -338,7 +338,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
         bt_menu = (ImageButton)convertView.findViewById(R.id.bt_task_menu);
       }
       
-      private void SetProfit(TextView label,BigDecimal income,BigDecimal expense,boolean prefix,boolean percent,String currency)
+      private void setProfit(TextView label, BigDecimal income, BigDecimal expense, boolean prefix, boolean percent, String currency)
       {
 
         BigDecimal profit = income.subtract(expense);
@@ -385,7 +385,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
         }      
       }
     
-      public void Update(int position)
+      public void update(int position)
       {
         String name = task_names.get(position);
         Task t = activity.getTask();
@@ -417,7 +417,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
         BigDecimal income = task.getIncome().multiply(s);
         BigDecimal expense = task.getExpense().multiply(s);
 
-        SetProfit(tx_profit,income, expense, true, true, "ISK");
+        setProfit(tx_profit, income, expense, true, true, "ISK");
 
         int dur = task.getDuration() * group_task.getScale();
         if(dur > 0)
@@ -425,7 +425,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
           BigDecimal time = new BigDecimal(dur);
           BigDecimal income_hour = income.multiply(SECONDS_HOUR).divide(time,10,BigDecimal.ROUND_UP);
           BigDecimal expense_hour = expense.multiply(SECONDS_HOUR).divide(time,10,BigDecimal.ROUND_UP);
-          SetProfit(tx_profithour,income_hour, expense_hour, false, false, "ISK/Hour");
+          setProfit(tx_profithour, income_hour, expense_hour, false, false, "ISK/Hour");
           tx_duration.setText("Duration: " + XUtil.TimeToStr(dur));
         } else
         {
@@ -456,13 +456,13 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
         holder = (TaskHolder)convertView.getTag();
       }
 
-      holder.Update(position);
+      holder.update(position);
 
       return convertView;
     }
   }
 
-  private void ShowTaskMenu(String task_name)
+  private void showTaskMenu(String task_name)
   {
     GroupMenuDialogFragment dialog = new GroupMenuDialogFragment();
     Bundle args = new Bundle();
@@ -471,7 +471,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     dialog.show(getActivity().getSupportFragmentManager(), "TaskMenuDialogFragment");
   }
 
-  public void AddTask()
+  public void addTask()
   {
     AddTaskDialogFragment dialog = new AddTaskDialogFragment();
     dialog.show(getActivity().getSupportFragmentManager(), "AddTaskDialogFragment");
@@ -482,11 +482,11 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     @Override
     public void onClick(View v)
     {
-      AddTask();
+      addTask();
     }
   }
 
-  public void AddGroup()
+  public void addGroup()
   {
     GroupTask group_task = (GroupTask)activity.getTask();
     GroupTask task = new GroupTask();
@@ -500,7 +500,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     @Override
     public void onClick(View v)
     {
-      AddGroup();
+      addGroup();
     }
   }
 
@@ -509,7 +509,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     @Override
     public void onValueChanged(int new_value)
     {
-      if(activity.IsMainTask())
+      if(activity.isMainTask())
       {
         return;
       }
@@ -525,13 +525,13 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
     {
-      sort_mode = SortMode.FromInt(pos);
+      sort_mode = SortMode.fromInt(pos);
       SharedPreferences sp = getActivity().getSharedPreferences("EIC", Context.MODE_PRIVATE);
       SharedPreferences.Editor ed = sp.edit();
       ed.putInt("group.sort", pos);
       ed.apply();
 
-      tasks_adapter.UpdateTaskList();
+      tasks_adapter.updateTaskList();
     }
 
     @Override
@@ -558,7 +558,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     
     static private SparseArray<SortMode> intmap;
     
-    static public SortMode FromInt(int i)
+    static public SortMode fromInt(int i)
     {
       if(intmap == null)
       {
@@ -604,7 +604,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
 
 
     SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
-    sort_mode = SortMode.FromInt(sp.getInt("group.sort", SortMode.NAME.value));
+    sort_mode = SortMode.fromInt(sp.getInt("group.sort", SortMode.NAME.value));
 
     sp_sort = (Spinner) rootView.findViewById(R.id.sp_menu_sort);
     
@@ -623,7 +623,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     sp_sort.setSelection(sort_mode.value);
     sp_sort.setOnItemSelectedListener(new SortModeItemSelectedListener());
     LinearLayout ly_scale = (LinearLayout) rootView.findViewById(R.id.ly_group_scale);
-    if(activity.IsMainTask())
+    if(activity.isMainTask())
     {
       ly_scale.setVisibility(View.GONE);
     } else
@@ -642,12 +642,12 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
   @Override
   public void onTaskChanged()
   {
-    if(!activity.IsMainTask())
+    if(!activity.isMainTask())
     {
       GroupTask group_task = (GroupTask)activity.getTask();
       ed_scale.setValue(group_task.getScale());
     }
-    tasks_adapter.UpdateTaskList();
+    tasks_adapter.updateTaskList();
   }
 
   @Override
@@ -690,7 +690,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     if(sp_sort != null)
     {
       SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
-      sort_mode = SortMode.FromInt(sp.getInt("group.sort", SortMode.NAME.value));
+      sort_mode = SortMode.fromInt(sp.getInt("group.sort", SortMode.NAME.value));
       sp_sort.setSelection(sort_mode.value);
     }
   }

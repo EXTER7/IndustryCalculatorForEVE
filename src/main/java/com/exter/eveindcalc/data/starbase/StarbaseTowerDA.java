@@ -24,35 +24,27 @@ public class StarbaseTowerDA
     @Override
     public int compare(Integer lhs, Integer rhs)
     {
-      return GetTower(lhs).Name.compareTo(GetTower(rhs).Name);
+      return getTower(lhs).Name.compareTo(getTower(rhs).Name);
     }
   }
 
   static private SparseArray<StarbaseTower> towers = null;
   
-  static private void LoadTowers()
+  static private void loadTowers()
   {
-    TSLReader tsl = null;
-    InputStream raw = null;
     try
     {
       AssetManager assets = EICApplication.getContext().getAssets();
-      raw = assets.open("starbases.tsl");
-      tsl = new TSLReader(raw);
-    } catch(IOException e)
-    {
-      throw new RuntimeException(e);
-    }
+      InputStream raw = assets.open("starbases.tsl");
+      TSLReader tsl = new TSLReader(raw);
 
-    try
-    {
       tsl.moveNext();
 
       if(!tsl.getName().equals("starbases"))
       {
         throw new EveDataException();
       }
-      towers = new SparseArray<StarbaseTower>();
+      towers = new SparseArray<>();
       while(true)
       {
         tsl.moveNext();
@@ -68,36 +60,29 @@ public class StarbaseTowerDA
           towers.put(t.TowerItem.ID, t);
         }
       }
-    } catch(InvalidTSLException | EveDataException | IOException e)
-    {
-      throw new RuntimeException(e);
-    }
-
-    try
-    {
       raw.close();
-    } catch(IOException e)
+    } catch(InvalidTSLException | EveDataException | IOException e)
     {
       throw new RuntimeException(e);
     }
   }
       
   
-  static public StarbaseTower GetTower(int id)
+  static public StarbaseTower getTower(int id)
   {
     if(towers == null)
     {
-      LoadTowers();  
+      loadTowers();
     }
     return towers.get(id);
   }
   
   
-  static public List<Integer> GetTowerIDs()
+  static public List<Integer> getTowerIDs()
   {
     if(towers == null)
     {
-      LoadTowers();  
+      loadTowers();
     }
     List<Integer> ids = new ArrayList<>();
     int i;

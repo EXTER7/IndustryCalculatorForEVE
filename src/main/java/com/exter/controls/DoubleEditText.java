@@ -17,7 +17,7 @@ public class DoubleEditText
     void FocusReceived(int tag);
   }
   
-  private double GetValue(String text)
+  private double getValue(String text)
   {
     double value;
     try
@@ -44,7 +44,7 @@ public class DoubleEditText
     public void afterTextChanged(Editable s)
     {
       String str = s.toString();
-      listener.valueChanged(tag, GetValue(str));
+      listener.valueChanged(tag, getValue(str));
     }
 
     @Override
@@ -108,7 +108,7 @@ public class DoubleEditText
     editor.setOnFocusChangeListener(new FocusChangeListener());
   }
 
-  public void SetValue(double value)
+  public void setValue(double value)
   {
     TextWatcher w = (TextWatcher)editor.getTag();
     editor.removeTextChangedListener(w);
@@ -123,9 +123,5 @@ public class DoubleEditText
     editor.setText(String.valueOf(value));
     editor.addTextChangedListener(w);   
   }
-  
-  public void SetTag(int edtag)
-  {
-    tag = edtag;
-  }
+
 }

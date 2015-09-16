@@ -17,7 +17,7 @@ public class RefineDA
 {
   static private Index index = null;
   
-  static public Refine GetRefine(int refine)
+  static public Refine getRefine(int refine)
   {
     try
     {
@@ -48,7 +48,7 @@ public class RefineDA
     }
   }
   
-  static public Index GetIndex()
+  static public Index getIndex()
   {
     if(index == null)
     {

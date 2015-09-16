@@ -12,7 +12,7 @@ public class IntegerEditText
     void onValueChanged(int value);
   }
   
-  private int GetValue(String text)
+  private int getValue(String text)
   {
     int value;
     try
@@ -39,7 +39,7 @@ public class IntegerEditText
     public void afterTextChanged(Editable s)
     {
       String str = s.toString();
-      listener.onValueChanged(GetValue(str));
+      listener.onValueChanged(getValue(str));
     }
 
     @Override
@@ -68,7 +68,7 @@ public class IntegerEditText
         ed.setSelection(ed.getText().length());
       } else
       {
-        int i = GetValue(ed.getText().toString());
+        int i = getValue(ed.getText().toString());
         ed.setText(String.valueOf(i));
       }
       ed.addTextChangedListener(w);
@@ -111,7 +111,7 @@ public class IntegerEditText
     editor.addTextChangedListener(w);   
   }
   
-  public void SetEnabled(boolean enabled)
+  public void setEnabled(boolean enabled)
   {
     editor.setEnabled(enabled);
   }

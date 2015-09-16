@@ -52,6 +52,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     @Override
     public void onNothingSelected(AdapterView<?> parent)
     {
+
     }
   }
 

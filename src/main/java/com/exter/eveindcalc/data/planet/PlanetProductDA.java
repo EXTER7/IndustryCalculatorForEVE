@@ -57,7 +57,7 @@ public class PlanetProductDA
     }
   }
 
-  static public PlanetProduct GetProduct(int pid)
+  static public PlanetProduct getProduct(int pid)
   {
     if(cache == null)
     {

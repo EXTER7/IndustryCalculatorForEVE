@@ -52,12 +52,12 @@ public class SettingsDialogFragment extends DialogFragment
       {
         if(requirement)
         {
-          Task.Market p = EveDatabase.GetDefaultRequiredPrice();
-          EveDatabase.SetDefaultRequiredPrice(new Task.Market(sys,p.order,p.manual));
+          Task.Market p = EveDatabase.getDefaultRequiredPrice();
+          EveDatabase.setDefaultRequiredPrice(new Task.Market(sys, p.order, p.manual));
         } else
         {
           Task.Market p = EveDatabase.GetDefaultProducedPrice();
-          EveDatabase.SetDefaultProducedPrice(new Task.Market(sys,p.order,p.manual));
+          EveDatabase.setDefaultProducedPrice(new Task.Market(sys, p.order, p.manual));
         }
       }
     }
@@ -96,12 +96,12 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Task.Market p = EveDatabase.GetDefaultRequiredPrice();
-        EveDatabase.SetDefaultRequiredPrice(new Task.Market(p.system,Task.Market.Order.SELL,p.manual));
+        Task.Market p = EveDatabase.getDefaultRequiredPrice();
+        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual));
       } else
       {
         Task.Market p = EveDatabase.GetDefaultProducedPrice();
-        EveDatabase.SetDefaultProducedPrice(new Task.Market(p.system,Task.Market.Order.SELL,p.manual));
+        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual));
       }
     }
   }
@@ -114,17 +114,18 @@ public class SettingsDialogFragment extends DialogFragment
     {
       requirement = req;
     }
+
     @Override
     public void onClick(View v)
     {
       if(requirement)
       {
-        Task.Market p = EveDatabase.GetDefaultRequiredPrice();
-        EveDatabase.SetDefaultRequiredPrice(new Task.Market(p.system,Task.Market.Order.BUY,p.manual));
+        Task.Market p = EveDatabase.getDefaultRequiredPrice();
+        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual));
       } else
       {
         Task.Market p = EveDatabase.GetDefaultProducedPrice();
-        EveDatabase.SetDefaultProducedPrice(new Task.Market(p.system,Task.Market.Order.BUY,p.manual));
+        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual));
       }
     }
   }
@@ -196,7 +197,7 @@ public class SettingsDialogFragment extends DialogFragment
     sp_sellto_system.setOnItemSelectedListener(null);
     sp_buyfrom_system.setOnItemSelectedListener(null);
 
-    Task.Market req = EveDatabase.GetDefaultRequiredPrice();
+    Task.Market req = EveDatabase.getDefaultRequiredPrice();
     Task.Market prod = EveDatabase.GetDefaultProducedPrice();
     
     if(req.order == Task.Market.Order.BUY)
@@ -218,8 +219,8 @@ public class SettingsDialogFragment extends DialogFragment
 
     sp_sellto_system.setOnItemSelectedListener(new SystemSelectedListener(false));
     sp_buyfrom_system.setOnItemSelectedListener(new SystemSelectedListener(true));
-    ed_default_me.setValue(EveDatabase.GetDefaultBlueprintME(null));
-    ed_default_te.setValue(EveDatabase.GetDefaultBlueprintTE(null));
+    ed_default_me.setValue(EveDatabase.getDefaultME(null));
+    ed_default_te.setValue(EveDatabase.getDefaultTE(null));
 
   }
   
@@ -227,7 +228,7 @@ public class SettingsDialogFragment extends DialogFragment
   public void onResume()
   {
     super.onResume();
-    Task.Market req = EveDatabase.GetDefaultRequiredPrice();
+    Task.Market req = EveDatabase.getDefaultRequiredPrice();
     Task.Market prod = EveDatabase.GetDefaultProducedPrice();
 
     sp_sellto_system.setOnItemSelectedListener(null);

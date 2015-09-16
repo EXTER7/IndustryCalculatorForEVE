@@ -95,7 +95,7 @@ public class EveApiService extends IntentService
 
   static public void updateBaseCosts(Context ctx)
   {
-    if(BaseCostDA.IsExpired())
+    if(BaseCostDA.isExpired())
     {
       Intent msg = new Intent(ctx, EveApiService.class);
       msg.putExtra("basecost", true);

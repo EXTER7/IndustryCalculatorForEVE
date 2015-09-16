@@ -242,7 +242,7 @@ public class GroupMenuDialogFragment extends DialogFragment
                 groups.put(e.getKey(), (GroupTask)t);
               }
             }
-            boolean parent = !activity.IsMainTask();
+            boolean parent = !activity.isMainTask();
             int start = (parent?2:1);
             CharSequence[] choices = new CharSequence[groups.keySet().size() + start];
             
@@ -283,7 +283,7 @@ public class GroupMenuDialogFragment extends DialogFragment
           }
           break;
         case 4:
-          if(EICApplication.IsChrome())
+          if(EICApplication.isChrome())
           {
             Share(group);
           } else
@@ -310,7 +310,7 @@ public class GroupMenuDialogFragment extends DialogFragment
     name = getArguments().getString("name");
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     builder.setTitle("Task");
-    if(EICApplication.IsChrome())
+    if(EICApplication.isChrome())
     {
       builder.setItems(R.array.task_menu_chrome, new TaskMenuDialogClickListener());
     } else

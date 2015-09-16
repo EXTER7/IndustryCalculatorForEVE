@@ -57,7 +57,7 @@ public class ReactionDA
     }
   }
 
-  static public Reaction GetReaction(int pid)
+  static public Reaction getReaction(int pid)
   {
     if(cache == null)
     {
@@ -66,7 +66,7 @@ public class ReactionDA
     return cache.get(pid);
   }
 
-  static public boolean IsItemReaction(int reaction)
+  static public boolean isItemReaction(int reaction)
   {
     try
     {
@@ -80,7 +80,7 @@ public class ReactionDA
     }
   }
 
-  static public Index GetIndex()
+  static public Index getIndex()
   {
     if(index == null)
     {

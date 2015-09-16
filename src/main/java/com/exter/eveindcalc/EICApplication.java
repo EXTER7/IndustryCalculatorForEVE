@@ -28,11 +28,10 @@ public class EICApplication extends Application
   static private Context context;
   static private GroupTask tasks;
   
-  static public boolean IsChrome()
+  static public boolean isChrome()
   {
     return Build.BRAND.contains("chromium") && Build.MANUFACTURER.contains("chromium");
   }
-  
   
   @Override
   public void onCreate()
@@ -135,7 +134,7 @@ public class EICApplication extends Application
   @Override
   public void onTerminate()
   {
-    EveDatabase.CloseDatabase();
+    EveDatabase.closeDatabase();
     super.onTerminate();
   }
 

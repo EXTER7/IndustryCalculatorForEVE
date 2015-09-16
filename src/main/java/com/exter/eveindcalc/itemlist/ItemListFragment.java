@@ -113,7 +113,7 @@ public class ItemListFragment extends Fragment
       return;
     }
     items = new ArrayList<>();
-    for(Index.Entry e:index.GetEntries())
+    for(Index.Entry e:index.getEntries())
     {
       if(e.Group == group)
       {

@@ -56,7 +56,7 @@ public class MarketFetchDialogFragment extends DialogFragment
   private class PriceChangeWatcher implements BigDecimalEditText.ValueListener
   {
     @Override
-    public void ValueChanged(int tag, BigDecimal new_value)
+    public void valueChanged(int tag, BigDecimal new_value)
     {
       price = new Task.Market(price.system,price.order,new_value);
     }
@@ -192,7 +192,7 @@ public class MarketFetchDialogFragment extends DialogFragment
       }
     }
 
-    ed_manual.SetValue(price.manual);
+    ed_manual.setValue(price.manual);
 
     switch(price.order)
     {

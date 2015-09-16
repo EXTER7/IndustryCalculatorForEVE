@@ -36,13 +36,13 @@ public abstract class ItemListActivity extends FragmentActivity
     @Override
     public int getCount()
     {
-      return index.GetGroups().size();
+      return index.getGroups().size();
     }
 
     @Override
     public Object getItem(int position)
     {
-      return index.GetGroups().get(position);        
+      return index.getGroups().get(position);
     }
 
     @Override
@@ -60,7 +60,7 @@ public abstract class ItemListActivity extends FragmentActivity
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-      Index.Group group = index.GetGroups().get(position);
+      Index.Group group = index.getGroups().get(position);
       ViewHolder holder;
       if (convertView == null)
       {
@@ -74,7 +74,7 @@ public abstract class ItemListActivity extends FragmentActivity
         holder = (ViewHolder)convertView.getTag();
       }
 
-      for(Index.Entry e:index.GetEntries())
+      for(Index.Entry e:index.getEntries())
       {
         if(e.Group == group.ID)
         {
@@ -94,7 +94,7 @@ public abstract class ItemListActivity extends FragmentActivity
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
       view.setSelected(true);
-      item_list.SetGroup(index.GetGroups().get(position).ID);
+      item_list.SetGroup(index.getGroups().get(position).ID);
     }
   }
   private Index index;
@@ -124,7 +124,7 @@ public abstract class ItemListActivity extends FragmentActivity
     {
       ItemListFragment fragment = new ItemListFragment();
       Bundle args = new Bundle();
-      args.putInt("group", index.GetGroups().get(pos).ID);
+      args.putInt("group", index.getGroups().get(pos).ID);
       fragment.setArguments(args);
       fragments[pos] = fragment;
       return fragment;
@@ -141,13 +141,13 @@ public abstract class ItemListActivity extends FragmentActivity
     @Override
     public int getCount()
     {
-      return index.GetGroups().size();
+      return index.getGroups().size();
     }
 
     @Override
     public CharSequence getPageTitle(int position)
     {
-      return index.GetGroups().get(position).Name;
+      return index.getGroups().get(position).Name;
     }
     
     

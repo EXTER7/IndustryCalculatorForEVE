@@ -94,7 +94,7 @@ public class MarketData
     }
   }
 
-  static private void PutPriceInCache(int item, int system, PriceValue value)
+  static private void putPriceInCache(int item, int system, PriceValue value)
   {
     synchronized(MarketData.class)
     {
@@ -106,12 +106,12 @@ public class MarketData
     }
   }
 
-  static private void PutPriceInCache(int item, int system, long expire, BigDecimal buy, BigDecimal sell)
+  static private void putPriceInCache(int item, int system, long expire, BigDecimal buy, BigDecimal sell)
   {
-    PutPriceInCache(item, system, new PriceValue(expire, buy, sell));
+    putPriceInCache(item, system, new PriceValue(expire, buy, sell));
   }
 
-  static public PriceValue GetLocalPrice(int item, int system)
+  static public PriceValue getLocalPrice(int item, int system)
   {
     SQLiteDatabase db = EveDatabase.getDatabase();
     if(db.isOpen())
@@ -119,7 +119,7 @@ public class MarketData
       PriceValue value = GetPriceFromCache(item, system);
       if(value == null)
       {
-        value = GetLocalPriceFromDatabase(db, item, system);
+        value = getLocalPriceFromDatabase(db, item, system);
       }
     
       return value;
@@ -129,7 +129,7 @@ public class MarketData
 
   static final private String[] QUERY_COLUMNS = { "buy", "sell", "time" };
 
-  static private PriceValue GetLocalPriceFromDatabase(SQLiteDatabase db, int item, int system)
+  static private PriceValue getLocalPriceFromDatabase(SQLiteDatabase db, int item, int system)
   {
     PriceValue value = null;
     final String[] query_args = { String.valueOf(item), String.valueOf(system) };
@@ -140,14 +140,14 @@ public class MarketData
       {
         c.moveToNext();
         value = new PriceValue(c.getLong(2), new BigDecimal(c.getString(0)), new BigDecimal(c.getString(1)));
-        PutPriceInCache(item, system, value);
+        putPriceInCache(item, system, value);
       }
       c.close();
     }
     return value;
   }
 
-  static public boolean HasLocalPrice(int item, int system)
+  static public boolean hasLocalPrice(int item, int system)
   {
     SQLiteDatabase db = EveDatabase.getDatabase();
     if(db.isOpen())
@@ -155,7 +155,7 @@ public class MarketData
       PriceValue value = GetPriceFromCache(item, system);
       if(value == null)
       {
-        value = GetLocalPriceFromDatabase(db, item, system);
+        value = getLocalPriceFromDatabase(db, item, system);
       }
       return value != null && !value.isExpired();
     } else
@@ -164,7 +164,7 @@ public class MarketData
     }
   }
 
-  static public void SetLocalPriceFromCache(int item, int system, BigDecimal buy, BigDecimal sell)
+  static public void setLocalPriceFromCache(int item, int system, BigDecimal buy, BigDecimal sell)
   {
     SQLiteDatabase db = EveDatabase.getDatabase();
 
@@ -191,11 +191,11 @@ public class MarketData
       {
         db.execSQL("update market_cache set" + " item = " + String.valueOf(item) + "," + " time = " + String.valueOf(expire) + "," + " system = " + String.valueOf(system) + "," + " buy = " + buy.toPlainString() + "," + " sell = " + sell.toPlainString() + " where id = " + String.valueOf(id) + ";");
       }
-      PutPriceInCache(item, system, expire, buy, sell);
+      putPriceInCache(item, system, expire, buy, sell);
     }
   }
 
-  static public BigDecimal GetMarketPrice(IItem item, Market market)
+  static public BigDecimal getMarketPrice(IItem item, Market market)
   {
     PriceValue pv;
     switch(market.order)
@@ -205,7 +205,7 @@ public class MarketData
         {
           return BigDecimal.ZERO;
         }
-        pv = GetLocalPrice(item.getID(), market.system);
+        pv = getLocalPrice(item.getID(), market.system);
         if(pv == null)
         {
           synchronized(request_prices)
@@ -227,7 +227,7 @@ public class MarketData
         {
           return BigDecimal.ZERO;
         }
-        pv = GetLocalPrice(item.getID(), market.system);
+        pv = getLocalPrice(item.getID(), market.system);
         if(pv == null)
         {
           synchronized(request_prices)

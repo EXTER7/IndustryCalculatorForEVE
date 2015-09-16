@@ -57,7 +57,7 @@ public class EveDatabase implements IEVEDataProvider
     return database;
   }
   
-  static public void CloseDatabase()
+  static public void closeDatabase()
   {
     if(database == null)
     {
@@ -134,10 +134,10 @@ public class EveDatabase implements IEVEDataProvider
   @Override
   public Market getDefaultRequiredMarket()
   {
-    return GetDefaultRequiredPrice();
+    return getDefaultRequiredPrice();
   }
 
-  static public Market GetDefaultRequiredPrice()
+  static public Market getDefaultRequiredPrice()
   {
     if(def_required == null)
     {
@@ -150,7 +150,7 @@ public class EveDatabase implements IEVEDataProvider
     return def_required;
   }
 
-  static public void SetDefaultProducedPrice(Task.Market p)
+  static public void setDefaultProducedPrice(Task.Market p)
   {
     def_produced = p;
     SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
@@ -160,7 +160,7 @@ public class EveDatabase implements IEVEDataProvider
     ed.apply();
   }
 
-  static public void SetDefaultRequiredPrice(Task.Market p)
+  static public void setDefaultRequiredPrice(Task.Market p)
   {
     def_required = p;
     SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
@@ -170,7 +170,7 @@ public class EveDatabase implements IEVEDataProvider
     ed.apply();
   }
 
-  static public int GetDefaultBlueprintME(IBlueprint bp)
+  static public int getDefaultME(IBlueprint bp)
   {
     if(bp != null && ((Item)bp.getProduct().item).MetaGroup != 1)
     {
@@ -187,11 +187,11 @@ public class EveDatabase implements IEVEDataProvider
   @Override
   public int getDefaultBlueprintME(IBlueprint bp)
   {
-    return GetDefaultBlueprintME(bp);
+    return getDefaultME(bp);
   }
 
 
-  static public int GetDefaultBlueprintTE(IBlueprint bp)
+  static public int getDefaultTE(IBlueprint bp)
   {
     if(bp != null && ((Item)bp.getProduct().item).MetaGroup != 1)
     {
@@ -208,7 +208,7 @@ public class EveDatabase implements IEVEDataProvider
   @Override
   public int getDefaultBlueprintTE(IBlueprint bp)
   {
-    return GetDefaultBlueprintTE(bp);
+    return getDefaultTE(bp);
   }
   
   static public void SetDefaultBlueprintME(int me)
@@ -276,7 +276,7 @@ public class EveDatabase implements IEVEDataProvider
   @Override
   public IDecryptor getDecryptor(int id)
   {
-    return DecryptorDA.GetDecryptor(id);
+    return DecryptorDA.getDecryptor(id);
   }
 
   @Override
@@ -288,37 +288,37 @@ public class EveDatabase implements IEVEDataProvider
   @Override
   public IPlanetBuilding getPlanetBuilding(int id)
   {
-    return PlanetProductDA.GetProduct(id);
+    return PlanetProductDA.getProduct(id);
   }
 
   @Override
   public IPlanetBuilding getPlanetBuilding(IItem product)
   {
-    return PlanetProductDA.GetProduct(product.getID());
+    return PlanetProductDA.getProduct(product.getID());
   }
 
   @Override
   public IReaction getReaction(int pid)
   {
-    return ReactionDA.GetReaction(pid);
+    return ReactionDA.getReaction(pid);
   }
 
   @Override
   public IRefinable getRefinable(int id)
   {
-    return RefineDA.GetRefine(id);
+    return RefineDA.getRefine(id);
   }
 
   @Override
   public IStarbaseTower getStarbaseTower(int id)
   {
-    return StarbaseTowerDA.GetTower(id);
+    return StarbaseTowerDA.getTower(id);
   }
 
   @Override
   public BigDecimal getItemBaseCost(IItem item)
   {
-    return BaseCostDA.GetCost(item);
+    return BaseCostDA.getCost(item);
   }
 
   @Override
@@ -330,7 +330,7 @@ public class EveDatabase implements IEVEDataProvider
   @Override
   public BigDecimal getMarketPrice(IItem item, Market market)
   {
-    return MarketData.GetMarketPrice(item, market);
+    return MarketData.getMarketPrice(item, market);
   }
 
 }

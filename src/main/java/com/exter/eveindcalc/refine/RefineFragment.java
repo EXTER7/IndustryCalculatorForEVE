@@ -284,7 +284,7 @@ public class RefineFragment extends Fragment implements IEveCalculatorFragment
     tx_amount.setText(((Item)refine_task.getRefinable().getRequiredItem().item).Name + " amount (units):");
 
     ed_amount.setValue((int) refine_task.getOreAmount());
-    ed_reftax.SetValue(refine_task.getRefineryTax());      
+    ed_reftax.setValue(refine_task.getRefineryTax());
 
     sp_station.setSelection(se_index);
     

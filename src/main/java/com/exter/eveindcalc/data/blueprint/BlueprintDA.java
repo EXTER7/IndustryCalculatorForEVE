@@ -94,7 +94,7 @@ public class BlueprintDA
       }
 
       Index index = new Index(tsl);
-      List<Integer> bp = index.GetItems();
+      List<Integer> bp = index.getItems();
       Object[] arg = new Object[1];
       for(int bpid : bp)
       {

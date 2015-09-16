@@ -113,8 +113,8 @@ public class BlueprintListActivity extends FragmentActivity
     public View getView(int position, View convertView, ViewGroup parent)
     {
       Blueprint bp = BlueprintDA.getBlueprint(bplist_filtered.get(position));
-      ItemGroup cat = InventoryDA.GetGroup(bp.Product.item.getGroupID());
-      ItemCategory group = InventoryDA.GetCategory(cat.Category);
+      ItemGroup cat = InventoryDA.getGroup(bp.Product.item.getGroupID());
+      ItemCategory group = InventoryDA.getCategory(cat.Category);
       ItemHolder holder;
       if(convertView == null)
       {
@@ -167,7 +167,7 @@ public class BlueprintListActivity extends FragmentActivity
     @Override
     public Object getChild(int groupPosition, int childPosition)
     {
-      return InventoryDA.BlueprintCategories(groups.get(groupPosition - 1)).get(childPosition);
+      return InventoryDA.blueprintCategories(groups.get(groupPosition - 1)).get(childPosition);
     }
 
     @Override
@@ -191,7 +191,7 @@ public class BlueprintListActivity extends FragmentActivity
       {
         holder = (ItemHolder) convertView.getTag();
       }
-      ItemGroup cat = InventoryDA.GetGroup((Integer)getChild(groupPosition, childPosition));
+      ItemGroup cat = InventoryDA.getGroup((Integer) getChild(groupPosition, childPosition));
       TaskHelper.setImageViewItemIcon(holder.im_icon, cat.Icon, 0.75f);
       holder.tx_name.setText(cat.Name);
       return convertView;
@@ -200,7 +200,7 @@ public class BlueprintListActivity extends FragmentActivity
     @Override
     public int getChildrenCount(int groupPosition)
     {
-      return groupPosition == 0?0:InventoryDA.BlueprintCategories(groups.get(groupPosition - 1)).size();
+      return groupPosition == 0?0:InventoryDA.blueprintCategories(groups.get(groupPosition - 1)).size();
     }
 
     @Override
@@ -242,7 +242,7 @@ public class BlueprintListActivity extends FragmentActivity
         holder.tx_name.setText("All");
       } else
       {
-        ItemCategory group = InventoryDA.GetCategory(groups.get(groupPosition - 1)); 
+        ItemCategory group = InventoryDA.getCategory(groups.get(groupPosition - 1));
         TaskHelper.setImageViewItemIcon(holder.im_icon, group.Icon);
         holder.tx_name.setText(group.Name);
       }
@@ -299,7 +299,7 @@ public class BlueprintListActivity extends FragmentActivity
       } else
       {
         filter_group = groups.get(groupPosition - 1);
-        filter_category = InventoryDA.BlueprintCategories(filter_group).get(childPosition);
+        filter_category = InventoryDA.blueprintCategories(filter_group).get(childPosition);
       }
       updateFilter();
       return false;
@@ -407,10 +407,10 @@ public class BlueprintListActivity extends FragmentActivity
         String text;
         if(g >= 0)
         {
-          text = InventoryDA.GetCategory(g).Name;
+          text = InventoryDA.getCategory(g).Name;
           if(c >= 0)
           {
-            text += " / " + InventoryDA.GetGroup(c).Name;
+            text += " / " + InventoryDA.getGroup(c).Name;
           }
           bt_category_clear.setEnabled(true);
         } else
@@ -461,10 +461,10 @@ public class BlueprintListActivity extends FragmentActivity
       } else
       {
         filter_group = groups.get(pos - 1);
-        categories = new ArrayList<Integer>(InventoryDA.BlueprintCategories(filter_group));
+        categories = new ArrayList<Integer>(InventoryDA.blueprintCategories(filter_group));
         for(int cat : categories)
         {
-          category_list.add(InventoryDA.GetGroup(cat).Name);
+          category_list.add(InventoryDA.getGroup(cat).Name);
         }
       }
       filter_category = -1;
@@ -541,9 +541,9 @@ public class BlueprintListActivity extends FragmentActivity
     super.onCreate(savedInstanceState);
 
     blueprints = new BlueprintDA();
-    groups = InventoryDA.BlueprintGroups();
+    groups = InventoryDA.blueprintGroups();
     categories = new ArrayList<Integer>();
-    metagroups = InventoryDA.MetaGroups();
+    metagroups = InventoryDA.metaGroups();
     filter_name = null;
     filter_group = -1;
     filter_category = -1;
@@ -568,7 +568,7 @@ public class BlueprintListActivity extends FragmentActivity
       group_list.add("All");
       for(int g : groups)
       {
-        group_list.add(InventoryDA.GetCategory(g).Name);
+        group_list.add(InventoryDA.getCategory(g).Name);
       }
 
       ArrayList<CharSequence> category_list = new ArrayList<CharSequence>();
@@ -603,7 +603,7 @@ public class BlueprintListActivity extends FragmentActivity
     metagroup_list.add("All");
     for(int m : metagroups)
     {
-      metagroup_list.add(InventoryDA.GetMetaGroup(m).Name);
+      metagroup_list.add(InventoryDA.getMetaGroup(m).Name);
     }
     ArrayAdapter<CharSequence> metagroup_adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, metagroup_list);
     metagroup_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

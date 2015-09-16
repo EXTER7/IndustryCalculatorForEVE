@@ -64,7 +64,7 @@ public class AddTaskDialogFragment extends DialogFragment
     public void onClick(View v)
     {
       GroupTask group_task = (GroupTask)activity.getTask();
-      ReactionTask task = new ReactionTask(StarbaseTowerDA.GetTower(16213));
+      ReactionTask task = new ReactionTask(StarbaseTowerDA.getTower(16213));
       group_task.addTask("New Reaction Starbase",task);
       activity.notifyTaskChanged();
       activity.onProfitChanged();
@@ -102,11 +102,11 @@ public class AddTaskDialogFragment extends DialogFragment
           SharedPreferences sp = getActivity().getSharedPreferences("EIC", Context.MODE_PRIVATE);
           task.setHardwiring(ManufacturingTask.Hardwiring.fromInt(sp.getInt("manufacturing.hardwiring", ManufacturingTask.Hardwiring.None.value)));
           task.setSolarSystem(sp.getInt("manufacturing.system", 30000142));
-          BlueprintHistoryDA.Entry histent = BlueprintHistoryDA.GetEntry(task.getBlueprint().getID());
+          BlueprintHistoryDA.Entry histent = BlueprintHistoryDA.getEntry(task.getBlueprint().getID());
           if(histent != null)
           {
-            task.setME(histent.GetME());
-            task.setTE(histent.GetTE());
+            task.setME(histent.getME());
+            task.setTE(histent.getTE());
           }
 
           group.addTask(((Item)task.getBlueprint().getProduct().item).Name, task);
@@ -120,7 +120,7 @@ public class AddTaskDialogFragment extends DialogFragment
         {
           GroupTask group = (GroupTask)activity.getTask();
           RefiningTask task = new RefiningTask(
-              RefineDA.GetRefine(data.getIntExtra("refine", -1)));
+              RefineDA.getRefine(data.getIntExtra("refine", -1)));
           group.addTask(((Item)task.getRefinable().getRequiredItem().item).Name, task);
           activity.notifyTaskChanged();
           activity.onProfitChanged();

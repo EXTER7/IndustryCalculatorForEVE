@@ -78,7 +78,6 @@ public class InstallationDA
 
   static private class InventionInstallationMissListener implements Cache.IMissListener<Integer,InventionInstallation>
   {
-
     static private final String[] COLUMNS = {"id","name","time","cost", "relics"};
     @Override
     public InventionInstallation onCacheMiss(Integer key)
@@ -214,7 +213,7 @@ public class InstallationDA
   }
 
 
-  static public List<Integer> GetRelicInventionInstallationIDs()
+  static public List<Integer> getRelicInventionInstallationIDs()
   {
     if(relic_invention_installation_list == null)
     {

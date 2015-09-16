@@ -31,7 +31,7 @@ public class DecryptorDA
     }
   }
   
-  static private void LoadDecryptors()
+  static private void loadDecryptors()
   {
     try
     {
@@ -72,21 +72,21 @@ public class DecryptorDA
   }
       
   
-  static public Decryptor GetDecryptor(int id)
+  static public Decryptor getDecryptor(int id)
   {
     if(decryptors == null)
     {
-      LoadDecryptors();  
+      loadDecryptors();
     }
     return decryptors.get(id);
   }
   
   
-  static public List<Decryptor> GetDecryptors()
+  static public List<Decryptor> getDecryptors()
   {
     if(decryptor_list == null)
     {
-      LoadDecryptors();  
+      loadDecryptors();
     }
     return Collections.unmodifiableList(decryptor_list);
   }

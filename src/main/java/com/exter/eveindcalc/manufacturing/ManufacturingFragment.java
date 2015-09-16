@@ -162,7 +162,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
       {
         return;
       }
-      man_task.getInvention().setDecryptor(pos == 0 ? null : DecryptorDA.GetDecryptors().get(pos - 1));
+      man_task.getInvention().setDecryptor(pos == 0 ? null : DecryptorDA.getDecryptors().get(pos - 1));
 
       ed_runs.setValue(man_task.getRuns());
       ed_copies.setValue(man_task.getCopies());
@@ -216,7 +216,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
         return;
       }
       man_task.setME(new_value);
-      histent.SetME(new_value);
+      histent.setME(new_value);
     }
   }
 
@@ -230,7 +230,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
         return;
       }
       man_task.setTE(new_value);
-      histent.SetTE(new_value);
+      histent.setTE(new_value);
       updateTime();
     }
   }
@@ -440,11 +440,11 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
     activity = (EICFragmentActivity) getActivity();
 
     man_task = (ManufacturingTask) activity.getTask();
-    histent = BlueprintHistoryDA.GetEntry(man_task.getBlueprint().getID());
+    histent = BlueprintHistoryDA.getEntry(man_task.getBlueprint().getID());
     if(histent == null)
     {
       histent = new BlueprintHistoryDA.Entry(man_task.getBlueprint().getID(), man_task.getME(), man_task.getTE());
-      histent.Update();
+      histent.update();
     }
 
     View root_view = inflater.inflate(R.layout.manufacturing_main, container, false);
@@ -495,14 +495,14 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
   @Override
   public void onPause()
   {
-    histent.Update();
+    histent.update();
     super.onPause();
   }
 
   @Override
   public void onDestroy()
   {
-    histent.Update();
+    histent.update();
     super.onDestroy();
   }
 
@@ -556,7 +556,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
     sp_installation.setAdapter(spinnerArrayAdapter);
     sp_installation.setSelection(installation_groups.indexOf(man_task.getInstallation()));
 
-    ed_tax.SetValue(man_task.getInstallationTax());
+    ed_tax.setValue(man_task.getInstallationTax());
 
     sp_hardwiring.setSelection(man_task.getHardwiring().value);
 
@@ -594,7 +594,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
         ed_invention_attempts.setValue(tinv.getAttempts());
         ed_invention_runs.setValue(tinv.getInventionRuns());
 
-        List<Decryptor> decryptors = DecryptorDA.GetDecryptors();
+        List<Decryptor> decryptors = DecryptorDA.getDecryptors();
         List<String> decr_names = new ArrayList<>();
         decr_names.add(" [None]");
         for(Decryptor d : decryptors)
@@ -617,7 +617,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
 
         if(bpinv.usesRelics())
         {
-          invention_installations = InstallationDA.GetRelicInventionInstallationIDs();
+          invention_installations = InstallationDA.getRelicInventionInstallationIDs();
         } else
         {
           invention_installations = InstallationDA.getInventionInstallationIDs();
@@ -653,9 +653,9 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
           relic_ids = null;
         }
 
-        ed_meresearch.SetEnabled(false);
-        ed_teresearch.SetEnabled(false);
-        ed_runs.SetEnabled(false);
+        ed_meresearch.setEnabled(false);
+        ed_teresearch.setEnabled(false);
+        ed_runs.setEnabled(false);
 
         ch_invention_enable.setOnCheckedChangeListener(null);
         ch_invention_enable.setChecked(true);
@@ -667,17 +667,17 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
         ch_invention_enable.setOnCheckedChangeListener(new InventionEnableListener());
         ly_invention_enable.setVisibility(View.GONE);
         ly_invention_installation.setVisibility(View.GONE);
-        ed_meresearch.SetEnabled(true);
-        ed_teresearch.SetEnabled(true);
-        ed_runs.SetEnabled(true);
+        ed_meresearch.setEnabled(true);
+        ed_teresearch.setEnabled(true);
+        ed_runs.setEnabled(true);
       }
     } else
     {
       ly_invention.setVisibility(View.GONE);
       ly_invention_installation.setVisibility(View.GONE);
-      ed_meresearch.SetEnabled(true);
-      ed_teresearch.SetEnabled(true);
-      ed_runs.SetEnabled(true);
+      ed_meresearch.setEnabled(true);
+      ed_teresearch.setEnabled(true);
+      ed_runs.setEnabled(true);
     }
     ed_meresearch.setValue(man_task.getME());
     ed_teresearch.setValue(man_task.getTE());

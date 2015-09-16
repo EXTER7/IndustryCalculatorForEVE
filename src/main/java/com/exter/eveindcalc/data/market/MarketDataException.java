@@ -13,7 +13,7 @@ public class MarketDataException extends Exception
     critical = crit;
   }
   
-  public boolean Critical()
+  public boolean isCritical()
   {
     return critical;
   }

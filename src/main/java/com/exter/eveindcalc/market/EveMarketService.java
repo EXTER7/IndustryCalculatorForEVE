@@ -155,7 +155,7 @@ public class EveMarketService extends IntentService
       boolean rest = false;
       for (int item : items)
       {
-        if (InventoryDA.getItem(item).Market && !MarketData.HasLocalPrice(item, system))
+        if (InventoryDA.getItem(item).Market && !MarketData.hasLocalPrice(item, system))
         {
           if (rest)
           {
@@ -191,17 +191,17 @@ public class EveMarketService extends IntentService
       FetchResult fr = fetched.get(i);
       if(fr == null)
       {
-        PriceValue pv = MarketData.GetLocalPrice(i, system);
+        PriceValue pv = MarketData.getLocalPrice(i, system);
         if(pv == null)
         {
-          MarketData.SetLocalPriceFromCache(i, system, BigDecimal.ZERO, BigDecimal.ZERO);
+          MarketData.setLocalPriceFromCache(i, system, BigDecimal.ZERO, BigDecimal.ZERO);
         } else
         {
-          MarketData.SetLocalPriceFromCache(i, system, pv.BuyPrice, pv.SellPrice);
+          MarketData.setLocalPriceFromCache(i, system, pv.BuyPrice, pv.SellPrice);
         }
       } else
       {
-        MarketData.SetLocalPriceFromCache(i, system, fr.buy, fr.sell);
+        MarketData.setLocalPriceFromCache(i, system, fr.buy, fr.sell);
       }
     }
   }
@@ -294,7 +294,7 @@ public class EveMarketService extends IntentService
           } catch(MarketDataException e)
           {
             e.printStackTrace();
-            if(e.Critical())
+            if(e.isCritical())
             {
               broadcastProgress(max, max);
               return;
@@ -311,7 +311,7 @@ public class EveMarketService extends IntentService
         } catch(MarketDataException e)
         {
           e.printStackTrace();
-          if(e.Critical())
+          if(e.isCritical())
           {
             broadcastProgress(max, max);
             retry = System.currentTimeMillis() + 1000 * 60 * 5;

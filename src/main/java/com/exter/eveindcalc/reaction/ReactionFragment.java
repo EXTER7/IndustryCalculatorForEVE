@@ -78,7 +78,7 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
         return;
       }
 
-      StarbaseTower tower = StarbaseTowerDA.GetTower(tower_ids.get(pos));
+      StarbaseTower tower = StarbaseTowerDA.getTower(tower_ids.get(pos));
       reaction_task.setStarbaseTower(tower);
       SharedPreferences sp = activity.getSharedPreferences("EIC", Context.MODE_PRIVATE);
       SharedPreferences.Editor ed = sp.edit();
@@ -140,13 +140,13 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     reaction_task = (ReactionTask) activity.getTask();
     ly_inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    tower_ids = StarbaseTowerDA.GetTowerIDs();
+    tower_ids = StarbaseTowerDA.getTowerIDs();
 
     View root_view = inflater.inflate(R.layout.reaction, container, false);
     List<String> tower_names = new ArrayList<>();
     for(Integer id : tower_ids)
     {
-      tower_names.add(StarbaseTowerDA.GetTower(id).Name);
+      tower_names.add(StarbaseTowerDA.getTower(id).Name);
     }
     sp_tower = (Spinner) root_view.findViewById(R.id.sp_reaction_tower);
     ed_runtime = new IntegerEditText((EditText) root_view.findViewById(R.id.ed_reaction_runtime), 1, 99999, 0, new RunTimeChangeWatcher());
@@ -175,7 +175,7 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     if(resultCode == Activity.RESULT_OK)
     {
       activity.getTask().registerListener(activity.GetListener());
-      reaction_task.addReaction(ReactionDA.GetReaction(data.getIntExtra("reaction", -1)));
+      reaction_task.addReaction(ReactionDA.getReaction(data.getIntExtra("reaction", -1)));
       onTaskChanged();
     }
   }

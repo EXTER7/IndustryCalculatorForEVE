@@ -29,6 +29,6 @@ public class RefineListActivity extends ItemListActivity
   @Override
   protected Index loadIndex()
   {
-    return RefineDA.GetIndex();
+    return RefineDA.getIndex();
   }
 }
