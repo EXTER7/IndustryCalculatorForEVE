@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/menu_import"
+        android:icon="@drawable/task_import"
+        android:title="Import Task"
+        android:titleCondensed="Import"/>
+    <item
+        android:id="@+id/menu_addtask"
+        android:icon="@drawable/add_task"
+        android:title="Add Task"
+        android:titleCondensed="Add Task"/>
+    <item
+        android:id="@+id/menu_addgroup"
+        android:icon="@drawable/group"
+        android:title="Add Group"
+        android:titleCondensed="Add Group"/>
+    <item
+        android:id="@+id/menu_settings"
+        android:icon="@drawable/icon"
+        android:title="Settings"
+        android:titleCondensed="Settings"/>
+    <item
+        android:id="@+id/menu_about"
+        android:icon="@drawable/icon"
+        android:title="About"
+        android:titleCondensed="About"/>
+</menu>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="group_sort">
+    <item>Name</item>
+    <item>Profit</item>
+    <item>Duration</item>
+    <item>Profit/Hour</item>
+    <item>Profit %</item>
+    </string-array>
+</resources>

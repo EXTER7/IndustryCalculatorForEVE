@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.exter.eveindcalc"
+    android:installLocation="auto"
+    android:versionCode="102"
+    android:versionName="3.2.5.1" >
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="20" />
+
+    <application
+        android:name="EICApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name">
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".manufacturing.BlueprintListActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="EICFragmentActivity"
+            android:configChanges="orientation|screenSize" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.PICK" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="*"
+                    android:mimeType="text/*"
+                    android:pathPattern=".*\\.eic" />
+                <data
+                    android:host="*"
+                    android:mimeType="application/octet-stream"
+                    android:pathPattern=".*\\.eic" />
+                </intent-filter>
+        </activity>
+        <activity android:name="com.exter.eveindcalc.refine.RefineListActivity" >
+        </activity>
+        <activity android:name=".reaction.ReactionListActivity" >
+        </activity>
+        <activity android:name=".reaction.MoonMinerListActivity" >
+        </activity>
+        <activity android:name=".planet.PlanetListActivity" >
+        </activity>
+        <activity android:name=".planet.PlanetProductListActivity" >
+        </activity>
+        <activity android:name=".planet.PlanetResourceListActivity" >
+        </activity>
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+        <activity android:name="AboutActivity">
+        </activity>
+        <service
+            android:name=".market.EveMarketService"
+            android:exported="false"
+            android:stopWithTask="true" >
+        </service>
+        <service
+            android:name=".market.EveApiService"
+            android:exported="false"
+            android:stopWithTask="true" >
+        </service>
+    </application>
+
+</manifest>

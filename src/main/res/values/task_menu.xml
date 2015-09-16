@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="task_menu">
+    <item>Remove</item>
+    <item>Rename</item>
+    <item>Move To</item>
+    <item>Duplicate</item>
+    <item>Export</item>
+    <item>Share</item>
+    </string-array>
+</resources>

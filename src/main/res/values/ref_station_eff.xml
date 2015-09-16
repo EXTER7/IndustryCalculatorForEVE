@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="ref_station_eff">
+    <item>Station (50%)</item>
+    <item>Station (45%)</item>
+    <item>Station (40%)</item>
+    <item>Station (35%)</item>
+    <item>Reprosessing Array</item>
+    <item>Intensive Reprosessing Array</item>
+    </string-array>
+</resources>

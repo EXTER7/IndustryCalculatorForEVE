@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="skill_levels">
+    <item>Not trained</item>
+    <item>Level I</item>
+    <item>Level II</item>
+    <item>Level III</item>
+    <item>Level IV</item>
+    <item>Level V</item>
+  </string-array>
+</resources>

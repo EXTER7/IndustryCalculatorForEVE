@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+              android:background="#000000">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.75"
+            android:gravity="center_vertical"
+            android:paddingRight="2dp"
+            android:text="Filter:" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/tx_itemfilter_search"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25"
+            android:inputType="textNoSuggestions"
+            android:text="" >
+
+        </EditText>
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:background="#666666" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.75"
+            android:gravity="center_vertical"
+            android:paddingRight="2dp"
+            android:text="Category:" >
+        </TextView>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25"
+            android:orientation="horizontal" >
+
+            <Spinner
+                android:id="@+id/sp_itemfilter_group"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingBottom="1dp"
+                android:paddingTop="1dp"
+                tools:listitem="@android:layout/simple_spinner_dropdown_item" >
+
+            </Spinner>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="/"
+                android:textSize="25dp" >
+            </TextView>
+
+            <Spinner
+                android:id="@+id/sp_itemfilter_category"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingBottom="1dp"
+                android:paddingTop="1dp" >
+            </Spinner>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:background="#444444" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.75"
+            android:gravity="center_vertical"
+            android:paddingRight="2dp"
+            android:text="Meta Group:" >
+        </TextView>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25"
+            android:orientation="horizontal" >
+
+            <Spinner
+                android:id="@+id/sp_itemfilter_metagroup"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingBottom="1dp"
+                android:paddingTop="1dp" >
+            </Spinner>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:background="#666666" />
+
+    <ListView
+        android:id="@+id/ls_itemfilter_items"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:choiceMode="singleChoice"
+        android:divider="#7F7F7F9F"
+        android:dividerHeight="1px"
+        android:focusable="false"
+        android:padding="3dp"
+        tools:listitem="@layout/blueprint" />
+
+</LinearLayout>

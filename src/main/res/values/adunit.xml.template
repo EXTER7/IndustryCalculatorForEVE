@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- To enable ads, set the value of "adunit" to your ad unit AD and rename
+     this file to 'adunit.xml'  -->
+<resources>
+    <string name="adunit">ca-app-pub-xxxxxxxxxxxxx</string>
+</resources>

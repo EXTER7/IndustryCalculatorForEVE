@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal"
+    android:weightSum="1"
+              android:background="#000000">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="0.7"
+        android:orientation="vertical" >
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="#888888" />
+
+        <ListView
+            android:id="@+id/ls_itemlist_categories"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:choiceMode="singleChoice"
+            android:divider="#7F7F7F9F"
+            android:dividerHeight="1px"
+            android:padding="3dp" />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="#888888" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="4dp"
+        android:layout_height="fill_parent"
+        android:background="#999999" />
+
+    <fragment
+        android:id="@+id/fragment_itemlist"
+        android:name="com.exter.eveindcalc.itemlist.ItemListFragment"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.3"
+        tools:layout="@layout/itemlist_main" />
+
+</LinearLayout>

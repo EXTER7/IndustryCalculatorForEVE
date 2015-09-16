@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="hw_refining">
+    <item>None/Other</item>
+    <item>Refining RX-801</item>
+    <item>Refining RX-802</item>
+    <item>Refining RX-804</item>
+  </string-array>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="hw_manufacturing">
+    <item>None/Other</item>
+    <item>Industry BX-801</item>
+    <item>Industry BX-802</item>
+    <item>Industry BX-804</item>
+  </string-array>
+</resources>
