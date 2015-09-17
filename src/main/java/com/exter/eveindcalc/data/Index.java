@@ -48,10 +48,10 @@ public class Index
   
   public Index(TSLReader reader) throws EveDataException
   {
-    groups = new SparseArray<Group>();
-    groups_list = new ArrayList<Group>();
-    entries = new ArrayList<Entry>();
-    items = new ArrayList<Integer>();
+    groups = new SparseArray<>();
+    groups_list = new ArrayList<>();
+    entries = new ArrayList<>();
+    items = new ArrayList<>();
 
     TSLObject node = new TSLObject();
 
@@ -73,39 +73,42 @@ public class Index
         } else if(type == TSLReader.State.OBJECT)
         {
           String node_name = reader.getName();
-          if(node_name.equals("item"))
+          switch (node_name)
           {
-            node.loadFromReader(reader);
-            int id = node.getStringAsInt("id", -1);
-            int group = node.getStringAsInt("group", -1);
-            if(id < 0 || group < 0)
+            case "item":
             {
-              throw new EveDataException();
+              node.loadFromReader(reader);
+              int id = node.getStringAsInt("id", -1);
+              int group = node.getStringAsInt("group", -1);
+              if (id < 0 || group < 0)
+              {
+                throw new EveDataException();
+              }
+              entries.add(new Entry(id, group));
+              items.add(id);
+              break;
             }
-            entries.add(new Entry(id, group));
-            items.add(id);
-          } else if(node_name.equals("group"))
-          {
-            node.loadFromReader(reader);
-            int id = node.getStringAsInt("id",-1);
-            String name = node.getString("name",null);
-            if(id < -1 || name == null)
+            case "group":
             {
-              throw new EveDataException();
+              node.loadFromReader(reader);
+              int id = node.getStringAsInt("id", -1);
+              String name = node.getString("name", null);
+              if (id < -1 || name == null)
+              {
+                throw new EveDataException();
+              }
+              Group g = new Group(id, name);
+              groups.put(g.ID, g);
+              groups_list.add(g);
+              break;
             }
-            Group g = new Group(id, name);
-            groups.put(g.ID, g);
-            groups_list.add(g);
-          } else
-          {
-            reader.skipObject();
+            default:
+              reader.skipObject();
+              break;
           }
         }
       }
-    } catch(InvalidTSLException e)
-    {
-      throw new EveDataException();
-    } catch(IOException e)
+    } catch(InvalidTSLException | IOException e)
     {
       throw new EveDataException();
     }
@@ -113,10 +116,10 @@ public class Index
   
   public Index(String group_name,Set<Integer> itemids)
   {
-    groups = new SparseArray<Group>();
-    groups_list = new ArrayList<Group>();
-    entries = new ArrayList<Entry>();
-    items = new ArrayList<Integer>();
+    groups = new SparseArray<>();
+    groups_list = new ArrayList<>();
+    entries = new ArrayList<>();
+    items = new ArrayList<>();
 
     Group g = new Group(0,group_name);
     groups.put(0, g);
@@ -132,10 +135,10 @@ public class Index
 
   public Index(String group_name,List<IItem> itemlist)
   {
-    groups = new SparseArray<Group>();
-    groups_list = new ArrayList<Group>();
-    entries = new ArrayList<Entry>();
-    items = new ArrayList<Integer>();
+    groups = new SparseArray<>();
+    groups_list = new ArrayList<>();
+    entries = new ArrayList<>();
+    items = new ArrayList<>();
 
     Group g = new Group(0,group_name);
     groups.put(0, g);

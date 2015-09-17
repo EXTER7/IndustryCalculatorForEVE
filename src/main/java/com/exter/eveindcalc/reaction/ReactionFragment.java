@@ -137,7 +137,7 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity) getActivity();
-    reaction_task = (ReactionTask) activity.getTask();
+    reaction_task = (ReactionTask) activity.getCurrentTask();
     ly_inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     tower_ids = StarbaseTowerDA.getTowerIDs();
@@ -174,7 +174,7 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     super.onActivityResult(requestCode, resultCode, data);
     if(resultCode == Activity.RESULT_OK)
     {
-      activity.getTask().registerListener(activity.GetListener());
+      activity.getCurrentTask().registerListener(activity.GetListener());
       reaction_task.addReaction(ReactionDA.getReaction(data.getIntExtra("reaction", -1)));
       onTaskChanged();
     }

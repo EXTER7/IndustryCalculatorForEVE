@@ -121,7 +121,7 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity)getActivity();
-    planet_task = (PlanetTask)activity.getTask();
+    planet_task = (PlanetTask)activity.getCurrentTask();
     View rootView = inflater.inflate(R.layout.planet, container, false);
     
     ed_runtime = new IntegerEditText((EditText) rootView.findViewById(R.id.ed_planet_runtime), 1, 99999, 0, new RunTimeChangeWatcher());
@@ -153,7 +153,7 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
     super.onActivityResult(requestCode, resultCode, data);
     if(resultCode == Activity.RESULT_OK)
     {
-      activity.getTask().registerListener(activity.GetListener());
+      activity.getCurrentTask().registerListener(activity.GetListener());
       switch(requestCode)
       {
         case REQUEST_PLANET:

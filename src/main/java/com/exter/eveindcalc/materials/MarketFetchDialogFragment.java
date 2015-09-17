@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,12 +66,7 @@ public class MarketFetchDialogFragment extends DialogFragment
   private MarketFetchAcceptListener accept_listener;
 
   private Spinner sp_system;
-  private RadioGroup rg_source;
-  private RadioButton rb_sell;
-  private RadioButton rb_buy;
-  private RadioButton rb_manual;
   private BigDecimalEditText ed_manual;
-  private LinearLayout ly_manual;
 
   private Task.Market price;
 
@@ -157,6 +153,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     void onAcceptProduced(Task.Market price);
   }
 
+  @NonNull
   @SuppressLint("InflateParams")
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState)
@@ -170,12 +167,12 @@ public class MarketFetchDialogFragment extends DialogFragment
     Bundle args = getArguments();
 
     sp_system = (Spinner) view.findViewById(R.id.sp_fetch_system);
-    rg_source = (RadioGroup) view.findViewById(R.id.rg_fetch_source);
-    rb_sell = (RadioButton) view.findViewById(R.id.rb_fetch_sell);
-    rb_buy = (RadioButton) view.findViewById(R.id.rb_fetch_buy);
-    rb_manual = (RadioButton) view.findViewById(R.id.rb_fetch_manual);
+    RadioGroup rg_source = (RadioGroup) view.findViewById(R.id.rg_fetch_source);
+    RadioButton rb_sell = (RadioButton) view.findViewById(R.id.rb_fetch_sell);
+    RadioButton rb_buy = (RadioButton) view.findViewById(R.id.rb_fetch_buy);
+    RadioButton rb_manual = (RadioButton) view.findViewById(R.id.rb_fetch_manual);
     ed_manual = new BigDecimalEditText((EditText) view.findViewById(R.id.ed_fetch_manual), -1, BigDecimal.ZERO, new BigDecimal("1000000000000"), BigDecimal.ZERO, new PriceChangeWatcher());
-    ly_manual = (LinearLayout) view.findViewById(R.id.ly_fetch_manual);
+    LinearLayout ly_manual = (LinearLayout) view.findViewById(R.id.ly_fetch_manual);
 
     price = TaskHelper.PriceFromBundle(args);
     type = args.getInt("type");
@@ -233,8 +230,8 @@ public class MarketFetchDialogFragment extends DialogFragment
     sp_system.setOnItemSelectedListener(null);
     RecentSystemsDA.putSystem(price.system);
 
-    system_ids = new ArrayList<Integer>();
-    List<String> system_names = new ArrayList<String>();
+    system_ids = new ArrayList<>();
+    List<String> system_names = new ArrayList<>();
     for(int id:RecentSystemsDA.getSystems())
     {
       system_ids.add(id);
@@ -243,7 +240,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     system_ids.add(-1);
     system_names.add("[ Other ... ]");
 
-    ArrayAdapter<String> sys_spinner_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, system_names);
+    ArrayAdapter<String> sys_spinner_adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, system_names);
     sys_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     sp_system.setAdapter(sys_spinner_adapter);
     sp_system.setSelection(system_ids.indexOf(price.system));

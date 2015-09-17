@@ -27,7 +27,8 @@ public class EICApplication extends Application
 {
   static private Context context;
   static private GroupTask tasks;
-  
+
+  // return true if the app is running on the ARC runtime in Chrome.
   static public boolean isChrome()
   {
     return Build.BRAND.contains("chromium") && Build.MANUFACTURER.contains("chromium");
@@ -40,12 +41,14 @@ public class EICApplication extends Application
     context = getApplicationContext();
     Task.setDataProvider(new EveDatabase());
   }
-  
+
+  // get the root group task.
   static public GroupTask getTasks()
   {
     return tasks;
   }
 
+  // write all tasks to storage.
   static public void saveTasks()
   {
     Log.i("Application","Saving tasks.");
@@ -53,6 +56,7 @@ public class EICApplication extends Application
     {
       return;
     }
+    
     synchronized(EICApplication.class)
     {
       File tmp = new File(getContext().getFilesDir() + "/tasks.tsl.tmp");
@@ -64,13 +68,7 @@ public class EICApplication extends Application
         TSLObject tsl = new TSLObject();
         tasks.writeToTSL(tsl);
         tsl.write(w, "task");
-        try
-        {
-          s.close();
-        } catch(IOException ignored)
-        {
-
-        }
+        s.close();
         //noinspection ResultOfMethodCallIgnored
         dest.delete();
         //noinspection ResultOfMethodCallIgnored

@@ -100,7 +100,7 @@ public class EICFragmentActivity extends FragmentActivity
       int progress = intent.getIntExtra("progress", 0);
       int max = intent.getIntExtra("max", 1);
             
-      if(progress == max && getTask() != null)
+      if(progress == max && getCurrentTask() != null)
       {
         ly_market_fetch.setVisibility(View.GONE);
         notifyPricesChanged();
@@ -119,7 +119,7 @@ public class EICFragmentActivity extends FragmentActivity
     @Override
     public void onReceive(Context context, Intent intent)
     {
-      if(getTask() != null)
+      if(getCurrentTask() != null)
       {
         notiftyExtraExpenseChanged();
         onProfitChanged();
@@ -146,7 +146,7 @@ public class EICFragmentActivity extends FragmentActivity
         case 0:
           try
           {
-            fragment = task_fragments.get(getTask().getClass()).getConstructor().newInstance();
+            fragment = task_fragments.get(getCurrentTask().getClass()).getConstructor().newInstance();
           } catch(IllegalArgumentException e)
           {
             throw e;
@@ -174,7 +174,7 @@ public class EICFragmentActivity extends FragmentActivity
     @Override
     public final int getCount()
     {
-      return getTask() == null?0:2;
+      return getCurrentTask() == null?0:2;
     }
 
     @Override
@@ -184,7 +184,7 @@ public class EICFragmentActivity extends FragmentActivity
       switch(position)
       {
         case 0:
-          title = task_names.get(getTask().getClass());
+          title = task_names.get(getCurrentTask().getClass());
           break;
         case 1:
           title = "Materials";
@@ -365,7 +365,8 @@ public class EICFragmentActivity extends FragmentActivity
   private ProgressBar pb_market_fetch;
   private LinearLayout ly_market_fetch;
 
-  public Task getTask()
+  // Get the current task.
+  public Task getCurrentTask()
   {
     if(task_path == null)
     {
@@ -378,7 +379,8 @@ public class EICFragmentActivity extends FragmentActivity
     return task_path.peek().second;
   }
 
-  public GroupTask getParentGroup()
+  // Get the group in which the current task belongs. return null if the current task is the root group.
+  public GroupTask getCurrentTaskParentGroup()
   {
     if(task_path == null)
     {
@@ -389,7 +391,7 @@ public class EICFragmentActivity extends FragmentActivity
       return EICApplication.getTasks();
     }
     Pair<String,Task> top = task_path.pop();
-    GroupTask result = (GroupTask) getTask();
+    GroupTask result = (GroupTask) getCurrentTask();
     task_path.push(top);
     return result;
   }
@@ -399,7 +401,7 @@ public class EICFragmentActivity extends FragmentActivity
     @Override
     public void onAcceptItem(int item, Task.Market p)
     {
-      getTask().setMaterialMarket(InventoryDA.getItem(item), p);
+      getCurrentTask().setMaterialMarket(InventoryDA.getItem(item), p);
       notifyMaterialChanged(item);
       onProfitChanged();
     }
@@ -407,7 +409,7 @@ public class EICFragmentActivity extends FragmentActivity
     @Override
     public void onAcceptRequired(Task.Market price)
     {
-      Task task = getTask();
+      Task task = getCurrentTask();
       for(ItemStack m:task.getRequiredMaterials())
       {
         task.setMaterialMarket(m.item, price);
@@ -419,7 +421,7 @@ public class EICFragmentActivity extends FragmentActivity
     @Override
     public void onAcceptProduced(Task.Market price)
     {
-      Task task = getTask();
+      Task task = getCurrentTask();
       for(ItemStack m:task.getProducedMaterials())
       {
         task.setMaterialMarket(m.item, price);
@@ -436,11 +438,11 @@ public class EICFragmentActivity extends FragmentActivity
     {
       for(String name : path)
       {
-        GroupTask group = (GroupTask) getTask();
+        GroupTask group = (GroupTask) getCurrentTask();
         task_path.push(new Pair<>(name, group.getTask(name)));
       }
     }
-    getTask().registerListener(listener);
+    getCurrentTask().registerListener(listener);
     onTaskChanged();
   }
 
@@ -500,6 +502,7 @@ public class EICFragmentActivity extends FragmentActivity
     
     listener = new TaskListener();
 
+    // Load task in a different thread while showing a progress dialog indicating that the tasks are loading.
     progress_dialog = ProgressDialog.show(this, "Loading...", "Updating database", true, false);
     load_handler = new LoaderHandler(this);
     Thread thread = new Thread(new LoaderThread());
@@ -529,7 +532,7 @@ public class EICFragmentActivity extends FragmentActivity
   {
     MenuInflater inflater = getMenuInflater();
     menu.clear();
-    if(getTask() instanceof GroupTask)
+    if(getCurrentTask() instanceof GroupTask)
     {
       inflater.inflate(R.menu.menu_group, menu);
     } else
@@ -580,7 +583,7 @@ public class EICFragmentActivity extends FragmentActivity
           Log.e("importTask", "task is null");
           return;
         }
-        GroupTask group = (GroupTask) getTask();
+        GroupTask group = (GroupTask) getCurrentTask();
         group.addTask(name, t);
       } catch(InvalidTSLException | IOException ignored)
       {
@@ -627,7 +630,7 @@ public class EICFragmentActivity extends FragmentActivity
   public void onDestroy()
   {
     ads.destroy();
-    Task t = getTask();
+    Task t = getCurrentTask();
     if(t != null)
     {
       t.unregisterListener(listener);
@@ -643,7 +646,7 @@ public class EICFragmentActivity extends FragmentActivity
   {
     unregisterReceiver(receiver);
     unregisterReceiver(receiver_basecost);
-    Task t = getTask();
+    Task t = getCurrentTask();
     if(t != null)
     {
       t.unregisterListener(listener);
@@ -670,7 +673,7 @@ public class EICFragmentActivity extends FragmentActivity
     filter.addCategory(Intent.CATEGORY_DEFAULT);
     registerReceiver(receiver_basecost, filter_base);
 
-    Task task = getTask();
+    Task task = getCurrentTask();
     if(task != null)
     {
       notifyMaterialSetChanged();
@@ -747,9 +750,11 @@ public class EICFragmentActivity extends FragmentActivity
     }
   }
 
+  // Called when changes in tasks parameters causes the profit to change.
+  // Updates the profit TextView.
   public void onProfitChanged()
   {
-    Task task = getTask();
+    Task task = getCurrentTask();
     BigDecimal income = task.getIncome();
     BigDecimal expense = task.getExpense();
 
@@ -792,10 +797,10 @@ public class EICFragmentActivity extends FragmentActivity
         MarketData.request_prices.clear();
       }
     }
-
   }
 
-  private String GetTaskName()
+  // Get the current task name to display in the title bar.
+  private String getTaskName()
   {
     if(task_path == null)
     {
@@ -808,27 +813,32 @@ public class EICFragmentActivity extends FragmentActivity
     return task_path.peek().first;
   }
 
+  // Called then users changes the current task (by going back or picking a task in a group).
+  // Updates the fragments.
   private void onTaskChanged()
   {
     if(pager == null)
     {
+      // Executes in tablets.
       FragmentManager fm = getSupportFragmentManager();
       pager_adapter = new LargePagerAdapter(fm);
       FragmentTransaction ft = fm.beginTransaction();
       ft.replace(ly_fragment_main.getId(), pager_adapter.getItem(0), "framentMain");
       ft.replace(ly_fragment_material.getId(), pager_adapter.getItem(1), "framentMaterials");
       ft.commit();
-      tx_fragment_main_title.setText(task_names.get(getTask().getClass()));
+      tx_fragment_main_title.setText(task_names.get(getCurrentTask().getClass()));
     } else
     {
+      // Executes in phones.
       pager_adapter = new PagerAdapter(getSupportFragmentManager());
       pager.setAdapter(pager_adapter);
     }
-    setTitle(GetTaskName());
+    setTitle(getTaskName());
     onProfitChanged();
   }
 
-  public boolean isMainTask()
+  // true if the current task is the root task group.
+  public boolean isRootTask()
   {
     return task_path.isEmpty();
   }
@@ -836,7 +846,7 @@ public class EICFragmentActivity extends FragmentActivity
   //Called when the user selects a task in a group.
   public void descend(String name)
   {
-    GroupTask group = (GroupTask) getTask();
+    GroupTask group = (GroupTask) getCurrentTask();
     Task t = group.getTask(name);
     group.unregisterListener(listener);
     task_path.push(new Pair<>(name, t));
@@ -867,7 +877,7 @@ public class EICFragmentActivity extends FragmentActivity
       super.onBackPressed();
       return;
     }
-    getTask().unregisterListener(listener);
+    getCurrentTask().unregisterListener(listener);
     task_path.pop().second.registerListener(listener);
     onTaskChanged();
   }

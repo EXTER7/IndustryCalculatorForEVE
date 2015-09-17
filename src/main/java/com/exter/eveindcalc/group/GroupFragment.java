@@ -91,7 +91,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     @Override
     public int compare(String lhs, String rhs)
     {
-      GroupTask group_task = (GroupTask)activity.getTask();
+      GroupTask group_task = (GroupTask)activity.getCurrentTask();
       Map<String,Task> list = group_task.getTaskList();
 
       Task l = list.get(lhs);
@@ -107,7 +107,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     @Override
     public int compare(String lhs, String rhs)
     {
-      GroupTask group_task = (GroupTask)activity.getTask();
+      GroupTask group_task = (GroupTask)activity.getCurrentTask();
       Map<String,Task> list = group_task.getTaskList();
 
       Task l = list.get(lhs);
@@ -154,7 +154,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     @Override
     public BigDecimal onCacheMiss(String key)
     {
-      GroupTask group_task = (GroupTask)activity.getTask();
+      GroupTask group_task = (GroupTask)activity.getCurrentTask();
       Task t = group_task.getTaskList().get(key);
 
       int dur = t.getDuration();
@@ -208,7 +208,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     @Override
     public BigDecimal onCacheMiss(String key)
     {
-      GroupTask group_task = (GroupTask)activity.getTask();
+      GroupTask group_task = (GroupTask)activity.getCurrentTask();
       Task t = group_task.getTaskList().get(key);
 
       BigDecimal income = t.getIncome();
@@ -268,7 +268,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     public void updateTaskList()
     {
       task_names.clear();
-      GroupTask g = (GroupTask)activity.getTask();
+      GroupTask g = (GroupTask)activity.getCurrentTask();
       if(g != null)
       {
         for(String n : g.getTaskList().keySet())
@@ -388,7 +388,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
       public void update(int position)
       {
         String name = task_names.get(position);
-        Task t = activity.getTask();
+        Task t = activity.getCurrentTask();
         if(!(t instanceof GroupTask))
         {
           return;
@@ -488,7 +488,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
 
   public void addGroup()
   {
-    GroupTask group_task = (GroupTask)activity.getTask();
+    GroupTask group_task = (GroupTask)activity.getCurrentTask();
     GroupTask task = new GroupTask();
     group_task.addTask("New Group",task);
     onTaskChanged();
@@ -509,11 +509,11 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     @Override
     public void onValueChanged(int new_value)
     {
-      if(activity.isMainTask())
+      if(activity.isRootTask())
       {
         return;
       }
-      GroupTask group_task = (GroupTask)activity.getTask();
+      GroupTask group_task = (GroupTask)activity.getCurrentTask();
       group_task.setScale(new_value);
       activity.notifyMaterialSetChanged();
       tasks_adapter.notifyDataSetChanged();
@@ -623,7 +623,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     sp_sort.setSelection(sort_mode.value);
     sp_sort.setOnItemSelectedListener(new SortModeItemSelectedListener());
     LinearLayout ly_scale = (LinearLayout) rootView.findViewById(R.id.ly_group_scale);
-    if(activity.isMainTask())
+    if(activity.isRootTask())
     {
       ly_scale.setVisibility(View.GONE);
     } else
@@ -642,9 +642,9 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
   @Override
   public void onTaskChanged()
   {
-    if(!activity.isMainTask())
+    if(!activity.isRootTask())
     {
-      GroupTask group_task = (GroupTask)activity.getTask();
+      GroupTask group_task = (GroupTask)activity.getCurrentTask();
       ed_scale.setValue(group_task.getScale());
     }
     tasks_adapter.updateTaskList();

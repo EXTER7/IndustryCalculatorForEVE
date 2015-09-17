@@ -84,30 +84,14 @@ public class PlanetProductDA
   {
     if(index_advanced == null)
     {
-      TSLReader tsl;
-      InputStream raw;
       try
       {
         AssetManager assets = EICApplication.getContext().getAssets();
-        raw = assets.open("planet/index_advanced.tsl");
-        tsl = new TSLReader(raw);
-      } catch(IOException e)
-      {
-        throw new RuntimeException(e);
-      }
-
-      try
-      {
+        InputStream raw = assets.open("planet/index_advanced.tsl");
+        TSLReader tsl = new TSLReader(raw);
         index_advanced = new Index(tsl);
-      } catch(EveDataException e1)
-      {
-        throw new RuntimeException(e1);
-      }
-
-      try
-      {
         raw.close();
-      } catch(IOException e)
+      } catch(EveDataException | IOException e)
       {
         throw new RuntimeException(e);
       }
@@ -119,30 +103,14 @@ public class PlanetProductDA
   {
     if(index == null)
     {
-      TSLReader tsl;
-      InputStream raw;
       try
       {
         AssetManager assets = EICApplication.getContext().getAssets();
-        raw = assets.open("planet/index.tsl");
-        tsl = new TSLReader(raw);
-      } catch(IOException e)
-      {
-        throw new RuntimeException(e);
-      }
-
-      try
-      {
+        InputStream raw = assets.open("planet/index.tsl");
+        TSLReader tsl = new TSLReader(raw);
         index = new Index(tsl);
-      } catch(EveDataException e1)
-      {
-        throw new RuntimeException(e1);
-      }
-
-      try
-      {
         raw.close();
-      } catch(IOException e)
+      } catch(EveDataException | IOException e)
       {
         throw new RuntimeException(e);
       }

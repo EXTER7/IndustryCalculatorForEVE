@@ -28,7 +28,7 @@ public class TaskNameDialogFragment extends DialogFragment
     @Override
     public void onClick(DialogInterface dialog, int which)
     {
-      GroupTask group_task = (GroupTask)activity.getTask();
+      GroupTask group_task = (GroupTask)activity.getCurrentTask();
       Task task = group_task.getTaskList().get(name);
       group_task.removeTask(name);
       group_task.addTask(ed_name.getText().toString(), task);

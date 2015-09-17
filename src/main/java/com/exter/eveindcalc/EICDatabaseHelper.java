@@ -16,8 +16,12 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
   private final Context ctx;
   private static final String DATABASE_NAME = "eic.db";
 
+  // Increment this if the data in the assets directory is changed (like when a new EVE expansion is released).
   public static final int DATABASE_VERSION = 118;
-  private static final int NONSTATIC_VERSION = 63;
+
+  // Increment this if the schema of non-static tables are changed (resets, non-static data).
+  private static final int NONSTATIC_VERSION = 110;
+
   public static final String ITEMS_CREATE = "create table items"
   +"( id integer primary key,"
   + "name varchar not null,"
@@ -48,6 +52,7 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
   +"(seqid integer primary key autoincrement,"
   + "id integer not null);";
 
+  // Non-static table
   public static final String MARKETCACHE_CREATE = "create table market_cache"
   +"( id integer primary key autoincrement,"
   + " time number(12) not null,"
@@ -56,20 +61,24 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
   + " buy varchar not null,"
   + " sell varchar not null);";
 
+  // Non-static table
   private static final String BPHISTORY_CREATE = "create table blueprint_history"
   +"( product integer primary key,"
   + "me integer not null,"
   + "te integer not null);";
 
+  // Non-static table
   public static final String BASECOST_CREATE = "create table base_cost"
   +"( id integer primary key,"
   + "cost varchar not null);";
 
+  // Non-static table
   public static final String SYSTEMCOST_CREATE = "create table system_cost"
   +"( id integer primary key,"
   + "manufacturing varchar not null,"
   + "invention varchar not null);";
 
+  // Non-static table
   public static final String SOLARSYSTEMS_CREATE = "create table solar_systems"
   +"( id integer primary key );";
   
@@ -114,6 +123,8 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
     db.execSQL(BASECOST_CREATE);
     db.execSQL(SYSTEMCOST_CREATE);
     db.execSQL(SOLARSYSTEMS_CREATE);
+
+    // Add trade hubs to the solar system list.
     db.execSQL("insert or replace into solar_systems (id) values ( 30000142 )");
     db.execSQL("insert or replace into solar_systems (id) values ( 30002187 )");
     db.execSQL("insert or replace into solar_systems (id) values ( 30002659 )");
@@ -158,53 +169,8 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
       db.execSQL("insert or replace into solar_systems (id) values ( 30002053 )");
       db.execSQL("insert or replace into solar_systems (id) values ( 31000005 )");
     }
-    if(oldVersion < 80)
-    {
-      db.execSQL("insert or replace into solar_systems (id) values ( 30000142 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002187 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002659 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002510 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002053 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 31000005 )");
-    }
-    if(oldVersion < 79)
-    {
-      db.execSQL("DROP TABLE IF EXISTS system_cost");
-      db.execSQL(SYSTEMCOST_CREATE);
-      db.execSQL("insert or replace into solar_systems (id) values ( 30000142 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002187 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002659 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002510 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002053 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 31000005 )");
-    }
-    if(oldVersion < 67)
-    {
-      db.execSQL("DROP TABLE IF EXISTS base_cost");
-      db.execSQL("DROP TABLE IF EXISTS system_cost");
-      db.execSQL("DROP TABLE IF EXISTS solar_systems");
-      db.execSQL(BASECOST_CREATE);
-      db.execSQL(SYSTEMCOST_CREATE);
-      db.execSQL(SOLARSYSTEMS_CREATE);
-      db.execSQL("insert or replace into solar_systems (id) values ( 30000142 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002187 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002659 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002510 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 30002053 )");
-      db.execSQL("insert or replace into solar_systems (id) values ( 31000005 )");
-    }
-    if(oldVersion < 93)
-    {
-      db.execSQL("insert or replace into solar_systems (id) values ( 31000005 )");
-    }
-    
-    if(oldVersion < 101)
-    {
-      db.execSQL("DROP TABLE IF EXISTS blueprint_history");
-      db.execSQL(BPHISTORY_CREATE);
-    }
 
-    
+
     db.execSQL("DROP TABLE IF EXISTS items");
     db.execSQL("DROP TABLE IF EXISTS categories");
     db.execSQL("DROP TABLE IF EXISTS groups");

@@ -207,7 +207,7 @@ public class RefineFragment extends Fragment implements IEveCalculatorFragment
   {
 
     activity = (EICFragmentActivity)getActivity();
-    refine_task = (RefiningTask) activity.getTask();
+    refine_task = (RefiningTask) activity.getCurrentTask();
     View rootView = inflater.inflate(R.layout.refine_main, container, false);
 
     

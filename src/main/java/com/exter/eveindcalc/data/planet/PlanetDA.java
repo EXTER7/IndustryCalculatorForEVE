@@ -32,27 +32,19 @@ public class PlanetDA
   
   static private void loadPlanets()
   {
-    TSLReader tsl = null;
-    InputStream raw = null;
     try
     {
       AssetManager assets = EICApplication.getContext().getAssets();
-      raw = assets.open("planet/planets.tsl");
-      tsl = new TSLReader(raw);
-    } catch(IOException e)
-    {
-      throw new RuntimeException(e);
-    }
+      InputStream raw = assets.open("planet/planets.tsl");
+      TSLReader tsl = new TSLReader(raw);
 
-    try
-    {
       tsl.moveNext();
 
       if(!tsl.getName().equals("planets"))
       {
         throw new EveDataException();
       }
-      planets = new SparseArray<Planet>();
+      planets = new SparseArray<>();
       while(true)
       {
         tsl.moveNext();
@@ -68,15 +60,8 @@ public class PlanetDA
           planets.put(p.ID, p);
         }
       }
-    } catch(InvalidTSLException | EveDataException | IOException e)
-    {
-      throw new RuntimeException(e);
-    }
-
-    try
-    {
       raw.close();
-    } catch(IOException e)
+    } catch(InvalidTSLException | EveDataException | IOException e)
     {
       throw new RuntimeException(e);
     }

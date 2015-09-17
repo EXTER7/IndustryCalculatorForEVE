@@ -16,7 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.exter.eveindcalc.data.starmap.SolarSystem;
-import com.exter.eveindcalc.data.starmap.solarSystemRegion;
+import com.exter.eveindcalc.data.starmap.SolarSystemRegion;
 import com.exter.eveindcalc.data.starmap.Starmap;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
 
   private Spinner sp_system;
 
-  private List<solarSystemRegion> regions;
+  private List<SolarSystemRegion> regions;
   private List<SolarSystem> systems;
 
   private int system;
@@ -93,13 +93,13 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
 
     regions = Starmap.getRegions();
     ArrayList<CharSequence> region_list = new ArrayList<>();
-    for(solarSystemRegion r : regions)
+    for(SolarSystemRegion r : regions)
     {
       region_list.add(r.Name);
     }
     ArrayAdapter<CharSequence> region_adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, region_list);
     region_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    solarSystemRegion reg = Starmap.getRegion(Starmap.getSolarSystem(system).Region);
+    SolarSystemRegion reg = Starmap.getRegion(Starmap.getSolarSystem(system).Region);
     sp_region.setAdapter(region_adapter);
     sp_region.setSelection(regions.indexOf(reg), true);
     setRegionSystems(reg);
@@ -108,7 +108,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     return builder.create();
   }
 
-  private void setRegionSystems(solarSystemRegion r)
+  private void setRegionSystems(SolarSystemRegion r)
   {
     Activity act = getActivity();
     systems = Starmap.getSolarSystems(r.ID);

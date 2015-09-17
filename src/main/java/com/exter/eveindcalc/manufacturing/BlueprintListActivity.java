@@ -38,11 +38,7 @@ import java.util.List;
 
 public class BlueprintListActivity extends FragmentActivity
 {
-  private TextView tx_search;
-  private Spinner sp_groups;
   private Spinner sp_categories;
-  private Spinner sp_metagroups;
-  private ExpandableListView ls_groups;
   private TextView tx_category;
   private ImageButton bt_category_clear;
 
@@ -113,6 +109,7 @@ public class BlueprintListActivity extends FragmentActivity
     public View getView(int position, View convertView, ViewGroup parent)
     {
       Blueprint bp = BlueprintDA.getBlueprint(bplist_filtered.get(position));
+      assert bp != null;
       ItemGroup cat = InventoryDA.getGroup(bp.Product.item.getGroupID());
       ItemCategory group = InventoryDA.getCategory(cat.Category);
       ItemHolder holder;
@@ -305,8 +302,7 @@ public class BlueprintListActivity extends FragmentActivity
       return false;
     }
   }
-  
-  private ListView ls_blueprints;
+
   private BlueprintListAdapter bpl_adapter;
 
   public void updateFilter()
@@ -320,6 +316,7 @@ public class BlueprintListActivity extends FragmentActivity
     task.execute(f);
   }
 
+  //Contains all filter parameters
   private class Filter
   {
     public String name;
@@ -338,7 +335,9 @@ public class BlueprintListActivity extends FragmentActivity
 
   private class FilterResult
   {
+    // Filter used for this result.
     public final Filter filter;
+    // List of blueprint that match the filer.
     public final List<Integer> blueprints;
 
     public FilterResult(Filter f, List<Integer> bps)
@@ -357,7 +356,7 @@ public class BlueprintListActivity extends FragmentActivity
         return null;
       }
 
-      ArrayList<Integer> products = new ArrayList<Integer>();
+      ArrayList<Integer> products = new ArrayList<>();
       Cursor c = src.queryBlueprints(filter.name, filter.category, filter.group, filter.metagroup);
       if(c != null)
       {
@@ -452,23 +451,23 @@ public class BlueprintListActivity extends FragmentActivity
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
     {
-      ArrayList<CharSequence> category_list = new ArrayList<CharSequence>();
+      ArrayList<CharSequence> category_list = new ArrayList<>();
       category_list.add("All");
       if(pos == 0)
       {
         filter_group = -1;
-        categories = new ArrayList<Integer>();
+        categories = new ArrayList<>();
       } else
       {
         filter_group = groups.get(pos - 1);
-        categories = new ArrayList<Integer>(InventoryDA.blueprintCategories(filter_group));
+        categories = new ArrayList<>(InventoryDA.blueprintCategories(filter_group));
         for(int cat : categories)
         {
           category_list.add(InventoryDA.getGroup(cat).Name);
         }
       }
       filter_category = -1;
-      ArrayAdapter<CharSequence> category_adapter = new ArrayAdapter<CharSequence>(BlueprintListActivity.this, android.R.layout.simple_spinner_item, category_list);
+      ArrayAdapter<CharSequence> category_adapter = new ArrayAdapter<>(BlueprintListActivity.this, android.R.layout.simple_spinner_item, category_list);
       category_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
       sp_categories.setAdapter(category_adapter);
       sp_categories.setSelection(0, true);
@@ -542,7 +541,7 @@ public class BlueprintListActivity extends FragmentActivity
 
     blueprints = new BlueprintDA();
     groups = InventoryDA.blueprintGroups();
-    categories = new ArrayList<Integer>();
+    categories = new ArrayList<>();
     metagroups = InventoryDA.metaGroups();
     filter_name = null;
     filter_group = -1;
@@ -553,31 +552,31 @@ public class BlueprintListActivity extends FragmentActivity
 
     bplist = blueprints.getAllBlueprints();
 
-    tx_search = (TextView) findViewById(R.id.tx_itemfilter_search);
-    sp_metagroups = (Spinner) findViewById(R.id.sp_itemfilter_metagroup);
+    TextView tx_search = (TextView) findViewById(R.id.tx_itemfilter_search);
+    Spinner sp_metagroups = (Spinner) findViewById(R.id.sp_itemfilter_metagroup);
     tx_search.addTextChangedListener(new SearchChangeListener());
 
 
-    ls_groups = (ExpandableListView) findViewById(R.id.ls_itemfilter_groups);
+    ExpandableListView ls_groups = (ExpandableListView) findViewById(R.id.ls_itemfilter_groups);
     if(ls_groups == null)
     {
-      sp_groups = (Spinner) findViewById(R.id.sp_itemfilter_group);
+      Spinner sp_groups = (Spinner) findViewById(R.id.sp_itemfilter_group);
       sp_categories = (Spinner) findViewById(R.id.sp_itemfilter_category);
 
-      ArrayList<CharSequence> group_list = new ArrayList<CharSequence>();
+      ArrayList<CharSequence> group_list = new ArrayList<>();
       group_list.add("All");
       for(int g : groups)
       {
         group_list.add(InventoryDA.getCategory(g).Name);
       }
 
-      ArrayList<CharSequence> category_list = new ArrayList<CharSequence>();
+      ArrayList<CharSequence> category_list = new ArrayList<>();
       category_list.add("All");
 
 
-      ArrayAdapter<CharSequence> group_adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, group_list);
+      ArrayAdapter<CharSequence> group_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, group_list);
       group_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-      ArrayAdapter<CharSequence> category_adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, category_list);
+      ArrayAdapter<CharSequence> category_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, category_list);
       category_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 
@@ -599,18 +598,18 @@ public class BlueprintListActivity extends FragmentActivity
       bt_category_clear.setOnClickListener(new CategoryClearClickListener());
     }
 
-    ArrayList<CharSequence> metagroup_list = new ArrayList<CharSequence>();
+    ArrayList<CharSequence> metagroup_list = new ArrayList<>();
     metagroup_list.add("All");
     for(int m : metagroups)
     {
       metagroup_list.add(InventoryDA.getMetaGroup(m).Name);
     }
-    ArrayAdapter<CharSequence> metagroup_adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, metagroup_list);
+    ArrayAdapter<CharSequence> metagroup_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, metagroup_list);
     metagroup_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     sp_metagroups.setOnItemSelectedListener(new MetaGroupSelectedListener());
     sp_metagroups.setAdapter(metagroup_adapter);
 
-    ls_blueprints = (ListView) findViewById(R.id.ls_itemfilter_items);
+    ListView ls_blueprints = (ListView) findViewById(R.id.ls_itemfilter_items);
 
     bpl_adapter = new BlueprintListAdapter(this);
     ls_blueprints.setAdapter(bpl_adapter);

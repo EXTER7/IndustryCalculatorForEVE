@@ -23,6 +23,7 @@ import com.exter.eveindcalc.TaskHelper;
 import com.exter.eveindcalc.data.EveDatabase;
 import com.exter.eveindcalc.data.blueprint.BlueprintDA;
 import com.exter.eveindcalc.data.blueprint.BlueprintHistoryDA;
+import com.exter.eveindcalc.data.inventory.InventoryDA;
 import com.exter.eveindcalc.data.inventory.Item;
 import com.exter.eveindcalc.data.planet.Planet;
 import com.exter.eveindcalc.data.planet.PlanetDA;
@@ -57,6 +58,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
     @Override
     public int compare(ViewHolderMaterial lhs, ViewHolderMaterial rhs)
     {
+      // Sort by type, material amount, item ID.
       if(lhs.type.weight == rhs.type.weight)
       {
         if(lhs.material.amount == rhs.material.amount)
@@ -78,6 +80,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
     }
   }
 
+  // Used to sort material by type (Mineral, PI, Reaction, ...)
   private enum ItemType
   {
     Market(4),
@@ -129,7 +132,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           int i;
           for(i = 0; i < raw.size(); i++)
           {
-            if(!p.Resources.contains(raw.keyAt(i)))
+            if(!p.Resources.contains(InventoryDA.getItem(raw.keyAt(i))))
             {
               continue planet;
             }
@@ -189,7 +192,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           break;
           case Group_Blueprint:
           {
-            GroupTask group = (GroupTask)calc.getTask();
+            GroupTask group = (GroupTask)calc.getCurrentTask();
             ManufacturingTask t = new ManufacturingTask(BlueprintDA.getBlueprint(material.item.getID()));
             SharedPreferences sp = getActivity().getSharedPreferences("EIC", Context.MODE_PRIVATE);
             t.setHardwiring(ManufacturingTask.Hardwiring.fromInt(sp.getInt("manufacturing.hardwiring", ManufacturingTask.Hardwiring.None.value)));
@@ -208,7 +211,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           break;
           case Group_Planet:
           {
-            GroupTask group = (GroupTask)calc.getTask();
+            GroupTask group = (GroupTask)calc.getCurrentTask();
             int i;
             PlanetTask t = new PlanetTask(PlanetDA.getPlanet(11));
             PlanetProduct p = PlanetProductDA.getProduct(material.item.getID());
@@ -240,7 +243,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           break;
           case Group_Reaction:
           {
-            GroupTask group = (GroupTask)calc.getTask();
+            GroupTask group = (GroupTask)calc.getCurrentTask();
             ReactionTask t = new ReactionTask(StarbaseTowerDA.getTower(StarbaseTowerDA.getTowerIDs().get(0)));
             Reaction r = ReactionDA.getReaction(material.item.getID());
             t.addReaction(r);
@@ -251,7 +254,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           case Planet_Extractor:
           case Planet_Factory:
           {
-            PlanetTask t = (PlanetTask)calc.getTask();
+            PlanetTask t = (PlanetTask)calc.getCurrentTask();
             PlanetProduct p = PlanetProductDA.getProduct(material.item.getID());
             int times = (int)XUtil.DivCeil(material.amount, p.ProductItem.amount * t.getRunTime() * 24);
             int i;
@@ -264,7 +267,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           case Reaction_Miner:
           case Reaction_Reactor:
           {
-            ReactionTask t = (ReactionTask)calc.getTask();
+            ReactionTask t = (ReactionTask)calc.getCurrentTask();
             Reaction r = ReactionDA.getReaction(material.item.getID());
             int times = (int)XUtil.DivCeil(material.amount, r.GetMainOutputAmount() * t.getRunTime() * 24);
             int i;
@@ -338,7 +341,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
     {
       holder_view = view;
       material = mat;
-      task = calc.getTask();
+      task = calc.getCurrentTask();
       im_icon = (ImageView) view.findViewById(R.id.im_material_icon);
       tx_material = (TextView) view.findViewById(R.id.tx_material_bill);
       tx_material_volume = (TextView) view.findViewById(R.id.tx_material_volume);
@@ -352,9 +355,9 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
 
       bt_component.setOnClickListener(null);
       bt_component.setVisibility(View.GONE);
-      if(required && !calc.isMainTask())
+      if(required && !calc.isRootTask())
       {
-        Task task = calc.getTask();
+        Task task = calc.getCurrentTask();
         Drawable dr = ContextCompat.getDrawable(MaterialsFragment.this.getActivity(), R.drawable.cost_blank);
         if(task instanceof GroupTask)
         {
@@ -490,7 +493,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
       tx_name.setText(name);
       if(!produced)
       {
-        tx_extra.setText("Additional expense: "+ formatter_decimal.format(calc.getTask().getExtraExpense()) +" ISK");
+        tx_extra.setText("Additional expense: "+ formatter_decimal.format(calc.getCurrentTask().getExtraExpense()) +" ISK");
       }
     }
 
@@ -498,7 +501,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
     {
       materials = mat;
       name = n;
-      task = calc.getTask();
+      task = calc.getCurrentTask();
       produced = prod;
 
       tx_name = (TextView) view.findViewById(R.id.tx_materialgroup_name);
@@ -618,7 +621,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
       return;
     }
 
-    Task task = calc.getTask();
+    Task task = calc.getCurrentTask();
     
     List<ItemStack> req_materials = task.getRequiredMaterials();
     List<ItemStack> prod_materials = task.getProducedMaterials();
@@ -628,11 +631,13 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
     prod_holders = new ArrayList<>();
 
     ly_materials.removeAllViews();
-        
+
+    // Add produced material header.
     View v = ly_inflater.inflate(R.layout.material_group, ly_materials, false);
     prod_holder = new ViewHolderGroup(v,prod_materials,"Produced",true);
     prod_holder.update();
     ly_materials.addView(v);
+
     for(ItemStack m:prod_materials)
     {
       v = ly_inflater.inflate(R.layout.material_src, ly_materials, false);
@@ -641,12 +646,14 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
       prod_holders.add(mat_holder);
     }
 
+    // Add all produced materials, sorted.
     Collections.sort(prod_holders,new MaterialHolderComparator());
     for(ViewHolderMaterial holder:prod_holders)
     {
       ly_materials.addView(holder.holder_view);
     }
 
+    // Add produced requred header.
     v = ly_inflater.inflate(R.layout.material_group, ly_materials, false);
     req_holder = new ViewHolderGroup(v,req_materials,"Required",false);
     req_holder.update();
@@ -658,7 +665,8 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
       mat_holder.update();
       req_holders.add(mat_holder);
     }
-    
+
+    // Add all required materials, sorted.
     Collections.sort(req_holders,new MaterialHolderComparator());
     for(ViewHolderMaterial holder:req_holders)
     {

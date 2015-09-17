@@ -84,30 +84,14 @@ public class ReactionDA
   {
     if(index == null)
     {
-      TSLReader tsl;
-      InputStream raw;
       try
       {
         AssetManager assets = EICApplication.getContext().getAssets();
-        raw = assets.open("reaction/index.tsl");
-        tsl = new TSLReader(raw);
-      } catch(IOException e)
-      {
-        throw new RuntimeException(e);
-      }
-
-      try
-      {
+        InputStream raw = assets.open("reaction/index.tsl");
+        TSLReader tsl = new TSLReader(raw);
         index = new Index(tsl);
-      } catch(EveDataException e1)
-      {
-        throw new RuntimeException(e1);
-      }
-
-      try
-      {
         raw.close();
-      } catch(IOException e)
+      } catch(EveDataException | IOException e)
       {
         throw new RuntimeException(e);
       }
@@ -126,23 +110,9 @@ public class ReactionDA
         AssetManager assets = EICApplication.getContext().getAssets();
         raw = assets.open("reaction/index_moon.tsl");
         tsl = new TSLReader(raw);
-      } catch(IOException e)
-      {
-        throw new RuntimeException(e);
-      }
-
-      try
-      {
         index_moon = new Index(tsl);
-      } catch(EveDataException e1)
-      {
-        throw new RuntimeException(e1);
-      }
-
-      try
-      {
         raw.close();
-      } catch(IOException e)
+      } catch(EveDataException | IOException e)
       {
         throw new RuntimeException(e);
       }

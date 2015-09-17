@@ -17,6 +17,7 @@ public class RefineDA
 {
   static private Index index = null;
   
+  @SuppressWarnings("TryFinallyCanBeTryWithResources")
   static public Refine getRefine(int refine)
   {
     try
@@ -34,13 +35,12 @@ public class RefineDA
         {
           return null;
         }
-      } catch(EveDataException e)
+      } catch(EveDataException | InvalidTSLException e)
+      {
+        throw new RuntimeException(e);
+      } finally
       {
         raw.close();
-        return null;
-      } catch(InvalidTSLException e)
-      {
-        return null;
       }
     } catch(IOException e)
     {
@@ -52,31 +52,14 @@ public class RefineDA
   {
     if(index == null)
     {
-      TSLReader tsl;
-      InputStream raw;
       try
       {
         AssetManager assets = EICApplication.getContext().getAssets();
-        raw = assets.open("refine/index.tsl");
-        tsl = new TSLReader(raw);
-      } catch(IOException e)
-      {
-        throw new RuntimeException(e);
-      }
-      
-      try
-      {
+        InputStream raw = assets.open("refine/index.tsl");
+        TSLReader tsl = new TSLReader(raw);
         index = new Index(tsl);
-      } catch(EveDataException e1)
-      {
-        throw new RuntimeException(e1);
-      }
-
-
-      try
-      {
         raw.close();
-      } catch(IOException e)
+      } catch( EveDataException | IOException e)
       {
         throw new RuntimeException(e);
       }

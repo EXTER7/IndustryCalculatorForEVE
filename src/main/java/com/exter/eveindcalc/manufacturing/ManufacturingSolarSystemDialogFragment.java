@@ -15,7 +15,7 @@ public class ManufacturingSolarSystemDialogFragment extends SolarSystemDialogFra
   protected void onSystemSelected(int systemid)
   {
     EICFragmentActivity activity = (EICFragmentActivity)getActivity();
-    ((ManufacturingTask)activity.getTask()).setSolarSystem(systemid);
+    ((ManufacturingTask)activity.getCurrentTask()).setSolarSystem(systemid);
     SharedPreferences sp = activity.getSharedPreferences("EIC", Context.MODE_PRIVATE);
     SharedPreferences.Editor ed = sp.edit();
     ed.putInt("manufacturing.system", systemid);

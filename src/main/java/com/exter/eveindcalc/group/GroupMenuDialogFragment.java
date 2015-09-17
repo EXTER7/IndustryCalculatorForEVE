@@ -80,14 +80,14 @@ public class GroupMenuDialogFragment extends DialogFragment
       public void onClick(DialogInterface dialog, int which)
       {
 
-        GroupTask group = (GroupTask)activity.getTask();
+        GroupTask group = (GroupTask)activity.getCurrentTask();
         Task t = group.getTask(name);
         if(parent)
         {
           if(which == 1)
           {
             group.removeTask(name);
-            activity.getParentGroup().addTask(name, t);
+            activity.getCurrentTaskParentGroup().addTask(name, t);
             activity.notifyTaskChanged();
             activity.onProfitChanged();
             return;
@@ -211,7 +211,7 @@ public class GroupMenuDialogFragment extends DialogFragment
     @Override
     public void onClick(DialogInterface dialog, int which)
     {
-      GroupTask group = (GroupTask)activity.getTask();
+      GroupTask group = (GroupTask)activity.getCurrentTask();
       switch(which)
       {
         case 0:
@@ -242,7 +242,7 @@ public class GroupMenuDialogFragment extends DialogFragment
                 groups.put(e.getKey(), (GroupTask)t);
               }
             }
-            boolean parent = !activity.isMainTask();
+            boolean parent = !activity.isRootTask();
             int start = (parent?2:1);
             CharSequence[] choices = new CharSequence[groups.keySet().size() + start];
             

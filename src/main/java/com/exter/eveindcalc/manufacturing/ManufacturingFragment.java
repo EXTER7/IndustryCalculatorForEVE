@@ -439,7 +439,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
   {
     activity = (EICFragmentActivity) getActivity();
 
-    man_task = (ManufacturingTask) activity.getTask();
+    man_task = (ManufacturingTask) activity.getCurrentTask();
     histent = BlueprintHistoryDA.getEntry(man_task.getBlueprint().getID());
     if(histent == null)
     {
@@ -554,6 +554,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
     ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, installation_names);
     spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     sp_installation.setAdapter(spinnerArrayAdapter);
+    //noinspection SuspiciousMethodCalls
     sp_installation.setSelection(installation_groups.indexOf(man_task.getInstallation()));
 
     ed_tax.setValue(man_task.getInstallationTax());

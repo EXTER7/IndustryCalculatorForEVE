@@ -35,6 +35,8 @@ import exter.eveindustry.task.Task;
 
 public class TaskHelper
 {
+
+  // Used to provide the task icon and description based on the type of task
   private interface ITaskIconProvider
   {
     int getIcon(Task task);

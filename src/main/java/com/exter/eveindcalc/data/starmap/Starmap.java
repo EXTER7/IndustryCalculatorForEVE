@@ -18,9 +18,9 @@ import exter.tsl.TSLReader;
 public class Starmap
 {
   
-  static private SparseArray<solarSystemRegion> regions = null;
+  static private SparseArray<SolarSystemRegion> regions = null;
   static private SparseArray<SolarSystem> systems = null;
-  static private List<solarSystemRegion> region_list = null;
+  static private List<SolarSystemRegion> region_list = null;
   static private List<SolarSystem> system_list = null;
   
   static private void loadStarmap()
@@ -73,7 +73,7 @@ public class Starmap
               {
                 throw new EveDataException();
               }
-              solarSystemRegion r = new solarSystemRegion(id, name);
+              SolarSystemRegion r = new SolarSystemRegion(id, name);
               regions.put(id, r);
               region_list.add(r);
               break;
@@ -113,7 +113,7 @@ public class Starmap
     }
   }
   
-  static public List<solarSystemRegion> getRegions()
+  static public List<SolarSystemRegion> getRegions()
   {
     if(region_list == null)
     {
@@ -139,7 +139,7 @@ public class Starmap
     return list;
   }
 
-  static public solarSystemRegion getRegion(int id)
+  static public SolarSystemRegion getRegion(int id)
   {
     if(regions == null)
     {

@@ -78,7 +78,7 @@ public class ImportTaskDialogFragment extends DialogFragment
           Log.e("importTask", "task is null");
           return false;
         }
-        GroupTask group = (GroupTask)activity.getTask();
+        GroupTask group = (GroupTask)activity.getCurrentTask();
         group.addTask(name, t);
         return true;
       } catch(InvalidTSLException | IOException ignore)

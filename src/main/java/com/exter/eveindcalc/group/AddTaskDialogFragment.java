@@ -63,7 +63,7 @@ public class AddTaskDialogFragment extends DialogFragment
     @Override
     public void onClick(View v)
     {
-      GroupTask group_task = (GroupTask)activity.getTask();
+      GroupTask group_task = (GroupTask)activity.getCurrentTask();
       ReactionTask task = new ReactionTask(StarbaseTowerDA.getTower(16213));
       group_task.addTask("New Reaction Starbase",task);
       activity.notifyTaskChanged();
@@ -77,7 +77,7 @@ public class AddTaskDialogFragment extends DialogFragment
     @Override
     public void onClick(View v)
     {
-      GroupTask group_task = (GroupTask)activity.getTask();
+      GroupTask group_task = (GroupTask)activity.getCurrentTask();
       PlanetTask task = new PlanetTask(PlanetDA.getPlanet(11));
       group_task.addTask("New Planet",task);
       activity.notifyTaskChanged();
@@ -96,7 +96,7 @@ public class AddTaskDialogFragment extends DialogFragment
       case REQUEST_MANUFATURING:
         if(resultCode == Activity.RESULT_OK)
         {
-          GroupTask group = (GroupTask)activity.getTask();
+          GroupTask group = (GroupTask)activity.getCurrentTask();
           ManufacturingTask task = new ManufacturingTask(BlueprintDA.getBlueprint(
                   data.getIntExtra("product", -1)));
           SharedPreferences sp = getActivity().getSharedPreferences("EIC", Context.MODE_PRIVATE);
@@ -118,7 +118,7 @@ public class AddTaskDialogFragment extends DialogFragment
       case REQUEST_REFINING:
         if(resultCode == Activity.RESULT_OK)
         {
-          GroupTask group = (GroupTask)activity.getTask();
+          GroupTask group = (GroupTask)activity.getCurrentTask();
           RefiningTask task = new RefiningTask(
               RefineDA.getRefine(data.getIntExtra("refine", -1)));
           group.addTask(((Item)task.getRefinable().getRequiredItem().item).Name, task);
