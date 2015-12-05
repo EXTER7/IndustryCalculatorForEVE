@@ -29,7 +29,7 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="EICFragmentActivity"
+            android:name=".EICFragmentActivity"
             android:configChanges="orientation|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -67,6 +67,5 @@ hs_err_pid*
 *.iml
 
 src/main/assets/*
-!src/main/assets/README.md
 src/main/res/values/adunit.xml
 

@@ -36,6 +36,24 @@ android {
     }
 }
 
+task extractAssetsFromEID(type: Copy) {
+   from(zipTree('eid.zip'))
+   into 'src/main/assets'
+}
+
+task cleanAssets(type: Delete) {
+    def assetsDir = "src/main/assets" 
+    file( assetsDir ).list().each{
+        f ->
+             delete "${assetsDir}/${f}"
+    }
+}
+
+
+preBuild.dependsOn extractAssetsFromEID
+clean.dependsOn cleanAssets
+extractAssetsFromEID.dependsOn cleanAssets
+
 dependencies {
     compile project(':TSL')
     compile project(':EVEIndustry')

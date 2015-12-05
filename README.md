@@ -1,9 +1,9 @@
 # IndustryCalculatorForEVE
 Android app that calculates profit from industry in EVE Online.
 
-Before building, data files must be added to the 'src/main/assets' directory.
+[Google Play Store Page](https://play.google.com/store/apps/details?id=com.exter.eveindcalc)
 
-To add the data files:
+To update the EVE data:
 
 - Download/clone the [EVEIndustryData repository](https://github.com/EXTER7/EVEIndustryData)
 
@@ -11,29 +11,9 @@ To add the data files:
 
 - Open a terminal/command promt in the 'datadump' directory of the EVEIndustryData repository.
 
-- Enter the command 'python3 datadump.py --no-zip' or './datadump.py --no-zip'
+- Excecute the command 'python3 datadump.py' or './datadump.py'
 
-- After the script finishes, copy the contents of the 'eid' directory (not the directory itself) to the 'src/main/assets' directory in this repository.
+- After the script finishes, copy the 'eid.zip' file it created to the root directory of this project replacing the existing 'eid.zip'.
 
-
-The directory structure in the end should look like this:
-
-    'src/'
-    +-- 'main/'
-    |   +-- 'java/'
-    |   +-- 'res/'
-    |   +-- 'assets/'
-    |        +-- blueprint/
-    |        +-- icons/
-    |        +-- planet/
-    |        +-- reaction/
-    |        +-- refine/
-    |        +-- inventory.tsl
-    |        +-- starbases.tsl
-    |        +-- starmap.tsl
-    |        +-- README.md
-    |
-    +-- 'build.gradle'
-    +-- 'settings.gradle'
-    +-- ...
+When making any change to the EVE data the value of the 'DATABASE_VERSION' field in the 'src/main/java/com/exter/eveindcalc/EICDatabaseHelper.java' class must be incremented to make the app refresh the databases after updating.
 
