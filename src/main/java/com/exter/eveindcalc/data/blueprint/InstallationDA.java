@@ -34,7 +34,10 @@ public class InstallationDA
     {
       SQLiteDatabase db = EveDatabase.getDatabase();
       Cursor c = db.query("installations", COLUMNS, "id = ?", new String[] {String.valueOf(key)}, null, null, null);
-      c.moveToNext();
+      if(!c.moveToNext())
+      {
+        throw new IllegalArgumentException("Installation not found: " + key.toString());
+      }
       Installation i = new Installation(c.getInt(0),c.getString(1));
       c.close();
       return i;
@@ -51,7 +54,10 @@ public class InstallationDA
       
       SQLiteDatabase db = EveDatabase.getDatabase();
       Cursor c = db.query("group_installations", COLUMNS, "id = ?", new String[] {String.valueOf(key)}, null, null, null);
-      c.moveToNext();
+      if(!c.moveToNext())
+      {
+        return null;
+      }
       InstallationGroup ig = new InstallationGroup(c.getInt(0),c.getInt(1),c.getInt(2),c.getFloat(3),c.getFloat(4),c.getFloat(5));
       c.close();
       return ig;
@@ -84,7 +90,10 @@ public class InstallationDA
     {
       SQLiteDatabase db = EveDatabase.getDatabase();
       Cursor c = db.query("invention_installations", COLUMNS, "id = ?", new String[] {String.valueOf(key)}, null, null, null);
-      c.moveToNext();
+      if(!c.moveToNext())
+      {
+        return null;
+      }
       InventionInstallation i = new InventionInstallation(c.getInt(0),c.getString(1),c.getFloat(2),c.getFloat(3),c.getInt(4) > 0);
       c.close();
       return i;
