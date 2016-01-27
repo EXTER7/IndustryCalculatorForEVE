@@ -4,4 +4,5 @@
     <string name="about">
 Industry Calculator for EVE Online version 3.2.6.0 © 2016 EXTER Software. All EVE-Online related materials are property of CCP.
 </string>
+<string name="app_github_url">https://github.com/EXTER7/IndustryCalculatorForEVE</string>
 </resources>
