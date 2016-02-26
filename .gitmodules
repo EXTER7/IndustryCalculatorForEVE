@@ -4,3 +4,6 @@
 [submodule "TSL"]
 	path = TSL
 	url = https://github.com/EXTER7/TSL.git
+[submodule "EVEIndustryData"]
+	path = EVEIndustryData
+	url = https://github.com/EXTER7/EVEIndustryData
