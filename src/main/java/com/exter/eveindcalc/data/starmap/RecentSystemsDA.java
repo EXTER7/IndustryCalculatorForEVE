@@ -22,7 +22,7 @@ public class RecentSystemsDA
     }
     systems = new HashSet<>();
     SQLiteDatabase db = EveDatabase.getDatabase();
-    Cursor c = db.rawQuery("SELECT id FROM solar_systems;", null);
+    Cursor c = db.rawQuery("SELECT id FROM saved_solar_systems;", null);
     while(c.moveToNext())
     {
       systems.add(c.getInt(0));

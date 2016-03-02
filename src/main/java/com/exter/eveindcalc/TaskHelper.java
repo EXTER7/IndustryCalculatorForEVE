@@ -13,8 +13,6 @@ import android.widget.RelativeLayout;
 
 import com.exter.cache.Cache;
 import com.exter.cache.LFUCache;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
-import com.exter.eveindcalc.data.inventory.Item;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +23,7 @@ import java.util.Map;
 
 import exter.eveindustry.data.planet.IPlanetBuilding;
 import exter.eveindustry.data.reaction.IReaction;
+import exter.eveindustry.dataprovider.item.Item;
 import exter.eveindustry.item.ItemStack;
 import exter.eveindustry.task.GroupTask;
 import exter.eveindustry.task.ManufacturingTask;
@@ -103,7 +102,7 @@ public class TaskHelper
       {
         return ((Item)m.iterator().next().item).Icon;
       }
-      return InventoryDA.getItem((((ReactionTask) task).getStarbaseTower().getID())).Icon;
+      return EICApplication.getDataProvider().getItem((((ReactionTask) task).getStarbaseTower().getID())).Icon;
     }
 
     @Override
@@ -144,7 +143,7 @@ public class TaskHelper
       {
         return ((Item)m.iterator().next().item).Icon;
       }
-      return InventoryDA.getItem(((PlanetTask) task).getPlanet().getID()).Icon;
+      return EICApplication.getDataProvider().getItem(((PlanetTask) task).getPlanet().getID()).Icon;
     }
 
     @Override

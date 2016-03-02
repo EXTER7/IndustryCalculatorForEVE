@@ -18,11 +18,11 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 import com.exter.controls.BigDecimalEditText;
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
 import com.exter.eveindcalc.SolarSystemDialogFragment;
 import com.exter.eveindcalc.TaskHelper;
 import com.exter.eveindcalc.data.starmap.RecentSystemsDA;
-import com.exter.eveindcalc.data.starmap.Starmap;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -235,7 +235,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     for(int id:RecentSystemsDA.getSystems())
     {
       system_ids.add(id);
-      system_names.add(Starmap.getSolarSystem(id).Name);
+      system_names.add(EICApplication.getDataProvider().getSolarSystem(id).Name);
     }
     system_ids.add(-1);
     system_names.add("[ Other ... ]");

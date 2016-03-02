@@ -1,5 +1,6 @@
 package com.exter.eveindcalc.group;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -179,7 +180,8 @@ public class GroupMenuDialogFragment extends DialogFragment
       }
     }
 
-    private void Share(GroupTask group)
+    @SuppressLint("SetWorldReadable")
+    private void share(GroupTask group)
     {
       Task t = group.getTask(name);
       Intent intent = new Intent(Intent.ACTION_SEND);
@@ -285,14 +287,14 @@ public class GroupMenuDialogFragment extends DialogFragment
         case 4:
           if(EICApplication.isChrome())
           {
-            Share(group);
+            share(group);
           } else
           {
             Export(group);
           }
           break;
         case 5:
-          Share(group);
+          share(group);
           break;
       }
     }

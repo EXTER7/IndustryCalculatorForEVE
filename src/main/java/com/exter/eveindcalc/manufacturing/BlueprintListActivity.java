@@ -5,11 +5,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,37 +26,33 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
 import com.exter.eveindcalc.TaskHelper;
-import com.exter.eveindcalc.data.blueprint.Blueprint;
-import com.exter.eveindcalc.data.blueprint.BlueprintDA;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
-import com.exter.eveindcalc.data.inventory.Item;
-import com.exter.eveindcalc.data.inventory.ItemCategory;
-import com.exter.eveindcalc.data.inventory.ItemGroup;
+import com.exter.eveindcalc.data.EveDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import exter.eveindustry.dataprovider.blueprint.Blueprint;
+import exter.eveindustry.dataprovider.item.Item;
+import exter.eveindustry.dataprovider.item.ItemCategory;
+import exter.eveindustry.dataprovider.item.ItemGroup;
+import exter.eveindustry.dataprovider.item.ItemMetaGroup;
+
 public class BlueprintListActivity extends FragmentActivity
 {
-  private Spinner sp_categories;
   private TextView tx_category;
   private ImageButton bt_category_clear;
 
-  private List<Integer> groups;
-  private List<Integer> categories;
-  private List<Integer> metagroups;
-
-  public int filter_category;
-  public int filter_group;
+  public ItemCategory filter_category;
+  public ItemGroup filter_group;
   public String filter_name;
-  public int filter_metagroup;
-  public List<Integer> bplist;
+  public ItemMetaGroup filter_metagroup;
 
   public List<Integer> bplist_filtered;
 
-  public BlueprintDA blueprints;
+  public EveDatabase provider;
   private FilterTask task;
 
   BlueprintGroupsAdapter groups_adapter;
@@ -108,10 +106,10 @@ public class BlueprintListActivity extends FragmentActivity
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-      Blueprint bp = BlueprintDA.getBlueprint(bplist_filtered.get(position));
+      Blueprint bp = provider.getBlueprint(bplist_filtered.get(position));
       assert bp != null;
-      ItemGroup cat = InventoryDA.getGroup(bp.Product.item.getGroupID());
-      ItemCategory group = InventoryDA.getCategory(cat.Category);
+      ItemGroup cat = provider.getItemGroup(bp.Product.item.getGroupID());
+      ItemCategory group = provider.getItemCategory(cat.Category);
       ItemHolder holder;
       if(convertView == null)
       {
@@ -129,7 +127,7 @@ public class BlueprintListActivity extends FragmentActivity
       TaskHelper.setImageViewItemIcon(holder.im_icon, product);
 
       holder.tx_product.setText(product.Name);
-      holder.tx_category.setText(group.Name + " / " + cat.Name);
+      holder.tx_category.setText(String.format("%s / %s", group.Name, cat.Name));
       return convertView;
     }
   }
@@ -146,9 +144,9 @@ public class BlueprintListActivity extends FragmentActivity
     }
   }
 
-  public class BlueprintGroupsAdapter extends BaseExpandableListAdapter
+  public class BlueprintGroupsAdapter extends BaseExpandableListAdapter implements ExpandableListView.OnGroupClickListener,ExpandableListView.OnChildClickListener
   {
-    private class ItemHolder
+    private class Holder
     {
       public TextView tx_name;
       public ImageView im_icon;
@@ -161,10 +159,15 @@ public class BlueprintListActivity extends FragmentActivity
       inflater = LayoutInflater.from(context);
     }
 
+
     @Override
     public Object getChild(int groupPosition, int childPosition)
     {
-      return InventoryDA.blueprintCategories(groups.get(groupPosition - 1)).get(childPosition);
+      if(groupPosition == 0)
+      {
+        return null;
+      }
+      return getGroups(categories.get(groupPosition - 1)).get(childPosition);
     }
 
     @Override
@@ -176,40 +179,44 @@ public class BlueprintListActivity extends FragmentActivity
     @Override
     public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent)
     {
-      ItemHolder holder;
+      Holder holder;
       if(convertView == null)
       {
         convertView = inflater.inflate(R.layout.itemfilter_group, parent, false);
-        holder = new ItemHolder();
+        holder = new Holder();
         holder.tx_name = (TextView) convertView.findViewById(R.id.tx_item_name);
         holder.im_icon = (ImageView) convertView.findViewById(R.id.im_item_icon);
         convertView.setTag(holder);
       } else
       {
-        holder = (ItemHolder) convertView.getTag();
+        holder = (Holder) convertView.getTag();
       }
-      ItemGroup cat = InventoryDA.getGroup((Integer) getChild(groupPosition, childPosition));
-      TaskHelper.setImageViewItemIcon(holder.im_icon, cat.Icon, 0.75f);
-      holder.tx_name.setText(cat.Name);
+      ItemGroup group = (ItemGroup) getChild(groupPosition, childPosition);
+      TaskHelper.setImageViewItemIcon(holder.im_icon, group.Icon, 0.75f);
+      holder.tx_name.setText(group.Name);
       return convertView;
     }
 
     @Override
     public int getChildrenCount(int groupPosition)
     {
-      return groupPosition == 0?0:InventoryDA.blueprintCategories(groups.get(groupPosition - 1)).size();
+      if(groupPosition == 0)
+      {
+        return 0;
+      }
+      return getGroups(categories.get(groupPosition - 1)).size();
     }
 
     @Override
     public Object getGroup(int groupPosition)
     {
-      return groupPosition == 0?-1:groups.get(groupPosition - 1);
+      return groupPosition == 0?null: category_groups.get(groupPosition - 1);
     }
 
     @Override
     public int getGroupCount()
     {
-      return groups == null?1:groups.size() + 1;
+      return category_groups == null?1: category_groups.size() + 1;
     }
 
     @Override
@@ -221,17 +228,17 @@ public class BlueprintListActivity extends FragmentActivity
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent)
     {
-      ItemHolder holder;
+      Holder holder;
       if(convertView == null)
       {
         convertView = inflater.inflate(R.layout.itemfilter_groupcategory, parent, false);
-        holder = new ItemHolder();
+        holder = new Holder();
         holder.tx_name = (TextView) convertView.findViewById(R.id.tx_item_name);
         holder.im_icon = (ImageView) convertView.findViewById(R.id.im_item_icon);
         convertView.setTag(holder);
       } else
       {
-        holder = (ItemHolder) convertView.getTag();
+        holder = (Holder) convertView.getTag();
       }
       if(groupPosition == 0)
       {
@@ -239,9 +246,9 @@ public class BlueprintListActivity extends FragmentActivity
         holder.tx_name.setText("All");
       } else
       {
-        ItemCategory group = InventoryDA.getCategory(groups.get(groupPosition - 1));
-        TaskHelper.setImageViewItemIcon(holder.im_icon, group.Icon);
-        holder.tx_name.setText(group.Name);
+        ItemCategory category = categories.get(groupPosition - 1);
+        TaskHelper.setImageViewItemIcon(holder.im_icon, category.Icon);
+        holder.tx_name.setText(category.Name);
       }
 
       return convertView;
@@ -258,11 +265,6 @@ public class BlueprintListActivity extends FragmentActivity
     {
       return true;
     }
-  }
-
-
-  private class CategoryGroupClickListener implements ExpandableListView.OnGroupClickListener
-  {
 
     @Override
     public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id)
@@ -270,20 +272,16 @@ public class BlueprintListActivity extends FragmentActivity
       v.setSelected(true);
       if(groupPosition == 0)
       {
-        filter_group = -1;
-        filter_category = -1;
+        filter_group = null;
+        filter_category = null;
       } else
       {
-        filter_group = groups.get(groupPosition - 1);
-        filter_category = -1;
+        filter_group = null;
+        filter_category = categories.get(groupPosition - 1);
       }
       updateFilter();
       return false;
     }
-  }
-
-  private class CategoryClickListener implements ExpandableListView.OnChildClickListener
-  {
 
     @Override
     public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id)
@@ -291,12 +289,13 @@ public class BlueprintListActivity extends FragmentActivity
       v.setSelected(true);
       if(groupPosition == 0)
       {
-        filter_group = -1;
-        filter_category = -1;
+        filter_group = null;
+        filter_category = null;
       } else
       {
-        filter_group = groups.get(groupPosition - 1);
-        filter_category = InventoryDA.blueprintCategories(filter_group).get(childPosition);
+        ItemCategory category = categories.get(groupPosition - 1);
+        filter_group = getGroups(category).get(childPosition);
+        filter_category = category;
       }
       updateFilter();
       return false;
@@ -320,16 +319,47 @@ public class BlueprintListActivity extends FragmentActivity
   private class Filter
   {
     public String name;
-    public int category;
-    public int group;
-    public int metagroup;
+    public ItemCategory category;
+    public ItemGroup group;
+    public ItemMetaGroup metagroup;
 
-    public Filter(String nm, int cat, int grp, int mg)
+    public Filter(String nm, ItemCategory cat, ItemGroup grp, ItemMetaGroup mg)
     {
-      name = nm;
+      name = nm !=null?nm.toLowerCase():null;
       category = cat;
       group = grp;
       metagroup = mg;
+    }
+
+    public Cursor query()
+    {
+      String query = "SELECT blueprints.id FROM blueprints,groups WHERE groups.id = blueprints.gid";
+      if(name != null && name.length() > 2)
+      {
+        String[] tokens = name.split(" ");
+        for(String t:tokens)
+        {
+          if(t != null && t.length() > 1)
+          {
+            t = DatabaseUtils.sqlEscapeString(t);
+            query = query + " AND blueprints.name LIKE '%" + t.substring(1, t.length() - 1) + "%'";
+          }
+        }
+      }
+      if(group != null)
+      {
+        query = query + " AND blueprints.gid = " + String.valueOf(group.ID);
+      }
+      if(category != null)
+      {
+        query = query + " AND groups.cid = " + String.valueOf(category.ID);
+      }
+      if(metagroup != null)
+      {
+        query = query + " AND blueprints.mgid = " + String.valueOf(metagroup.ID);
+      }
+      query = query + " ORDER BY blueprints.name;";
+      return EveDatabase.getDatabase().rawQuery(query, null);
     }
   }
 
@@ -349,15 +379,15 @@ public class BlueprintListActivity extends FragmentActivity
 
   private class FilterTask extends AsyncTask<Filter, Integer, FilterResult>
   {
-    private List<Integer> applyFilter(Filter filter, BlueprintDA src)
+    private List<Integer> applyFilter(Filter filter)
     {
       if(isCancelled())
       {
         return null;
       }
 
-      ArrayList<Integer> products = new ArrayList<>();
-      Cursor c = src.queryBlueprints(filter.name, filter.category, filter.group, filter.metagroup);
+      List<Integer> products = new ArrayList<>();
+      Cursor c = filter.query();
       if(c != null)
       {
         while(c.moveToNext())
@@ -383,7 +413,7 @@ public class BlueprintListActivity extends FragmentActivity
 
       Filter filter = filters[0];
 
-      return new FilterResult(filter, applyFilter(filter, blueprints));
+      return new FilterResult(filter, applyFilter(filter));
     }
 
     @Override
@@ -400,16 +430,16 @@ public class BlueprintListActivity extends FragmentActivity
       bpl_adapter.notifyDataSetChanged();
       if(tx_category != null)
       {
-        int c = result.filter.category;
-        int g = result.filter.group;
+        ItemCategory c = result.filter.category;
+        ItemGroup g = result.filter.group;
         
         String text;
-        if(g >= 0)
+        if(g != null)
         {
-          text = InventoryDA.getCategory(g).Name;
-          if(c >= 0)
+          text = g.Name;
+          if(c != null)
           {
-            text += " / " + InventoryDA.getGroup(c).Name;
+            text += " / " + c.Name;
           }
           bt_category_clear.setEnabled(true);
         } else
@@ -429,7 +459,7 @@ public class BlueprintListActivity extends FragmentActivity
     @Override
     public void afterTextChanged(Editable s)
     {
-      filter_name = s.toString().toLowerCase();
+      filter_name = s.toString();
       updateFilter();
     }
 
@@ -451,26 +481,13 @@ public class BlueprintListActivity extends FragmentActivity
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
     {
-      ArrayList<CharSequence> category_list = new ArrayList<>();
-      category_list.add("All");
       if(pos == 0)
       {
-        filter_group = -1;
-        categories = new ArrayList<>();
+        filter_group = null;
       } else
       {
-        filter_group = groups.get(pos - 1);
-        categories = new ArrayList<>(InventoryDA.blueprintCategories(filter_group));
-        for(int cat : categories)
-        {
-          category_list.add(InventoryDA.getGroup(cat).Name);
-        }
+        filter_group = getGroups(filter_category).get(pos - 1);
       }
-      filter_category = -1;
-      ArrayAdapter<CharSequence> category_adapter = new ArrayAdapter<>(BlueprintListActivity.this, android.R.layout.simple_spinner_item, category_list);
-      category_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-      sp_categories.setAdapter(category_adapter);
-      sp_categories.setSelection(0, true);
       updateFilter();
     }
 
@@ -488,11 +505,12 @@ public class BlueprintListActivity extends FragmentActivity
     {
       if(pos == 0)
       {
-        filter_category = -1;
+        filter_category = null;
       } else
       {
         filter_category = categories.get(pos - 1);
       }
+      updateGroupSpinner();
       updateFilter();
     }
 
@@ -509,7 +527,7 @@ public class BlueprintListActivity extends FragmentActivity
     {
       if(pos == 0)
       {
-        filter_metagroup = -1;
+        filter_metagroup = null;
       } else
       {
         filter_metagroup = metagroups.get(pos - 1);
@@ -529,28 +547,74 @@ public class BlueprintListActivity extends FragmentActivity
     @Override
     public void onClick(View v)
     {
-      filter_group = -1;
-      filter_category = -1;
+      filter_group = null;
+      filter_category = null;
       updateFilter();
     }
   }
+
+  static private List<ItemCategory> categories = null;
+  static private List<ItemMetaGroup> metagroups = null;
+
+  private Spinner sp_groups;
+
+  private SparseArray<List<ItemGroup>> category_groups = new SparseArray<>();
+
+  public List<ItemGroup> getGroups(ItemCategory category)
+  {
+    List<ItemGroup> group = category_groups.get(category.ID);
+    if(group == null)
+    {
+      group = loadCategoryGroups(category);
+      category_groups.put(category.ID,group);
+    }
+    return group;
+  }
+
+  private List<ItemGroup> loadCategoryGroups(ItemCategory category)
+  {
+    List<ItemGroup> groups = new ArrayList<>();
+    Cursor c = EveDatabase.getDatabase().query("groups",new String[] {"id"},"cid = ?",new String[] {String.valueOf(category.ID)},null,null,null);
+    while(c.moveToNext())
+    {
+      groups.add(provider.getItemGroup(c.getInt(0)));
+    }
+    c.close();
+    return groups;
+  }
+
   @Override
   public void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
 
-    blueprints = new BlueprintDA();
-    groups = InventoryDA.blueprintGroups();
-    categories = new ArrayList<>();
-    metagroups = InventoryDA.metaGroups();
+    provider = EICApplication.getDataProvider();
+
+    if(categories == null)
+    {
+      categories = new ArrayList<>();
+      metagroups = new ArrayList<>();
+      Cursor c = EveDatabase.getDatabase().query("categories",new String[] {"id"},null,null,null,null,null);
+      while(c.moveToNext())
+      {
+        categories.add(provider.getItemCategory(c.getInt(0)));
+      }
+      c.close();
+      c = EveDatabase.getDatabase().query("metagroups",new String[] {"id"},null,null,null,null,null);
+      while(c.moveToNext())
+      {
+        metagroups.add(provider.getItemMetaGroup(c.getInt(0)));
+      }
+      c.close();
+    }
+
     filter_name = null;
-    filter_group = -1;
-    filter_category = -1;
-    filter_metagroup = -1;
+    filter_group = null;
+    filter_category = null;
+    filter_metagroup = null;
 
     setContentView(R.layout.itemfilter);
 
-    bplist = blueprints.getAllBlueprints();
 
     TextView tx_search = (TextView) findViewById(R.id.tx_itemfilter_search);
     Spinner sp_metagroups = (Spinner) findViewById(R.id.sp_itemfilter_metagroup);
@@ -560,36 +624,30 @@ public class BlueprintListActivity extends FragmentActivity
     ExpandableListView ls_groups = (ExpandableListView) findViewById(R.id.ls_itemfilter_groups);
     if(ls_groups == null)
     {
-      Spinner sp_groups = (Spinner) findViewById(R.id.sp_itemfilter_group);
-      sp_categories = (Spinner) findViewById(R.id.sp_itemfilter_category);
+      sp_groups = (Spinner) findViewById(R.id.sp_itemfilter_group);
+      Spinner sp_categories = (Spinner) findViewById(R.id.sp_itemfilter_category);
 
-      ArrayList<CharSequence> group_list = new ArrayList<>();
-      group_list.add("All");
-      for(int g : groups)
+
+      ArrayList<CharSequence> category_names = new ArrayList<>();
+      category_names.add("All");
+      for(ItemCategory category:categories)
       {
-        group_list.add(InventoryDA.getCategory(g).Name);
+        category_names.add(category.Name);
       }
-
-      ArrayList<CharSequence> category_list = new ArrayList<>();
-      category_list.add("All");
-
-
-      ArrayAdapter<CharSequence> group_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, group_list);
-      group_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-      ArrayAdapter<CharSequence> category_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, category_list);
+      ArrayAdapter<CharSequence> category_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, category_names);
       category_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-
-      sp_groups.setAdapter(group_adapter);
       sp_categories.setAdapter(category_adapter);
+
+      updateGroupSpinner();
+
       sp_groups.setOnItemSelectedListener(new GroupSelectedListener());
       sp_categories.setOnItemSelectedListener(new CategorySelectedListener());
     } else
     {
       groups_adapter = new BlueprintGroupsAdapter(this);
       ls_groups.setAdapter(groups_adapter);
-      ls_groups.setOnChildClickListener(new CategoryClickListener());
-      ls_groups.setOnGroupClickListener(new CategoryGroupClickListener());
+      ls_groups.setOnChildClickListener(groups_adapter);
+      ls_groups.setOnGroupClickListener(groups_adapter);
       ls_groups.setSelection(0);
       
       tx_category = (TextView) findViewById(R.id.tx_itemfilter_category);
@@ -600,9 +658,9 @@ public class BlueprintListActivity extends FragmentActivity
 
     ArrayList<CharSequence> metagroup_list = new ArrayList<>();
     metagroup_list.add("All");
-    for(int m : metagroups)
+    for(ItemMetaGroup m : metagroups)
     {
-      metagroup_list.add(InventoryDA.getMetaGroup(m).Name);
+      metagroup_list.add(m.Name);
     }
     ArrayAdapter<CharSequence> metagroup_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, metagroup_list);
     metagroup_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -617,6 +675,25 @@ public class BlueprintListActivity extends FragmentActivity
 
 
     setTitle("Manufacturing");
+  }
+
+  private void updateGroupSpinner()
+  {
+    ArrayList<CharSequence> group_list = new ArrayList<>();
+    group_list.add("All");
+    filter_group = null;
+    if(filter_category != null)
+    {
+      for (ItemGroup group : getGroups(filter_category))
+      {
+        group_list.add(group.Name);
+      }
+    }
+    ArrayAdapter<CharSequence> group_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, group_list);
+    group_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    sp_groups.setAdapter(group_adapter);
+    sp_groups.setSelection(0);
+
   }
 
   @Override

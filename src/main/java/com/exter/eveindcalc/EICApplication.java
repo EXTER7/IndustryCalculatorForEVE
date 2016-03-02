@@ -28,6 +28,8 @@ public class EICApplication extends Application
   static private Context context;
   static private GroupTask tasks;
 
+  static private EveDatabase provider;
+
   // return true if the app is running on the ARC runtime in Chrome.
   static public boolean isChrome()
   {
@@ -39,7 +41,8 @@ public class EICApplication extends Application
   {
     super.onCreate();
     context = getApplicationContext();
-    Task.setDataProvider(new EveDatabase());
+    provider = new EveDatabase(getAssets());
+    Task.setDataProvider(provider);
   }
 
   // get the root group task.
@@ -139,5 +142,10 @@ public class EICApplication extends Application
   static public Context getContext()
   {
     return context;
+  }
+
+  static public EveDatabase getDataProvider()
+  {
+    return provider;
   }
 }

@@ -12,13 +12,13 @@ public class ManufacturingSolarSystemDialogFragment extends SolarSystemDialogFra
 {
 
   @Override
-  protected void onSystemSelected(int systemid)
+  protected void onSystemSelected(int system_id)
   {
     EICFragmentActivity activity = (EICFragmentActivity)getActivity();
-    ((ManufacturingTask)activity.getCurrentTask()).setSolarSystem(systemid);
+    ((ManufacturingTask)activity.getCurrentTask()).setSolarSystem(system_id);
     SharedPreferences sp = activity.getSharedPreferences("EIC", Context.MODE_PRIVATE);
     SharedPreferences.Editor ed = sp.edit();
-    ed.putInt("manufacturing.system", systemid);
+    ed.putInt("manufacturing.system", system_id);
     ed.apply();
     activity.notiftyExtraExpenseChanged();
     activity.notifyTaskChanged();

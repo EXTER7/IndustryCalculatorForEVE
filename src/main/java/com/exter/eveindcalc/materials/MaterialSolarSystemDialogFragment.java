@@ -9,7 +9,7 @@ public class MaterialSolarSystemDialogFragment extends SolarSystemDialogFragment
 {
 
   @Override
-  protected void onSystemSelected(int systemid)
+  protected void onSystemSelected(int system_id)
   {
     Fragment f = getActivity().getSupportFragmentManager().findFragmentByTag("MarketFetchDialogFragment");
     if(f == null)
@@ -18,6 +18,6 @@ public class MaterialSolarSystemDialogFragment extends SolarSystemDialogFragment
       return;
     }
     MarketFetchDialogFragment df = (MarketFetchDialogFragment)f;
-    df.setSystem(systemid);
+    df.setSystem(system_id);
   }
 }

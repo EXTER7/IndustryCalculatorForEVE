@@ -18,21 +18,20 @@ import android.widget.TextView;
 
 import com.exter.controls.DoubleEditText;
 import com.exter.controls.IntegerEditText;
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICFragmentActivity;
 import com.exter.eveindcalc.IEveCalculatorFragment;
 import com.exter.eveindcalc.R;
 import com.exter.eveindcalc.TaskHelper;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
-import com.exter.eveindcalc.data.inventory.Item;
-import com.exter.eveindcalc.data.planet.Planet;
-import com.exter.eveindcalc.data.planet.PlanetDA;
-import com.exter.eveindcalc.data.planet.PlanetProduct;
-import com.exter.eveindcalc.data.planet.PlanetProductDA;
+import com.exter.eveindcalc.data.EveDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import exter.eveindustry.data.planet.IPlanetBuilding;
+import exter.eveindustry.dataprovider.item.Item;
+import exter.eveindustry.dataprovider.planet.Planet;
+import exter.eveindustry.dataprovider.planet.PlanetBuilding;
 import exter.eveindustry.task.PlanetTask;
 
 public class PlanetFragment extends Fragment implements IEveCalculatorFragment
@@ -115,12 +114,14 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
   private DoubleEditText ed_tax;
   PlanetTask planet_task;
 
-  private  EICFragmentActivity activity;
+  private EICFragmentActivity activity;
+  private EveDatabase provider;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity)getActivity();
+    provider = EICApplication.getDataProvider();
     planet_task = (PlanetTask)activity.getCurrentTask();
     View rootView = inflater.inflate(R.layout.planet, container, false);
     
@@ -157,10 +158,10 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
       switch(requestCode)
       {
         case REQUEST_PLANET:
-          planet_task.setPlanet(PlanetDA.getPlanet(data.getIntExtra("planet", -1)));
+          planet_task.setPlanet(provider.getPlanet(data.getIntExtra("planet", -1)));
           break;
         case REQUEST_PROCESS:
-          planet_task.addBuilding(PlanetProductDA.getProduct(data.getIntExtra("planetproduct", -1)));
+          planet_task.addBuilding(provider.getPlanetBuilding(data.getIntExtra("planetproduct", -1)));
           break;
       }
       onTaskChanged();
@@ -176,18 +177,18 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
     }
     Planet p = (Planet)planet_task.getPlanet();
     tx_planet_name.setText(p.TypeName);
-    TaskHelper.setImageViewItemIcon(im_planet_icon, InventoryDA.getItem(p.ID));
+    TaskHelper.setImageViewItemIcon(im_planet_icon, provider.getItem(p.ID));
     ed_runtime.setValue(planet_task.getRunTime());
     ed_tax.setValue(planet_task.getCustomsOfficeTax());
 
     holders = new ArrayList<>();
 
     ly_process.removeAllViews();
-        
+
     for(IPlanetBuilding pr:planet_task.getBuildings())
     {
       View v = ly_inflater.inflate(R.layout.process, ly_process, false);
-      ViewHolderPlanetProcess proc_holder = new ViewHolderPlanetProcess(v,(PlanetProduct)pr);
+      ViewHolderPlanetProcess proc_holder = new ViewHolderPlanetProcess(v,(PlanetBuilding)pr);
       ly_process.addView(v);
       holders.add(proc_holder);
     }
@@ -230,9 +231,9 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
     private ImageView im_icon;
     
 
-    private PlanetProduct building;
+    private PlanetBuilding building;
 
-    public ViewHolderPlanetProcess(View view, PlanetProduct proc)
+    public ViewHolderPlanetProcess(View view, PlanetBuilding proc)
     {
       building = proc;
       tx_name = (TextView) view.findViewById(R.id.tx_process_name);
@@ -268,5 +269,4 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
   {
 
   }
-
 }

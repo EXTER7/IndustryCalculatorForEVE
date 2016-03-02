@@ -23,19 +23,18 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.exter.controls.IntegerEditText;
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICFragmentActivity;
 import com.exter.eveindcalc.IEveCalculatorFragment;
 import com.exter.eveindcalc.R;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
-import com.exter.eveindcalc.data.reaction.Reaction;
-import com.exter.eveindcalc.data.reaction.ReactionDA;
-import com.exter.eveindcalc.data.starbase.StarbaseTower;
-import com.exter.eveindcalc.data.starbase.StarbaseTowerDA;
+import com.exter.eveindcalc.data.EveDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import exter.eveindustry.data.reaction.IReaction;
+import exter.eveindustry.dataprovider.reaction.Reaction;
+import exter.eveindustry.dataprovider.starbase.StarbaseTower;
 import exter.eveindustry.task.ReactionTask;
 
 public class ReactionFragment extends Fragment implements IEveCalculatorFragment
@@ -78,10 +77,11 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
         return;
       }
 
-      StarbaseTower tower = StarbaseTowerDA.getTower(tower_ids.get(pos));
+      StarbaseTower tower = towers.get(pos);
       reaction_task.setStarbaseTower(tower);
       SharedPreferences sp = activity.getSharedPreferences("EIC", Context.MODE_PRIVATE);
       SharedPreferences.Editor ed = sp.edit();
+      assert tower.TowerItem != null;
       ed.putInt("reaction.tower", tower.TowerItem.ID);
       ed.apply();
     }
@@ -130,8 +130,10 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
 
   private EICFragmentActivity activity;
 
-  private List<Integer> tower_ids;
+  private List<StarbaseTower> towers;
   public ReactionTask reaction_task;
+
+  private EveDatabase provider;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -140,13 +142,15 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     reaction_task = (ReactionTask) activity.getCurrentTask();
     ly_inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    tower_ids = StarbaseTowerDA.getTowerIDs();
+    provider = EICApplication.getDataProvider();
+
+    towers = new ArrayList<>(provider.allStarbaseTowers());
 
     View root_view = inflater.inflate(R.layout.reaction, container, false);
     List<String> tower_names = new ArrayList<>();
-    for(Integer id : tower_ids)
+    for(StarbaseTower tower : towers)
     {
-      tower_names.add(StarbaseTowerDA.getTower(id).Name);
+      tower_names.add(tower.Name);
     }
     sp_tower = (Spinner) root_view.findViewById(R.id.sp_reaction_tower);
     ed_runtime = new IntegerEditText((EditText) root_view.findViewById(R.id.ed_reaction_runtime), 1, 99999, 0, new RunTimeChangeWatcher());
@@ -175,7 +179,7 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     if(resultCode == Activity.RESULT_OK)
     {
       activity.getCurrentTask().registerListener(activity.GetListener());
-      reaction_task.addReaction(ReactionDA.getReaction(data.getIntExtra("reaction", -1)));
+      reaction_task.addReaction(provider.getReaction(data.getIntExtra("reaction", -1)));
       onTaskChanged();
     }
   }
@@ -189,7 +193,8 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     }
 
     ed_runtime.setValue(reaction_task.getRunTime());
-    sp_tower.setSelection(tower_ids.indexOf(reaction_task.getStarbaseTower().getID()));
+    StarbaseTower tower = (StarbaseTower) reaction_task.getStarbaseTower();
+    sp_tower.setSelection(towers.indexOf(tower));
 
     holders = new ArrayList<>();
 
@@ -255,7 +260,7 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
       {
         im_icon.setImageResource(R.drawable.moonminer);
       }
-      tx_name.setText(InventoryDA.getItem(proc.ID).Name);
+      tx_name.setText(provider.getItem(proc.ID).Name);
       bt_remove.setOnClickListener(new RemoveListener());
     }
   }

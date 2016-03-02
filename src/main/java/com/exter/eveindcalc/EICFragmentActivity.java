@@ -34,7 +34,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.exter.eveindcalc.data.EveDatabase;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
 import com.exter.eveindcalc.data.market.MarketData;
 import com.exter.eveindcalc.group.GroupFragment;
 import com.exter.eveindcalc.group.ImportTaskDialogFragment;
@@ -401,7 +400,7 @@ public class EICFragmentActivity extends FragmentActivity
     @Override
     public void onAcceptItem(int item, Task.Market p)
     {
-      getCurrentTask().setMaterialMarket(InventoryDA.getItem(item), p);
+      getCurrentTask().setMaterialMarket(EICApplication.getDataProvider().getItem(item), p);
       notifyMaterialChanged(item);
       onProfitChanged();
     }
@@ -562,7 +561,10 @@ public class EICFragmentActivity extends FragmentActivity
         }
 
         TSLObject tsl = new TSLObject(reader);
-        is.close();
+        if (is != null)
+        {
+          is.close();
+        }
 
         String name = tsl.getString("name", null);
         if(name == null)

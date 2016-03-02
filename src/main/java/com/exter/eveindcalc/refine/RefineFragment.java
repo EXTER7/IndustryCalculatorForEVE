@@ -14,12 +14,12 @@ import android.widget.TextView;
 
 import com.exter.controls.DoubleEditText;
 import com.exter.controls.IntegerEditText;
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICFragmentActivity;
 import com.exter.eveindcalc.IEveCalculatorFragment;
 import com.exter.eveindcalc.R;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
-import com.exter.eveindcalc.data.inventory.Item;
 
+import exter.eveindustry.dataprovider.item.Item;
 import exter.eveindustry.task.RefiningTask;
 
 public class RefineFragment extends Fragment implements IEveCalculatorFragment
@@ -65,7 +65,6 @@ public class RefineFragment extends Fragment implements IEveCalculatorFragment
   private IntegerEditText ed_amount;
   
   public RefiningTask refine_task;
-  
 
 
   private class RefiningSkillItemSelectedListener implements Spinner.OnItemSelectedListener
@@ -280,8 +279,10 @@ public class RefineFragment extends Fragment implements IEveCalculatorFragment
         break;
     }
 
-    tx_skill.setText(InventoryDA.getItem(refine_task.getRefinable().getSkill()).Name + " skill:");
-    tx_amount.setText(((Item)refine_task.getRefinable().getRequiredItem().item).Name + " amount (units):");
+    tx_skill.setText(String.format("%s skill:",
+            EICApplication.getDataProvider().getItem(refine_task.getRefinable().getSkill()).Name));
+    tx_amount.setText(String.format("%s amount (units):",
+            ((Item) refine_task.getRefinable().getRequiredItem().item).Name));
 
     ed_amount.setValue((int) refine_task.getOreAmount());
     ed_reftax.setValue(refine_task.getRefineryTax());

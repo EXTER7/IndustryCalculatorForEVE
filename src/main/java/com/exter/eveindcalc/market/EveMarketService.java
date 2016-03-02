@@ -12,7 +12,6 @@ import android.util.Pair;
 import android.util.SparseArray;
 
 import com.exter.eveindcalc.EICApplication;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
 import com.exter.eveindcalc.data.market.MarketData;
 import com.exter.eveindcalc.data.market.MarketData.PriceValue;
 import com.exter.eveindcalc.data.market.MarketDataException;
@@ -153,9 +152,9 @@ public class EveMarketService extends IntentService
     {
       String url_str = "http://api.eve-central.com/api/marketstat?typeid=";
       boolean rest = false;
-      for (int item : items)
+      for(int item : items)
       {
-        if (InventoryDA.getItem(item).Market && !MarketData.hasLocalPrice(item, system))
+        if(EICApplication.getDataProvider().getItem(item).Market && !MarketData.hasLocalPrice(item, system))
         {
           if (rest)
           {
@@ -165,7 +164,7 @@ public class EveMarketService extends IntentService
           url_str += String.valueOf(item);
         }
       }
-      if (rest)
+      if(rest)
       {
         url_str += "&usesystem=" + String.valueOf(system);
 

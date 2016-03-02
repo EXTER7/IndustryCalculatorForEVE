@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Pair;
 
 import com.exter.eveindcalc.data.EveDatabase;
-import com.exter.eveindcalc.data.inventory.Item;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import exter.eveindustry.data.inventory.IItem;
+import exter.eveindustry.dataprovider.item.Item;
 import exter.eveindustry.task.Task.Market;
 
 public class MarketData

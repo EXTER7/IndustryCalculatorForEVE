@@ -16,10 +16,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
 import com.exter.eveindcalc.TaskHelper;
-import com.exter.eveindcalc.data.Index;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
+
+import exter.eveindustry.dataprovider.index.Index;
+
 
 public abstract class ItemListActivity extends FragmentActivity
 {
@@ -78,7 +80,7 @@ public abstract class ItemListActivity extends FragmentActivity
       {
         if(e.Group == group.ID)
         {
-          TaskHelper.setImageViewItemIcon(holder.im_icon, InventoryDA.getItem(e.ID));
+          TaskHelper.setImageViewItemIcon(holder.im_icon, EICApplication.getDataProvider().getItem(e.ItemID));
           break;
         }
       }

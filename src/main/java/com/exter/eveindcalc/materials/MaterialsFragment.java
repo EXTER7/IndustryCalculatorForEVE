@@ -16,23 +16,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICFragmentActivity;
 import com.exter.eveindcalc.IEveCalculatorFragment;
 import com.exter.eveindcalc.R;
 import com.exter.eveindcalc.TaskHelper;
 import com.exter.eveindcalc.data.EveDatabase;
-import com.exter.eveindcalc.data.blueprint.BlueprintDA;
 import com.exter.eveindcalc.data.blueprint.BlueprintHistoryDA;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
-import com.exter.eveindcalc.data.inventory.Item;
-import com.exter.eveindcalc.data.planet.Planet;
-import com.exter.eveindcalc.data.planet.PlanetDA;
-import com.exter.eveindcalc.data.planet.PlanetProduct;
-import com.exter.eveindcalc.data.planet.PlanetProductDA;
-import com.exter.eveindcalc.data.reaction.Reaction;
-import com.exter.eveindcalc.data.reaction.ReactionDA;
-import com.exter.eveindcalc.data.starbase.StarbaseTowerDA;
-import com.exter.eveindcalc.data.starmap.Starmap;
 import com.exter.eveindcalc.util.XUtil;
 
 import java.math.BigDecimal;
@@ -42,6 +32,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import exter.eveindustry.dataprovider.item.Item;
+import exter.eveindustry.dataprovider.planet.Planet;
+import exter.eveindustry.dataprovider.planet.PlanetBuilding;
+import exter.eveindustry.dataprovider.reaction.Reaction;
 import exter.eveindustry.item.ItemStack;
 import exter.eveindustry.task.GroupTask;
 import exter.eveindustry.task.ManufacturingTask;
@@ -122,9 +116,8 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
     {
       private Planet getPlanetFromResources(SparseIntArray raw, boolean advanced)
       {
-        planet:for(int pid:PlanetDA.getPlanetIDs())
+        planet:for(Planet p:provider.allPlanets())
         {
-          Planet p = PlanetDA.getPlanet(pid);
           if(advanced && !p.Advanced)
           {
             continue;
@@ -132,7 +125,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           int i;
           for(i = 0; i < raw.size(); i++)
           {
-            if(!p.Resources.contains(InventoryDA.getItem(raw.keyAt(i))))
+            if(!p.Resources.contains(provider.getItem(raw.keyAt(i))))
             {
               continue planet;
             }
@@ -142,12 +135,12 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         return null;
       }
       
-      private void addPlanetSubProcess(PlanetTask task, PlanetProduct prod, SparseIntArray raw)
+      private void addPlanetSubProcess(PlanetTask task, PlanetBuilding prod, SparseIntArray raw)
       {
         for(ItemStack m : prod.Materials)
         {
           int i;
-          PlanetProduct sub = PlanetProductDA.getProduct(m.item.getID());
+          PlanetBuilding sub = provider.getPlanetBuilding(m.item);
           long amount = m.amount / sub.ProductItem.amount;
           if(m.amount % sub.ProductItem.amount > 0)
           {
@@ -193,7 +186,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           case Group_Blueprint:
           {
             GroupTask group = (GroupTask)calc.getCurrentTask();
-            ManufacturingTask t = new ManufacturingTask(BlueprintDA.getBlueprint(material.item.getID()));
+            ManufacturingTask t = new ManufacturingTask(provider.getBlueprint(material.item.getID()));
             SharedPreferences sp = getActivity().getSharedPreferences("EIC", Context.MODE_PRIVATE);
             t.setHardwiring(ManufacturingTask.Hardwiring.fromInt(sp.getInt("manufacturing.hardwiring", ManufacturingTask.Hardwiring.None.value)));
             t.setSolarSystem(sp.getInt("manufacturing.system", 30000142));
@@ -213,8 +206,8 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           {
             GroupTask group = (GroupTask)calc.getCurrentTask();
             int i;
-            PlanetTask t = new PlanetTask(PlanetDA.getPlanet(11));
-            PlanetProduct p = PlanetProductDA.getProduct(material.item.getID());
+            PlanetTask t = new PlanetTask(provider.getPlanet(11));
+            PlanetBuilding p = provider.getPlanetBuilding(material.item.getID());
             t.addBuilding(p);
             t.setRunTime((int)XUtil.DivCeil( material.amount,p.ProductItem.amount * 24 * group.getScale()));
             SparseIntArray raw = new SparseIntArray();
@@ -226,7 +219,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
               for(i = 0; i < raw.size(); i++)
               {
                 int j;
-                PlanetProduct rp = PlanetProductDA.getProduct(raw.keyAt(i));
+                PlanetBuilding rp = provider.getPlanetBuilding(raw.keyAt(i));
                 long amount = raw.valueAt(i) / rp.getProduct().amount;
                 if(raw.valueAt(i) % rp.getProduct().amount > 0)
                 {
@@ -244,8 +237,8 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           case Group_Reaction:
           {
             GroupTask group = (GroupTask)calc.getCurrentTask();
-            ReactionTask t = new ReactionTask(StarbaseTowerDA.getTower(StarbaseTowerDA.getTowerIDs().get(0)));
-            Reaction r = ReactionDA.getReaction(material.item.getID());
+            ReactionTask t = new ReactionTask(provider.allStarbaseTowers().iterator().next());
+            Reaction r = provider.getReaction(material.item.getID());
             t.addReaction(r);
             t.setRunTime((int)XUtil.DivCeil(material.amount,r.GetMainOutputAmount() * 24 * group.getScale()));
             group.addTask(((Item)material.item).Name, t);
@@ -255,7 +248,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           case Planet_Factory:
           {
             PlanetTask t = (PlanetTask)calc.getCurrentTask();
-            PlanetProduct p = PlanetProductDA.getProduct(material.item.getID());
+            PlanetBuilding p = provider.getPlanetBuilding(material.item);
             int times = (int)XUtil.DivCeil(material.amount, p.ProductItem.amount * t.getRunTime() * 24);
             int i;
             for(i = 0; i < times; i++)
@@ -268,7 +261,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           case Reaction_Reactor:
           {
             ReactionTask t = (ReactionTask)calc.getCurrentTask();
-            Reaction r = ReactionDA.getReaction(material.item.getID());
+            Reaction r = provider.getReaction(material.item.getID());
             int times = (int)XUtil.DivCeil(material.amount, r.GetMainOutputAmount() * t.getRunTime() * 24);
             int i;
             for(i = 0; i < times; i++)
@@ -304,21 +297,21 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
 
       DecimalFormat formatter = new DecimalFormat("###,###");
       DecimalFormat formatter_decimal = new DecimalFormat("###,###.##");
-      tx_material_volume.setText(formatter_decimal.format(material.amount * item.Volume) + " m3");
+      tx_material_volume.setText(String.format("%s m3", formatter_decimal.format(material.amount * item.Volume)));
       Task.Market price = task.getMaterialMarket(material.item);
       switch(price.order)
       {
         case SELL:
-          tx_source.setText("Sell orders: " + Starmap.getSolarSystem(price.system).Name);
+          tx_source.setText(String.format("Sell orders: %s", provider.getSolarSystem(price.system).Name));
           break;
         case BUY:
-          tx_source.setText("Buy orders: " + Starmap.getSolarSystem(price.system).Name);
+          tx_source.setText(String.format("Buy orders: %s", provider.getSolarSystem(price.system).Name));
           break;
         case MANUAL:
           tx_source.setText("Manual");
           break;
       }
-      tx_material.setText(item.Name + " \u00D7 " + formatter.format(material.amount));
+      tx_material.setText(String.format("%s × %s", item.Name, formatter.format(material.amount)));
       updatePriceValue();
     }
 
@@ -332,8 +325,8 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
       } else
       {
         DecimalFormat formatter_decimal = new DecimalFormat("###,###.##");
-        tx_material_totalprice.setText(formatter_decimal.format(price_value.multiply(new BigDecimal(material.amount))) + " ISK");
-        tx_price.setText(price_value.toPlainString() + " ISK/unit");
+        tx_material_totalprice.setText(String.format("%s ISK", formatter_decimal.format(price_value.multiply(new BigDecimal(material.amount)))));
+        tx_price.setText(String.format("%s ISK/unit", price_value.toPlainString()));
       }
     }
 
@@ -361,15 +354,15 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         Drawable dr = ContextCompat.getDrawable(MaterialsFragment.this.getActivity(), R.drawable.cost_blank);
         if(task instanceof GroupTask)
         {
-          if(BlueprintDA.isItemBlueprint(mat.item.getID()))
+          if(provider.getBlueprint(mat.item.getID()) != null)
           {
             type = ItemType.Group_Blueprint;
             dr = ContextCompat.getDrawable(MaterialsFragment.this.getActivity(), R.drawable.cost_manufacuring);
-          } else if(ReactionDA.isItemReaction(mat.item.getID()))
+          } else if(provider.getReaction(mat.item.getID()) != null)
           {
             type = ItemType.Group_Reaction;
             dr = ContextCompat.getDrawable(MaterialsFragment.this.getActivity(), R.drawable.cost_reaction);
-          } else if(PlanetProductDA.IsItemFromPlanet(mat.item.getID()))
+          } else if(provider.getPlanetBuilding(mat.item) != null)
           {
             type = ItemType.Group_Planet;
             dr = ContextCompat.getDrawable(MaterialsFragment.this.getActivity(), R.drawable.cost_pi);
@@ -380,7 +373,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         } else if(task instanceof PlanetTask)
         {
           PlanetTask t = (PlanetTask)task;
-          PlanetProduct p = PlanetProductDA.getProduct(mat.item.getID());
+          PlanetBuilding p = provider.getPlanetBuilding(mat.item);
           if(p == null)
           {
             type = ItemType.Market;
@@ -401,7 +394,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           }
         } else if(task instanceof ReactionTask)
         {
-          Reaction r = ReactionDA.getReaction(mat.item.getID());
+          Reaction r = provider.getReaction(mat.item.getID());
           if(r == null)
           {
             type = ItemType.Market;
@@ -487,13 +480,13 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         total_volume += m.amount * i.Volume;
       }
       DecimalFormat formatter_decimal = new DecimalFormat("###,###.##");
-      tx_volume.setText(formatter_decimal.format(total_volume) + " m3");
-      tx_totalprice.setText(formatter_decimal.format(total_price) + " ISK");
+      tx_volume.setText(String.format("%s m3", formatter_decimal.format(total_volume)));
+      tx_totalprice.setText(String.format("%s ISK", formatter_decimal.format(total_price)));
 
       tx_name.setText(name);
       if(!produced)
       {
-        tx_extra.setText("Additional expense: "+ formatter_decimal.format(calc.getCurrentTask().getExtraExpense()) +" ISK");
+        tx_extra.setText(String.format("Additional expense: %s ISK", formatter_decimal.format(calc.getCurrentTask().getExtraExpense())));
       }
     }
 
@@ -535,12 +528,14 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
   ViewHolderGroup prod_holder;
   private LayoutInflater ly_inflater;
 
+  private EveDatabase provider;
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
-
     View rootView = inflater.inflate(R.layout.matlist, container, false);
-    
+    provider = EICApplication.getDataProvider();
+
     calc = (EICFragmentActivity) getActivity();
     ly_inflater = (LayoutInflater) calc.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     ly_materials = (LinearLayout) rootView.findViewById(R.id.ly_matlist_materials);

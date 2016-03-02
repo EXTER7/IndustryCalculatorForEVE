@@ -2,6 +2,7 @@ package com.exter.eveindcalc.manufacturing;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,31 +19,28 @@ import android.widget.TextView;
 
 import com.exter.controls.DoubleEditText;
 import com.exter.controls.IntegerEditText;
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICFragmentActivity;
 import com.exter.eveindcalc.IEveCalculatorFragment;
 import com.exter.eveindcalc.R;
 import com.exter.eveindcalc.SolarSystemDialogFragment;
+import com.exter.eveindcalc.data.EveDatabase;
 import com.exter.eveindcalc.data.blueprint.BlueprintHistoryDA;
-import com.exter.eveindcalc.data.blueprint.Installation;
-import com.exter.eveindcalc.data.blueprint.InstallationDA;
-import com.exter.eveindcalc.data.blueprint.InstallationGroup;
-import com.exter.eveindcalc.data.blueprint.InventionInstallation;
-import com.exter.eveindcalc.data.decryptor.Decryptor;
-import com.exter.eveindcalc.data.decryptor.DecryptorDA;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
-import com.exter.eveindcalc.data.inventory.Item;
 import com.exter.eveindcalc.data.starmap.RecentSystemsDA;
-import com.exter.eveindcalc.data.starmap.Starmap;
 import com.exter.eveindcalc.util.XUtil;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import exter.eveindustry.data.blueprint.IBlueprint;
+import exter.eveindustry.dataprovider.blueprint.InventionInstallation;
+import exter.eveindustry.dataprovider.decryptor.Decryptor;
+import exter.eveindustry.dataprovider.item.Item;
 import exter.eveindustry.task.ManufacturingTask;
 
 public class ManufacturingFragment extends Fragment implements IEveCalculatorFragment
@@ -89,7 +87,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
 
     public void Update()
     {
-      tx_name.setText(getName() + " skill:");
+      tx_name.setText(String.format("%s skill:", getName()));
       sp_level.setSelection(getLevel());
     }
 
@@ -110,7 +108,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
       {
         return "";
       }
-      return InventoryDA.getItem(skill).Name;
+      return provider.getItem(skill).Name;
     }
 
     public int getLevel()
@@ -162,7 +160,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
       {
         return;
       }
-      man_task.getInvention().setDecryptor(pos == 0 ? null : DecryptorDA.getDecryptors().get(pos - 1));
+      man_task.getInvention().setDecryptor(pos == 0 ? null : decryptors.get(pos - 1));
 
       ed_runs.setValue(man_task.getRuns());
       ed_copies.setValue(man_task.getCopies());
@@ -314,7 +312,8 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
       {
         return;
       }
-      man_task.setInstallation(installation_groups.get(pos));
+      EveDatabase provider = EICApplication.getDataProvider();
+      man_task.setInstallation(provider.getInstallationGroup(installation_group_ids.get(pos)));
       updateTime();
       activity.notiftyExtraExpenseChanged();
       activity.onProfitChanged();
@@ -336,7 +335,8 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
       {
         return;
       }
-      man_task.getInvention().setInstallation(InstallationDA.getInventionInstallation(invention_installations.get(pos)));
+      EveDatabase provider = EICApplication.getDataProvider();
+      man_task.getInvention().setInstallation(provider.getInventionInstallation(invention_installation_ids.get(pos)));
       updateTime();
       activity.notiftyExtraExpenseChanged();
       activity.onProfitChanged();
@@ -423,8 +423,9 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
 
   private List<Integer> system_ids;
 
-  private List<InstallationGroup> installation_groups;
-  private List<Integer> invention_installations;
+  private List<Integer> installation_group_ids = new ArrayList<>();
+  private List<Integer> invention_installation_ids = null;
+  private List<String> invention_installation_names = null;
 
   private EICFragmentActivity activity;
 
@@ -433,11 +434,20 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
   private List<Integer> relic_ids;
   public ManufacturingTask man_task;
   public BlueprintHistoryDA.Entry histent;
+  private EveDatabase provider;
+
+  static private List<Decryptor> decryptors = null;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity) getActivity();
+    provider = EICApplication.getDataProvider();
+
+    if(decryptors == null)
+    {
+      decryptors = new ArrayList<>(provider.allDecryptors());
+    }
 
     man_task = (ManufacturingTask) activity.getCurrentTask();
     histent = BlueprintHistoryDA.getEntry(man_task.getBlueprint().getID());
@@ -487,6 +497,30 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
 
     ch_invention_enable.setOnCheckedChangeListener(new InventionEnableListener());
 
+    EveDatabase provider = EICApplication.getDataProvider();
+
+    int group = man_task.getBlueprint().getProduct().item.getGroupID();
+    List<String> installation_names = new ArrayList<>();
+    Cursor c = EveDatabase.getDatabase().query("group_installations",new String[] { "id", "installation" },"gid = ?", new String[] {String.valueOf(group)}, null, null, null);
+    while(c.moveToNext())
+    {
+      int id = c.getInt(0);
+      String name = provider.getInstallation(c.getInt(1)).Name;
+      if(id == provider.getDefaultInstallation(man_task.getBlueprint()).ID)
+      {
+        installation_group_ids.add(0, id);
+        installation_names.add(0, name);
+      } else
+      {
+        installation_group_ids.add(id);
+        installation_names.add(name);
+      }
+    }
+    c.close();
+    ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, installation_names);
+    spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    sp_installation.setAdapter(spinnerArrayAdapter);
+    //noinspection SuspiciousMethodCalls
     onTaskChanged();
 
     return root_view;
@@ -513,7 +547,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
       return;
     }
     DecimalFormat f = new DecimalFormat("##.#");
-    tx_invention_success.setText(f.format(man_task.getInvention().getChance() * 100) + " %");
+    tx_invention_success.setText(String.format("%s %%", f.format(man_task.getInvention().getChance() * 100)));
   }
 
   private void updateTime()
@@ -535,27 +569,8 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
       return;
     }
 
-    List<InstallationGroup> installations = InstallationDA.getBlueprintInstallations(man_task.getBlueprint());
-    List<String> installation_names = new ArrayList<>();
-    installation_groups = new ArrayList<>();
-    for(InstallationGroup ig : installations)
-    {
-      Installation ins = InstallationDA.getInstallation(ig.Installation);
-      if(ins.ID == InstallationDA.getDefaultInstallation())
-      {
-        installation_groups.add(0, ig);
-        installation_names.add(0, ins.Name);
-      } else
-      {
-        installation_groups.add(ig);
-        installation_names.add(ins.Name);
-      }
-    }
-    ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, installation_names);
-    spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    sp_installation.setAdapter(spinnerArrayAdapter);
-    //noinspection SuspiciousMethodCalls
-    sp_installation.setSelection(installation_groups.indexOf(man_task.getInstallation()));
+
+    sp_installation.setSelection(installation_group_ids.indexOf(man_task.getInstallation().getID()));
 
     ed_tax.setValue(man_task.getInstallationTax());
 
@@ -569,7 +584,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
     for(int id : RecentSystemsDA.getSystems())
     {
       system_ids.add(id);
-      system_names.add(Starmap.getSolarSystem(id).Name);
+      system_names.add(provider.getSolarSystem(id).Name);
     }
     system_ids.add(-1);
     system_names.add("[ Other ... ]");
@@ -595,7 +610,6 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
         ed_invention_attempts.setValue(tinv.getAttempts());
         ed_invention_runs.setValue(tinv.getInventionRuns());
 
-        List<Decryptor> decryptors = DecryptorDA.getDecryptors();
         List<String> decr_names = new ArrayList<>();
         decr_names.add(" [None]");
         for(Decryptor d : decryptors)
@@ -616,23 +630,25 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
         }
         sp_invention_decryptor.setOnItemSelectedListener(new DecryptorSelectedListener());
 
-        if(bpinv.usesRelics())
+        if(invention_installation_ids == null)
         {
-          invention_installations = InstallationDA.getRelicInventionInstallationIDs();
-        } else
-        {
-          invention_installations = InstallationDA.getInventionInstallationIDs();
+          invention_installation_ids = new ArrayList<>();
+          invention_installation_names = new ArrayList<>();
+          for(Iterator<InventionInstallation> iter = provider.allInventionInstallations();iter.hasNext();)
+          {
+            InventionInstallation inst = iter.next();
+            if(bpinv.usesRelics() == inst.Relics)
+            {
+              invention_installation_ids.add(inst.ID);
+              invention_installation_names.add(inst.Name);
+            }
+          }
         }
-        List<String> invention_installation_names = new ArrayList<>();
-        for(Integer i : invention_installations)
-        {
-          InventionInstallation ins = InstallationDA.getInventionInstallation(i);
-          invention_installation_names.add(ins.Name);
-        }
+
         ArrayAdapter<String> invention_spinnerArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, invention_installation_names);
         invention_spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sp_invention_installation.setAdapter(invention_spinnerArrayAdapter);
-        sp_invention_installation.setSelection(invention_installations.indexOf(tinv.GetInstallation().getID()));
+        sp_invention_installation.setSelection(invention_installation_ids.indexOf(tinv.getInstallation().getID()));
 
         Set<Integer> relics = bpinv.getRelicIDs();
         if(relics != null)
@@ -642,7 +658,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
           List<String> relic_names = new ArrayList<>();
           for(int r : relic_ids)
           {
-            relic_names.add(InventoryDA.getItem(r).Name);
+            relic_names.add(provider.getItem(r).Name);
           }
           ArrayAdapter<String> relic_spinnerArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, relic_names);
           relic_spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

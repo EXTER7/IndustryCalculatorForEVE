@@ -19,7 +19,6 @@ import android.widget.Spinner;
 import com.exter.controls.IntegerEditText;
 import com.exter.eveindcalc.data.EveDatabase;
 import com.exter.eveindcalc.data.starmap.RecentSystemsDA;
-import com.exter.eveindcalc.data.starmap.Starmap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -249,7 +248,7 @@ public class SettingsDialogFragment extends DialogFragment
     for(int id:RecentSystemsDA.getSystems())
     {
       system_ids.add(id);
-      system_names.add(Starmap.getSolarSystem(id).Name);
+      system_names.add(EICApplication.getDataProvider().getSolarSystem(id).Name);
     }
     system_ids.add(-1);
     system_names.add("[ Other ... ]");

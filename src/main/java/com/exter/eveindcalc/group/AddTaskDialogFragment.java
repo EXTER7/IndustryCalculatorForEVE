@@ -15,17 +15,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICFragmentActivity;
 import com.exter.eveindcalc.R;
-import com.exter.eveindcalc.data.blueprint.BlueprintDA;
 import com.exter.eveindcalc.data.blueprint.BlueprintHistoryDA;
-import com.exter.eveindcalc.data.inventory.Item;
-import com.exter.eveindcalc.data.planet.PlanetDA;
-import com.exter.eveindcalc.data.refine.RefineDA;
-import com.exter.eveindcalc.data.starbase.StarbaseTowerDA;
 import com.exter.eveindcalc.manufacturing.BlueprintListActivity;
 import com.exter.eveindcalc.refine.RefineListActivity;
 
+import exter.eveindustry.dataprovider.EVEDataProvider;
+import exter.eveindustry.dataprovider.item.Item;
 import exter.eveindustry.task.GroupTask;
 import exter.eveindustry.task.ManufacturingTask;
 import exter.eveindustry.task.PlanetTask;
@@ -64,7 +62,7 @@ public class AddTaskDialogFragment extends DialogFragment
     public void onClick(View v)
     {
       GroupTask group_task = (GroupTask)activity.getCurrentTask();
-      ReactionTask task = new ReactionTask(StarbaseTowerDA.getTower(16213));
+      ReactionTask task = new ReactionTask(provider.getStarbaseTower(16213));
       group_task.addTask("New Reaction Starbase",task);
       activity.notifyTaskChanged();
       activity.onProfitChanged();
@@ -78,7 +76,7 @@ public class AddTaskDialogFragment extends DialogFragment
     public void onClick(View v)
     {
       GroupTask group_task = (GroupTask)activity.getCurrentTask();
-      PlanetTask task = new PlanetTask(PlanetDA.getPlanet(11));
+      PlanetTask task = new PlanetTask(provider.getPlanet(11));
       group_task.addTask("New Planet",task);
       activity.notifyTaskChanged();
       activity.onProfitChanged();
@@ -97,7 +95,7 @@ public class AddTaskDialogFragment extends DialogFragment
         if(resultCode == Activity.RESULT_OK)
         {
           GroupTask group = (GroupTask)activity.getCurrentTask();
-          ManufacturingTask task = new ManufacturingTask(BlueprintDA.getBlueprint(
+          ManufacturingTask task = new ManufacturingTask(provider.getBlueprint(
                   data.getIntExtra("product", -1)));
           SharedPreferences sp = getActivity().getSharedPreferences("EIC", Context.MODE_PRIVATE);
           task.setHardwiring(ManufacturingTask.Hardwiring.fromInt(sp.getInt("manufacturing.hardwiring", ManufacturingTask.Hardwiring.None.value)));
@@ -120,7 +118,7 @@ public class AddTaskDialogFragment extends DialogFragment
         {
           GroupTask group = (GroupTask)activity.getCurrentTask();
           RefiningTask task = new RefiningTask(
-              RefineDA.getRefine(data.getIntExtra("refine", -1)));
+              provider.getRefinable(data.getIntExtra("refine", -1)));
           group.addTask(((Item)task.getRefinable().getRequiredItem().item).Name, task);
           activity.notifyTaskChanged();
           activity.onProfitChanged();
@@ -131,13 +129,15 @@ public class AddTaskDialogFragment extends DialogFragment
   }
   
   private EICFragmentActivity activity;
-  
+  private EVEDataProvider provider;
+
   @NonNull
   @SuppressLint("InflateParams")
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity) getActivity();
+    provider = EICApplication.getDataProvider();
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     LayoutInflater inflater = getActivity().getLayoutInflater();
     View view = inflater.inflate(R.layout.add_task, null);

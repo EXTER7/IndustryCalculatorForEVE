@@ -3,9 +3,10 @@ package com.exter.eveindcalc.reaction;
 import android.app.Activity;
 import android.content.Intent;
 
-import com.exter.eveindcalc.data.Index;
-import com.exter.eveindcalc.data.reaction.ReactionDA;
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.itemlist.ItemListActivity;
+
+import exter.eveindustry.dataprovider.index.Index;
 
 public class MoonMinerListActivity extends ItemListActivity
 {
@@ -28,7 +29,7 @@ public class MoonMinerListActivity extends ItemListActivity
   @Override
   protected Index loadIndex()
   {
-    return ReactionDA.getMoonIndex();
+    return EICApplication.getDataProvider().getMoonProductIndex();
   }
 
 }

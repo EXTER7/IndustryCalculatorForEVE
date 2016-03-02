@@ -426,7 +426,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
           BigDecimal income_hour = income.multiply(SECONDS_HOUR).divide(time,10,BigDecimal.ROUND_UP);
           BigDecimal expense_hour = expense.multiply(SECONDS_HOUR).divide(time,10,BigDecimal.ROUND_UP);
           setProfit(tx_profithour, income_hour, expense_hour, false, false, "ISK/Hour");
-          tx_duration.setText("Duration: " + XUtil.TimeToStr(dur));
+          tx_duration.setText(String.format("Duration: %s", XUtil.TimeToStr(dur)));
         } else
         {
           tx_profithour.setText(" ");

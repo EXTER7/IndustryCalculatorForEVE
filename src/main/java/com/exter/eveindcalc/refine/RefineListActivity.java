@@ -3,9 +3,10 @@ package com.exter.eveindcalc.refine;
 import android.app.Activity;
 import android.content.Intent;
 
-import com.exter.eveindcalc.data.Index;
-import com.exter.eveindcalc.data.refine.RefineDA;
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.itemlist.ItemListActivity;
+
+import exter.eveindustry.dataprovider.index.Index;
 
 public class RefineListActivity extends ItemListActivity
 {
@@ -29,6 +30,6 @@ public class RefineListActivity extends ItemListActivity
   @Override
   protected Index loadIndex()
   {
-    return RefineDA.getIndex();
+    return EICApplication.getDataProvider().getRefinableIndex();
   }
 }

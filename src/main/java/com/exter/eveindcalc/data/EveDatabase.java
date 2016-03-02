@@ -2,47 +2,80 @@ package com.exter.eveindcalc.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICDatabaseHelper;
 import com.exter.eveindcalc.data.basecost.BaseCostDA;
-import com.exter.eveindcalc.data.blueprint.BlueprintDA;
-import com.exter.eveindcalc.data.blueprint.InstallationDA;
-import com.exter.eveindcalc.data.blueprint.InstallationGroup;
-import com.exter.eveindcalc.data.decryptor.DecryptorDA;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
-import com.exter.eveindcalc.data.inventory.Item;
 import com.exter.eveindcalc.data.market.MarketData;
-import com.exter.eveindcalc.data.planet.PlanetDA;
-import com.exter.eveindcalc.data.planet.PlanetProductDA;
-import com.exter.eveindcalc.data.reaction.ReactionDA;
-import com.exter.eveindcalc.data.refine.RefineDA;
-import com.exter.eveindcalc.data.starbase.StarbaseTowerDA;
 import com.exter.eveindcalc.data.systemcost.SystemCostDA;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
-import exter.eveindustry.data.IEVEDataProvider;
+import exter.eveindustry.dataprovider.EVEDataProvider;
 import exter.eveindustry.data.blueprint.IBlueprint;
-import exter.eveindustry.data.blueprint.IInstallationGroup;
-import exter.eveindustry.data.blueprint.IInventionInstallation;
-import exter.eveindustry.data.decryptor.IDecryptor;
 import exter.eveindustry.data.inventory.IItem;
-import exter.eveindustry.data.planet.IPlanet;
-import exter.eveindustry.data.planet.IPlanetBuilding;
-import exter.eveindustry.data.reaction.IReaction;
-import exter.eveindustry.data.reaction.IStarbaseTower;
-import exter.eveindustry.data.refinable.IRefinable;
 import exter.eveindustry.data.systemcost.ISolarSystemIndustryCost;
+import exter.eveindustry.dataprovider.filesystem.IFileSystemHandler;
+import exter.eveindustry.dataprovider.item.Item;
 import exter.eveindustry.task.Task;
 import exter.eveindustry.task.Task.Market;
 
-public class EveDatabase implements IEVEDataProvider
+public class EveDatabase extends EVEDataProvider
 {
   static private EICDatabaseHelper dbhelper;
   static private SQLiteDatabase database;
+
+  static private class AssetsFileSystemHandler implements IFileSystemHandler
+  {
+    private AssetManager assets;
+
+    public AssetsFileSystemHandler(AssetManager assets)
+    {
+      this.assets = assets;
+    }
+
+    @Override
+    public <T> T readFile(String path, IReadHandler<T> handler)
+    {
+      try
+      {
+        InputStream stream = assets.open(path);
+        T result = handler.readFile(stream);
+        stream.close();
+        return result;
+      } catch(IOException e)
+      {
+        return null;
+      }
+    }
+
+    @Override
+    public List<String> listDirectoryFiles(String path)
+    {
+      List<String> result = new ArrayList<>();
+      try
+      {
+        String[] contents = assets.list(path);
+        for(String file: contents)
+        {
+          if(file.endsWith(".tsl"))
+          {
+            result.add(path + "/" + file);
+          }
+        }
+        return result;
+      } catch(IOException e1)
+      {
+        return result;
+      }
+    }
+  }
 
   static public SQLiteDatabase getDatabase()
   {
@@ -73,36 +106,10 @@ public class EveDatabase implements IEVEDataProvider
   static private Task.Market def_produced = null;
   static private int default_me = -1;
   static private int default_te = -1;
-  
-  @Override
-  public int getDefaultSolarSystem()
-  {
-    return 30000142;
-  }
 
-
-  @Override
-  public int getIndustrySkillID()
+  public EveDatabase(AssetManager assets)
   {
-    return 3380;
-  }
-
-  @Override
-  public int getAdvancedIndustrySkillID()
-  {
-    return 3388;
-  }
-
-  @Override
-  public int getRefiningSkillID()
-  {
-    return 3388;
-  }
-
-  @Override
-  public int getRefineryEfficiencySkillID()
-  {
-    return 3389;
+    super(new AssetsFileSystemHandler(assets));
   }
 
   @Override
@@ -227,92 +234,6 @@ public class EveDatabase implements IEVEDataProvider
     SharedPreferences.Editor ed = sp.edit();
     ed.putInt("blueprint.default.te", te);
     ed.apply();
-  }
-
-  @Override
-  public IItem getItem(int id)
-  {
-    return InventoryDA.getItem(id);
-  }
-
-  @Override
-  public IBlueprint getBlueprint(int id)
-  {
-    return BlueprintDA.getBlueprint(id);
-  }
-
-  @Override
-  public IInstallationGroup getDefaultInstallation(IBlueprint blueprint)
-  {
-    List<InstallationGroup> groups = InstallationDA.getBlueprintInstallations(blueprint);
-    for(InstallationGroup ig:groups)
-    {
-      if(ig.Installation == 6)
-      {
-        return ig;
-      }
-    }
-    return groups.get(0);
-  }
-
-  @Override
-  public IInstallationGroup getInstallationGroup(int id)
-  {
-    return InstallationDA.getInstallationGroup(id);
-  }
-
-  @Override
-  public IInventionInstallation getInventionInstallation(int id)
-  {
-    return InstallationDA.getInventionInstallation(id);
-  }
-
-  @Override
-  public IInventionInstallation getDefaultInventionInstallation(IBlueprint blueprint)
-  {
-    return InstallationDA.getInventionInstallation(blueprint.getInvention().usesRelics() ? 158 : 38);
-  }
-
-  @Override
-  public IDecryptor getDecryptor(int id)
-  {
-    return DecryptorDA.getDecryptor(id);
-  }
-
-  @Override
-  public IPlanet getPlanet(int id)
-  {
-    return PlanetDA.getPlanet(id);
-  }
-
-  @Override
-  public IPlanetBuilding getPlanetBuilding(int id)
-  {
-    return PlanetProductDA.getProduct(id);
-  }
-
-  @Override
-  public IPlanetBuilding getPlanetBuilding(IItem product)
-  {
-    return PlanetProductDA.getProduct(product.getID());
-  }
-
-  @Override
-  public IReaction getReaction(int pid)
-  {
-    return ReactionDA.getReaction(pid);
-  }
-
-  @Override
-  public IRefinable getRefinable(int id)
-  {
-    return RefineDA.getRefine(id);
-  }
-
-  @Override
-  public IStarbaseTower getStarbaseTower(int id)
-  {
-    return StarbaseTowerDA.getTower(id);
   }
 
   @Override

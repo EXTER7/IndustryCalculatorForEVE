@@ -15,38 +15,21 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
 import com.exter.eveindcalc.TaskHelper;
-import com.exter.eveindcalc.data.inventory.InventoryDA;
-import com.exter.eveindcalc.data.inventory.Item;
-import com.exter.eveindcalc.data.planet.Planet;
-import com.exter.eveindcalc.data.planet.PlanetDA;
+import com.exter.eveindcalc.data.EveDatabase;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 import exter.eveindustry.data.inventory.IItem;
+import exter.eveindustry.dataprovider.item.Item;
+import exter.eveindustry.dataprovider.planet.Planet;
 
 public class PlanetListActivity extends FragmentActivity
 {
-  
-  @Override
-  public void onCreate(Bundle savedInstanceState)
-  {
-    super.onCreate(savedInstanceState);
-    planet_ids = PlanetDA.getPlanetIDs();
-    setContentView(R.layout.planetlist);
-
-
-    ListView ls_planets = (ListView) findViewById(R.id.ls_planets);
-    
-    //activity.bplist = BlueprintData.getAllBlueprints();
-
-    PlanetListAdapter planet_adapter = new PlanetListAdapter(this);
-    ls_planets.setAdapter(planet_adapter);
-    ls_planets.setOnItemClickListener(new PlanetListClickListener());
-    setTitle("Planets");
-  }
-  
   private class PlanetListAdapter extends BaseAdapter
   {
     private LayoutInflater inflater;
@@ -59,24 +42,24 @@ public class PlanetListActivity extends FragmentActivity
     @Override
     public int getCount()
     {
-      if(planet_ids == null)
+      if(planets == null)
       {
         return 0;
       }
       {
-        return planet_ids.size();
+        return planets.size();
       }
     }
        
     @Override
     public Object getItem(int position)
     {
-      if(planet_ids == null)
+      if(planets == null)
       {
          return null;
       } else
       {
-        return planet_ids.get(position);        
+        return planets.get(position);
       }
     }
        
@@ -97,7 +80,7 @@ public class PlanetListActivity extends FragmentActivity
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-      Planet planet = PlanetDA.getPlanet(planet_ids.get(position));
+      Planet planet = planets.get(position);
       ItemHolder holder;
       if (convertView == null)
       {
@@ -111,7 +94,7 @@ public class PlanetListActivity extends FragmentActivity
       {
         holder = (ItemHolder)convertView.getTag();
       }
-      TaskHelper.setImageViewItemIcon(holder.im_icon, InventoryDA.getItem(planet.ID));
+      TaskHelper.setImageViewItemIcon(holder.im_icon, provider.getItem(planet.ID));
 
       holder.tx_name.setText(planet.TypeName);
       holder.ly_resources.removeAllViews();
@@ -139,6 +122,24 @@ public class PlanetListActivity extends FragmentActivity
     }
   }
 
-  private List<Integer> planet_ids;
+  private List<Planet> planets;
+  private EveDatabase provider;
 
+  @Override
+  public void onCreate(Bundle savedInstanceState)
+  {
+    super.onCreate(savedInstanceState);
+    provider = EICApplication.getDataProvider();
+    planets = new ArrayList<>(provider.allPlanets());
+    setContentView(R.layout.planetlist);
+
+
+    ListView ls_planets = (ListView) findViewById(R.id.ls_planets);
+
+
+    PlanetListAdapter planet_adapter = new PlanetListAdapter(this);
+    ls_planets.setAdapter(planet_adapter);
+    ls_planets.setOnItemClickListener(new PlanetListClickListener());
+    setTitle("Planets");
+  }
 }

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -15,23 +16,23 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.exter.eveindcalc.data.starmap.SolarSystem;
-import com.exter.eveindcalc.data.starmap.SolarSystemRegion;
-import com.exter.eveindcalc.data.starmap.Starmap;
+
+import com.exter.eveindcalc.data.EveDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
 public abstract class SolarSystemDialogFragment extends DialogFragment
 {
-  protected abstract void onSystemSelected(int systemid);
+  protected abstract void onSystemSelected(int system_id);
   
   private class RegionSelectedListener implements Spinner.OnItemSelectedListener
   {
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
     {
-      setRegionSystems(regions.get(pos));
+      setRegionSystems(region_ids.get(pos));
     }
 
     @Override
@@ -46,7 +47,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
     {
-      system = systems.get(pos).ID;
+      system = system_ids.get(pos);
     }
 
     @Override
@@ -58,8 +59,9 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
 
   private Spinner sp_system;
 
-  private List<SolarSystemRegion> regions;
-  private List<SolarSystem> systems;
+  static private List<Integer> region_ids = null;
+  static private ArrayList<CharSequence> region_names = null;
+  private List<Integer> system_ids;
 
   private int system;
 
@@ -89,42 +91,52 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     sp_system = (Spinner) view.findViewById(R.id.sp_solarsystem_system);
 
     system = 30000142;
-    
 
-    regions = Starmap.getRegions();
-    ArrayList<CharSequence> region_list = new ArrayList<>();
-    for(SolarSystemRegion r : regions)
+
+    if(region_ids == null)
     {
-      region_list.add(r.Name);
+      region_names = new ArrayList<>();
+      region_ids = new ArrayList<>();
+      Cursor c = EveDatabase.getDatabase().query("regions",new String[] { "id", "name" },null, null, null, null, null);
+      while(c.moveToNext())
+      {
+        region_ids.add(c.getInt(0));
+        region_names.add(c.getString(1));
+      }
+      c.close();
     }
-    ArrayAdapter<CharSequence> region_adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, region_list);
+    ArrayAdapter<CharSequence> region_adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, region_names);
     region_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    SolarSystemRegion reg = Starmap.getRegion(Starmap.getSolarSystem(system).Region);
+    int reg = EICApplication.getDataProvider().getSolarSystem(system).Region;
     sp_region.setAdapter(region_adapter);
-    sp_region.setSelection(regions.indexOf(reg), true);
+    sp_region.setSelection(region_ids.indexOf(reg), true);
     setRegionSystems(reg);
     sp_region.setOnItemSelectedListener(new RegionSelectedListener());
     sp_system.setOnItemSelectedListener(new SystemSelectedListener());
     return builder.create();
   }
 
-  private void setRegionSystems(SolarSystemRegion r)
+  private void setRegionSystems(int region_id)
   {
     Activity act = getActivity();
-    systems = Starmap.getSolarSystems(r.ID);
-    ArrayList<CharSequence> systems_list = new ArrayList<>();
-    for(SolarSystem s : systems)
+    system_ids = new ArrayList<>();
+    ArrayList<CharSequence> system_names = new ArrayList<>();
+    Cursor c = EveDatabase.getDatabase().query("solar_systems",new String[] { "id", "name" },"region = ?", new String[] {String.valueOf(region_id)}, null, null, null);
+    while(c.moveToNext())
     {
-      systems_list.add(s.Name);
+      system_ids.add(c.getInt(0));
+      system_names.add(c.getString(1));
     }
-    ArrayAdapter<CharSequence> systems_adapter = new ArrayAdapter<>(act, android.R.layout.simple_spinner_item, systems_list);
+    c.close();
+
+    ArrayAdapter<CharSequence> systems_adapter = new ArrayAdapter<>(act, android.R.layout.simple_spinner_item, system_names);
     systems_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
     sp_system.setAdapter(systems_adapter);
-    int index = systems.indexOf(Starmap.getSolarSystem(system));
+    int index = system_ids.indexOf(system);
     if(index == -1)
     {
-      system = systems.get(0).ID;
+      system = system_ids.get(0);
       sp_system.setSelection(0, true);
     } else
     {

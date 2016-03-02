@@ -59,14 +59,13 @@
             android:orientation="horizontal" >
 
             <Spinner
-                android:id="@+id/sp_itemfilter_group"
+                android:id="@+id/sp_itemfilter_category"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingBottom="1dp"
                 android:paddingTop="1dp"
                 tools:listitem="@android:layout/simple_spinner_dropdown_item" >
-
             </Spinner>
 
             <TextView
@@ -78,13 +77,16 @@
             </TextView>
 
             <Spinner
-                android:id="@+id/sp_itemfilter_category"
+                android:id="@+id/sp_itemfilter_group"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingBottom="1dp"
-                android:paddingTop="1dp" >
+                android:paddingTop="1dp"
+                tools:listitem="@android:layout/simple_spinner_dropdown_item" >
+
             </Spinner>
+
         </LinearLayout>
     </LinearLayout>
 

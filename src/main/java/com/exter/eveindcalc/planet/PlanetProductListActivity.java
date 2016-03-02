@@ -3,11 +3,13 @@ package com.exter.eveindcalc.planet;
 import android.app.Activity;
 import android.content.Intent;
 
-import com.exter.eveindcalc.data.Index;
-import com.exter.eveindcalc.data.planet.Planet;
-import com.exter.eveindcalc.data.planet.PlanetDA;
-import com.exter.eveindcalc.data.planet.PlanetProductDA;
+
+import com.exter.eveindcalc.EICApplication;
+import com.exter.eveindcalc.data.EveDatabase;
 import com.exter.eveindcalc.itemlist.ItemListActivity;
+
+import exter.eveindustry.dataprovider.index.Index;
+import exter.eveindustry.dataprovider.planet.Planet;
 
 public class PlanetProductListActivity extends ItemListActivity
 {
@@ -30,12 +32,9 @@ public class PlanetProductListActivity extends ItemListActivity
   @Override
   protected Index loadIndex()
   {
-    Planet p = PlanetDA.getPlanet(getIntent().getIntExtra("planet", -1));
-    if(p.Advanced)
-    {
-      return PlanetProductDA.GetIndexAdvanced();
-    }
-    return PlanetProductDA.GetIndex();
+    EveDatabase provider = EICApplication.getDataProvider();
+    Planet planet = provider.getPlanet(getIntent().getIntExtra("planet", -1));
+    return provider.getPlanetProductIndex(planet.Advanced);
   }
 
 }
