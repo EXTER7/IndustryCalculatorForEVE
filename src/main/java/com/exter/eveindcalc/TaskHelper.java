@@ -266,7 +266,8 @@ public class TaskHelper
   static public void setImageViewItemIcon(ImageView view, int iconid, float scale)
   {
     Context ctx = EICApplication.getContext();
-    switch(ctx.getResources().getDisplayMetrics().densityDpi)
+    int density = ctx.getResources().getDisplayMetrics().densityDpi;
+    switch(density)
     {
       case DisplayMetrics.DENSITY_LOW:
         scale *= 0.5f;
@@ -275,6 +276,10 @@ public class TaskHelper
         scale *= 0.75f;
         break;
       default:
+    }
+    if(density > DisplayMetrics.DENSITY_XHIGH)
+    {
+      scale *= 2.0f;
     }
     int width, height;
 

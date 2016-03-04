@@ -97,7 +97,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     {
       region_names = new ArrayList<>();
       region_ids = new ArrayList<>();
-      Cursor c = EveDatabase.getDatabase().query("regions",new String[] { "id", "name" },null, null, null, null, null);
+      Cursor c = EveDatabase.getDatabase().query("regions",new String[] { "id", "name" },null, null, null, null, "name");
       while(c.moveToNext())
       {
         region_ids.add(c.getInt(0));
@@ -121,7 +121,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     Activity act = getActivity();
     system_ids = new ArrayList<>();
     ArrayList<CharSequence> system_names = new ArrayList<>();
-    Cursor c = EveDatabase.getDatabase().query("solar_systems",new String[] { "id", "name" },"region = ?", new String[] {String.valueOf(region_id)}, null, null, null);
+    Cursor c = EveDatabase.getDatabase().query("solar_systems",new String[] { "id", "name" },"rid = ?", new String[] {String.valueOf(region_id)}, null, null, "name");
     while(c.moveToNext())
     {
       system_ids.add(c.getInt(0));

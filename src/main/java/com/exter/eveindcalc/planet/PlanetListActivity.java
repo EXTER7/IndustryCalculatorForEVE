@@ -116,7 +116,7 @@ public class PlanetListActivity extends FragmentActivity
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
       Intent i = new Intent();
-      i.putExtra("planet", (Integer)parent.getItemAtPosition(position));
+      i.putExtra("planet", ((Planet)parent.getItemAtPosition(position)).ID);
       setResult(Activity.RESULT_OK,i);
       finish();
     }

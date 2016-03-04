@@ -43,7 +43,7 @@ public class RecentSystemsDA
     {
       systems.add(sys);
       SQLiteDatabase db = EveDatabase.getDatabase();
-      db.execSQL("insert or replace into solar_systems (id) values ("
+      db.execSQL("insert or replace into saved_solar_systems (id) values ("
           + String.valueOf(sys) + ");");
     }
   }

@@ -25,7 +25,7 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
   private static final String DATABASE_NAME = "eic.db";
 
   // Increment this if the data in the assets directory is changed (like when a new EVE expansion is released).
-  public static final int DATABASE_VERSION = 120;
+  public static final int DATABASE_VERSION = 121;
 
   // Increment this if the schema of non-static tables are changed (resets, non-static data).
   private static final int NONSTATIC_VERSION = 120;
@@ -53,7 +53,7 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
 
   public static final String SOLARSYSTEMS_CREATE = "create table solar_systems"
   +"( id integer primary key,"
-  + " rid not null,"
+  + " rid integer not null,"
   + " name varchar not null);";
 
   public static final String REGIONS_CREATE = "create table regions"
