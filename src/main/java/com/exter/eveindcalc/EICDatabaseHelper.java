@@ -25,17 +25,19 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
   private static final String DATABASE_NAME = "eic.db";
 
   // Increment this if the data in the assets directory is changed (like when a new EVE expansion is released).
-  public static final int DATABASE_VERSION = 121;
+  public static final int DATABASE_VERSION = 123;
 
   // Increment this if the schema of non-static tables are changed (resets, non-static data).
   private static final int NONSTATIC_VERSION = 120;
 
   public static final String GROUPS_CREATE = "create table groups"
   +"( id integer primary key,"
-  + "cid integer not null);";
+  + " cid integer not null,"
+  + " name varchar not null);";
 
   public static final String CATEGORIES_CREATE = "create table categories"
-  +"( id integer primary key);";
+  + "( id integer primary key,"
+  + " name varchar not null);";
   
   public static final String METAGROUPS_CREATE = "create table metagroups"
   +"( id integer primary key );";
@@ -128,6 +130,7 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
 
     EveDatabase data = EICApplication.getDataProvider();
     Set<Integer> bp_groups = new HashSet<>();
+    Set<Integer> bp_categories = new HashSet<>();
     for(Iterator<Item> iter = data.allItems(); iter.hasNext();)
     {
       Item item = iter.next();
@@ -145,17 +148,26 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
     for(Iterator<ItemGroup> iter = data.allItemGroups(); iter.hasNext();)
     {
       ItemGroup group = iter.next();
-      ContentValues cv = new ContentValues();
-      cv.put("id", group.ID);
-      cv.put("cid", group.Category);
-      db.insert("groups", null, cv);
+      if(bp_groups.contains(group.ID))
+      {
+        ContentValues cv = new ContentValues();
+        cv.put("id", group.ID);
+        cv.put("cid", group.Category);
+        cv.put("name", group.Name);
+        db.insert("groups", null, cv);
+        bp_categories.add(group.Category);
+      }
     }
     for(Iterator<ItemCategory> iter = data.allItemCategories(); iter.hasNext();)
     {
       ItemCategory category = iter.next();
-      ContentValues cv = new ContentValues();
-      cv.put("id", category.ID);
-      db.insert("categories", null, cv);
+      if(bp_categories.contains(category.ID))
+      {
+        ContentValues cv = new ContentValues();
+        cv.put("id", category.ID);
+        cv.put("name", category.Name);
+        db.insert("categories", null, cv);
+      }
     }
     for(Iterator<ItemMetaGroup> iter = data.allItemMetaGroups(); iter.hasNext();)
     {

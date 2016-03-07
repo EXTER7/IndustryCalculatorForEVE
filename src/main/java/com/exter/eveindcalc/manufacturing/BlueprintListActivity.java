@@ -210,13 +210,13 @@ public class BlueprintListActivity extends FragmentActivity
     @Override
     public Object getGroup(int groupPosition)
     {
-      return groupPosition == 0?null: category_groups.get(groupPosition - 1);
+      return groupPosition == 0?null: categories.get(groupPosition - 1);
     }
 
     @Override
     public int getGroupCount()
     {
-      return category_groups == null?1: category_groups.size() + 1;
+      return categories == null?1: categories.size() + 1;
     }
 
     @Override
@@ -434,17 +434,17 @@ public class BlueprintListActivity extends FragmentActivity
         ItemGroup g = result.filter.group;
         
         String text;
-        if(g != null)
+        if(c != null)
         {
-          text = g.Name;
-          if(c != null)
+          text = c.Name;
+          if(g != null)
           {
-            text += " / " + c.Name;
+            text += " / " + g.Name;
           }
           bt_category_clear.setEnabled(true);
         } else
         {
-          text = "All getAllBlueprints";
+          text = "All";
           bt_category_clear.setEnabled(false);
         }        
         tx_category.setText(text);
@@ -574,7 +574,7 @@ public class BlueprintListActivity extends FragmentActivity
   private List<ItemGroup> loadCategoryGroups(ItemCategory category)
   {
     List<ItemGroup> groups = new ArrayList<>();
-    Cursor c = EveDatabase.getDatabase().query("groups",new String[] {"id"},"cid = ?",new String[] {String.valueOf(category.ID)},null,null,null);
+    Cursor c = EveDatabase.getDatabase().query("groups",new String[] {"id"},"cid = ?",new String[] {String.valueOf(category.ID)},null,null,"name");
     while(c.moveToNext())
     {
       groups.add(provider.getItemGroup(c.getInt(0)));
@@ -594,7 +594,7 @@ public class BlueprintListActivity extends FragmentActivity
     {
       categories = new ArrayList<>();
       metagroups = new ArrayList<>();
-      Cursor c = EveDatabase.getDatabase().query("categories",new String[] {"id"},null,null,null,null,null);
+      Cursor c = EveDatabase.getDatabase().query("categories",new String[] {"id"},null,null,null,null,"name");
       while(c.moveToNext())
       {
         categories.add(provider.getItemCategory(c.getInt(0)));
