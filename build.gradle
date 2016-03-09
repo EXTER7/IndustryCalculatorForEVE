@@ -22,6 +22,9 @@ android {
         applicationId "com.exter.eveindcalc"
         minSdkVersion 10
         targetSdkVersion 23
+
+        versionName "3.2.7.0"
+        versionCode 105
     }
 
     buildTypes {

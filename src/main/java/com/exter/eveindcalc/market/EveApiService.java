@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Process;
 import android.util.Log;
 
+import com.exter.eveindcalc.BuildConfig;
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.data.basecost.BaseCostDA;
 import com.exter.eveindcalc.data.systemcost.SystemCostDA;
@@ -39,10 +41,10 @@ public class EveApiService extends IntentService
     }
     try
     {
-      URL url = new URL("http://public-crest.eveonline.com/market/prices/");
+      URL url = new URL("https://public-crest.eveonline.com/market/prices/");
       Log.i("eic-url", url.toString());
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestProperty("User-Agent","EVE_IndCalc3");
+      conn.setRequestProperty("User-Agent","EVE_IndCalc " + BuildConfig.VERSION_NAME);
       InputStreamReader reader = new InputStreamReader(conn.getInputStream());
       JsonReader json = new JsonReader(reader);
 
@@ -72,7 +74,7 @@ public class EveApiService extends IntentService
     }
     try
     {
-      URL url = new URL("http://public-crest.eveonline.com/industry/systems/");
+      URL url = new URL("https://public-crest.eveonline.com/industry/systems/");
       Log.i("eic-url", url.toString());
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
       conn.setRequestProperty("User-Agent","EVE_IndCalc3");

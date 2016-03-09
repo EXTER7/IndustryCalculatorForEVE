@@ -11,6 +11,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.util.SparseArray;
 
+import com.exter.eveindcalc.BuildConfig;
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.data.market.MarketData;
 import com.exter.eveindcalc.data.market.MarketData.PriceValue;
@@ -171,7 +172,7 @@ public class EveMarketService extends IntentService
         Log.i("eic-url", url_str);
         URL url = new URL(url_str);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestProperty("User-Agent", "EVE_IndCalc3");
+        conn.setRequestProperty("User-Agent", "EVE_IndCalc " + BuildConfig.VERSION_NAME);
         InputStreamReader reader = new InputStreamReader(conn.getInputStream());
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
         factory.setNamespaceAware(true);
