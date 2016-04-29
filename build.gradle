@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0-beta6'
+        classpath 'com.android.tools.build:gradle:2.0.0'
     }
 }
 
@@ -23,8 +23,8 @@ android {
         minSdkVersion 10
         targetSdkVersion 23
 
-        versionName "3.2.7.1"
-        versionCode 106
+        versionName "3.2.8.0"
+        versionCode 107
     }
 
     buildTypes {
@@ -61,7 +61,7 @@ dependencies {
     compile project(':TSL')
     compile project(':EVEIndustry')
     compile project(':EVEIndustryData')
-    compile 'com.android.support:support-v4:23.2.0'
+    compile 'com.android.support:support-v4:23.3.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.google.android.gms:play-services:8.4.0'
 }
