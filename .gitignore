@@ -67,4 +67,5 @@ hs_err_pid*
 
 src/main/assets/*
 src/main/res/values/adunit.xml
+projectFilesBackup/
 
