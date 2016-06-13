@@ -164,21 +164,23 @@ public class SystemCostDA
           reader.endArray();
         } else
         {
-          reader.skipValue();
+          Log.w("eic-api","Unexpected token: " + name);
+          retryUpdate(10 * 60);
+          return;
         }
       }
     } catch(IllegalStateException e)
     {
       e.printStackTrace();
       retryUpdate(10 * 60);
+      return;
     } catch(IOException e)
     {
       e.printStackTrace();
       retryUpdate(30);
-    } finally
-    {
-      SetExpire((System.currentTimeMillis() / 1000) + 2 * 60 * 60);
+      return;
     }
+    SetExpire((System.currentTimeMillis() / 1000) + 2 * 60 * 60);
   }
 
   static public void retryUpdate(long time)

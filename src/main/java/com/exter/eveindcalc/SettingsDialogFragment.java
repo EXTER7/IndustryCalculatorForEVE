@@ -16,10 +16,12 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 
+import com.exter.controls.BigDecimalEditText;
 import com.exter.controls.IntegerEditText;
 import com.exter.eveindcalc.data.EveDatabase;
 import com.exter.eveindcalc.data.starmap.RecentSystemsDA;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,11 +54,11 @@ public class SettingsDialogFragment extends DialogFragment
         if(requirement)
         {
           Task.Market p = EveDatabase.getDefaultRequiredPrice();
-          EveDatabase.setDefaultRequiredPrice(new Task.Market(sys, p.order, p.manual));
+          EveDatabase.setDefaultRequiredPrice(new Task.Market(sys, p.order, p.manual,p.broker,p.transaction));
         } else
         {
-          Task.Market p = EveDatabase.GetDefaultProducedPrice();
-          EveDatabase.setDefaultProducedPrice(new Task.Market(sys, p.order, p.manual));
+          Task.Market p = EveDatabase.getDefaultProducedPrice();
+          EveDatabase.setDefaultProducedPrice(new Task.Market(sys, p.order, p.manual,p.broker,p.transaction));
         }
       }
     }
@@ -70,9 +72,13 @@ public class SettingsDialogFragment extends DialogFragment
 
   private Spinner sp_sellto_system;
   private RadioGroup rg_sellto_source;
+  private BigDecimalEditText ed_sellto_broker;
+  private BigDecimalEditText ed_sellto_tax;
 
   private Spinner sp_buyfrom_system;
   private RadioGroup rg_buyfrom_source;
+  private BigDecimalEditText ed_buyfrom_broker;
+  private BigDecimalEditText ed_buyfrom_tax;
 
   private IntegerEditText ed_default_me;
   private IntegerEditText ed_default_te;
@@ -96,11 +102,11 @@ public class SettingsDialogFragment extends DialogFragment
       if(requirement)
       {
         Task.Market p = EveDatabase.getDefaultRequiredPrice();
-        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual));
+        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual,p.broker,p.transaction));
       } else
       {
-        Task.Market p = EveDatabase.GetDefaultProducedPrice();
-        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual));
+        Task.Market p = EveDatabase.getDefaultProducedPrice();
+        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual,p.broker,p.transaction));
       }
     }
   }
@@ -120,15 +126,61 @@ public class SettingsDialogFragment extends DialogFragment
       if(requirement)
       {
         Task.Market p = EveDatabase.getDefaultRequiredPrice();
-        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual));
+        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual,p.broker,p.transaction));
       } else
       {
-        Task.Market p = EveDatabase.GetDefaultProducedPrice();
-        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual));
+        Task.Market p = EveDatabase.getDefaultProducedPrice();
+        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual,p.broker,p.transaction));
       }
     }
   }
 
+  private class BrokerChangeWatcher implements BigDecimalEditText.ValueListener
+  {
+    private boolean requirement;
+
+    public BrokerChangeWatcher(boolean req)
+    {
+      requirement = req;
+    }
+
+    @Override
+    public void valueChanged(int tag, BigDecimal new_value)
+    {
+      if(requirement)
+      {
+        Task.Market p = EveDatabase.getDefaultRequiredPrice();
+        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, p.order, p.manual,p.broker,new_value));
+      } else
+      {
+        Task.Market p = EveDatabase.getDefaultProducedPrice();
+        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, p.order, p.manual,p.broker,new_value));
+      }
+    }
+  }
+
+  private class TaxChangeWatcher implements BigDecimalEditText.ValueListener
+  {
+    private boolean requirement;
+
+    public TaxChangeWatcher(boolean req)
+    {
+      requirement = req;
+    }
+    @Override
+    public void valueChanged(int tag, BigDecimal new_value)
+    {
+      if(requirement)
+      {
+        Task.Market p = EveDatabase.getDefaultRequiredPrice();
+        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, p.order, p.manual,new_value,p.transaction));
+      } else
+      {
+        Task.Market p = EveDatabase.getDefaultProducedPrice();
+        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, p.order, p.manual,new_value,p.transaction));
+      }
+    }
+  }
 
   private class MeResearchChangeWatcher implements IntegerEditText.ValueListener
   {
@@ -173,11 +225,17 @@ public class SettingsDialogFragment extends DialogFragment
     rg_sellto_source = (RadioGroup) view.findViewById(R.id.rg_sellto_source);
     RadioButton rb_sellto_sell = (RadioButton) view.findViewById(R.id.rb_sellto_sell);
     RadioButton rb_sellto_buy = (RadioButton) view.findViewById(R.id.rb_sellto_buy);
+    ed_sellto_broker = new BigDecimalEditText((EditText) view.findViewById(R.id.ed_sellto_broker), -1, BigDecimal.ZERO, new BigDecimal("100"), BigDecimal.ZERO, new BrokerChangeWatcher(false));
+    ed_sellto_tax = new BigDecimalEditText((EditText) view.findViewById(R.id.ed_sellto_tax), -1, BigDecimal.ZERO, new BigDecimal("100"), BigDecimal.ZERO, new TaxChangeWatcher(false));
 
     sp_buyfrom_system = (Spinner) view.findViewById(R.id.sp_buyfrom_system);
     rg_buyfrom_source = (RadioGroup) view.findViewById(R.id.rg_buyfrom_source);
     RadioButton rb_buyfrom_sell = (RadioButton) view.findViewById(R.id.rb_buyfrom_sell);
     RadioButton rb_buyfrom_buy = (RadioButton) view.findViewById(R.id.rb_buyfrom_buy);
+    ed_buyfrom_broker = new BigDecimalEditText((EditText) view.findViewById(R.id.ed_buyfrom_broker), -1, BigDecimal.ZERO, new BigDecimal("100"), BigDecimal.ZERO, new BrokerChangeWatcher(true));
+    ed_buyfrom_tax = new BigDecimalEditText((EditText) view.findViewById(R.id.ed_buyfrom_tax), -1, BigDecimal.ZERO, new BigDecimal("100"), BigDecimal.ZERO, new TaxChangeWatcher(true));
+
+
     ed_default_me = new IntegerEditText((EditText) view.findViewById(R.id.ed_settings_melevel), 0, 10, 0, new MeResearchChangeWatcher());
     ed_default_te = new IntegerEditText((EditText) view.findViewById(R.id.ed_settings_pelevel), 0, 20, 0, new TeResearchChangeWatcher());
 
@@ -197,7 +255,7 @@ public class SettingsDialogFragment extends DialogFragment
     sp_buyfrom_system.setOnItemSelectedListener(null);
 
     Task.Market req = EveDatabase.getDefaultRequiredPrice();
-    Task.Market prod = EveDatabase.GetDefaultProducedPrice();
+    Task.Market prod = EveDatabase.getDefaultProducedPrice();
     
     if(req.order == Task.Market.Order.BUY)
     {
@@ -212,9 +270,14 @@ public class SettingsDialogFragment extends DialogFragment
     } else
     {
       rg_sellto_source.check(R.id.rb_sellto_sell);
-    }      
+    }
     updateSystem(sp_sellto_system, prod.system);
     updateSystem(sp_buyfrom_system, req.system);
+
+    ed_sellto_broker.setValue(prod.broker);
+    ed_sellto_tax.setValue(prod.transaction);
+    ed_buyfrom_broker.setValue(req.broker);
+    ed_buyfrom_tax.setValue(req.transaction);
 
     sp_sellto_system.setOnItemSelectedListener(new SystemSelectedListener(false));
     sp_buyfrom_system.setOnItemSelectedListener(new SystemSelectedListener(true));
@@ -228,7 +291,7 @@ public class SettingsDialogFragment extends DialogFragment
   {
     super.onResume();
     Task.Market req = EveDatabase.getDefaultRequiredPrice();
-    Task.Market prod = EveDatabase.GetDefaultProducedPrice();
+    Task.Market prod = EveDatabase.getDefaultProducedPrice();
 
     sp_sellto_system.setOnItemSelectedListener(null);
     updateSystem(sp_sellto_system, prod.system);

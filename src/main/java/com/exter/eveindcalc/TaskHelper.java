@@ -203,20 +203,26 @@ public class TaskHelper
     }
   }
 
+  static private BigDecimal getBigDecimal(Bundle bundle,String key,BigDecimal def)
+  {
+    String str = bundle.getString(key);
+    if(str == null)
+    {
+      return def;
+    } else
+    {
+      return new BigDecimal(str);
+    }
+  }
+
   static public Task.Market PriceFromBundle(Bundle bundle)
   {
     int system = bundle.getInt("system",30000142);
     Task.Market.Order source = Task.Market.Order.fromInt(bundle.getInt("source",Task.Market.Order.SELL.value));
-    String manual_str = bundle.getString("manual");
-    BigDecimal manual;
-    if(manual_str == null)
-    {
-      manual = BigDecimal.ZERO;
-    } else
-    {
-      manual = new BigDecimal(manual_str);
-    }
-    return new Task.Market(system, source, manual);
+    BigDecimal manual = getBigDecimal(bundle,"manual",BigDecimal.ZERO);
+    BigDecimal broker = getBigDecimal(bundle,"broker",new BigDecimal("3"));
+    BigDecimal tax = getBigDecimal(bundle,"tax",new BigDecimal("2"));
+    return new Task.Market(system, source, manual,broker,tax);
   }
 
   static public void PriceToBundle(Task.Market p, Bundle bundle)
@@ -224,6 +230,8 @@ public class TaskHelper
     bundle.putInt("system", p.system);
     bundle.putInt("source", p.order.value);
     bundle.putString("manual", p.manual.toPlainString());
+    bundle.putString("broker",p.broker.toPlainString());
+    bundle.putString("tax",p.transaction.toPlainString());
   }
 
   static private class CacheMiss implements Cache.IMissListener<Integer, Bitmap>

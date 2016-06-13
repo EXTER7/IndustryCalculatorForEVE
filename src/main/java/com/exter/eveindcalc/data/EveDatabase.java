@@ -122,10 +122,10 @@ public class EveDatabase extends EVEDataProvider
   @Override
   public Market getDefaultProducedMarket()
   {
-    return GetDefaultProducedPrice();
+    return getDefaultProducedPrice();
   }
 
-  static public Market GetDefaultProducedPrice()
+  static public Market getDefaultProducedPrice()
   {
     if(def_produced == null)
     {
@@ -133,7 +133,9 @@ public class EveDatabase extends EVEDataProvider
       def_produced = new Task.Market(
           sp.getInt("market.produced.system", 30000142),
           Task.Market.Order.fromInt(sp.getInt("market.produced.source",Task.Market.Order.SELL.value)),
-          BigDecimal.ZERO);
+          BigDecimal.ZERO,
+          new BigDecimal(sp.getString("market.produced.broker", "3")),
+          new BigDecimal(sp.getString("market.produced.tax", "2")));
     }
     return def_produced;
   }
@@ -152,7 +154,9 @@ public class EveDatabase extends EVEDataProvider
       def_required = new Task.Market(
           sp.getInt("market.required.system", 30000142),
           Task.Market.Order.fromInt(sp.getInt("market.required.source",Task.Market.Order.SELL.value)),
-          BigDecimal.ZERO);
+          BigDecimal.ZERO,
+          new BigDecimal(sp.getString("market.required.broker", "3")),
+          new BigDecimal(sp.getString("market.required.tax", "2")));
     }
     return def_required;
   }
@@ -164,6 +168,8 @@ public class EveDatabase extends EVEDataProvider
     SharedPreferences.Editor ed = sp.edit();
     ed.putInt("market.produced.system", p.system);
     ed.putInt("market.produced.source", p.order.value);
+    ed.putString("market.produced.broker",p.broker.toString());
+    ed.putString("market.produced.tax",p.transaction.toString());
     ed.apply();
   }
 
@@ -174,6 +180,8 @@ public class EveDatabase extends EVEDataProvider
     SharedPreferences.Editor ed = sp.edit();
     ed.putInt("market.required.system", p.system);
     ed.putInt("market.required.source", p.order.value);
+    ed.putString("market.required.broker",p.broker.toString());
+    ed.putString("market.required.tax",p.transaction.toString());
     ed.apply();
   }
 

@@ -295,9 +295,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
     {
       Item item = (Item)material.item;
 
-      DecimalFormat formatter = new DecimalFormat("###,###");
-      DecimalFormat formatter_decimal = new DecimalFormat("###,###.##");
-      tx_material_volume.setText(String.format("%s m3", formatter_decimal.format(material.amount * item.Volume)));
+      tx_material_volume.setText(String.format("%s m3", DECIMAL_FORMATTER.format(material.amount * item.Volume)));
       Task.Market price = task.getMaterialMarket(material.item);
       switch(price.order)
       {
@@ -311,7 +309,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           tx_source.setText("Manual");
           break;
       }
-      tx_material.setText(String.format("%s × %s", item.Name, formatter.format(material.amount)));
+      tx_material.setText(String.format("%s × %s", item.Name, INTEGER_FORMATTER.format(material.amount)));
       updatePriceValue();
     }
 
@@ -324,9 +322,8 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         tx_price.setText("--");
       } else
       {
-        DecimalFormat formatter_decimal = new DecimalFormat("###,###.##");
-        tx_material_totalprice.setText(String.format("%s ISK", formatter_decimal.format(price_value.multiply(new BigDecimal(material.amount)))));
-        tx_price.setText(String.format("%s ISK/unit", price_value.toPlainString()));
+        tx_material_totalprice.setText(String.format("%s ISK", DECIMAL_FORMATTER.format(price_value.multiply(new BigDecimal(material.amount)))));
+        tx_price.setText(String.format("%s ISK/unit", DECIMAL_FORMATTER.format(price_value)));
       }
     }
 
@@ -457,7 +454,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         Bundle args = new Bundle();
         MarketFetchDialogFragment dialog = new MarketFetchDialogFragment();
         args.putInt("type", produced?MarketFetchDialogFragment.TYPE_PRODUCED:MarketFetchDialogFragment.TYPE_REQUIRED);
-        TaskHelper.PriceToBundle(produced?EveDatabase.GetDefaultProducedPrice():EveDatabase.getDefaultRequiredPrice(),args);
+        TaskHelper.PriceToBundle(produced?EveDatabase.getDefaultProducedPrice():EveDatabase.getDefaultRequiredPrice(),args);
         dialog.setArguments(args);
         dialog.setOnAcceptListener(calc.new EveCalculatorMarketFetchAcceptListener());
         dialog.show(calc.getSupportFragmentManager(), "MarketFetchDialogFragment");
@@ -529,6 +526,9 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
   private LayoutInflater ly_inflater;
 
   private EveDatabase provider;
+
+  static private final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("###,###.##");
+  static private final DecimalFormat INTEGER_FORMATTER = new DecimalFormat("###,###");
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

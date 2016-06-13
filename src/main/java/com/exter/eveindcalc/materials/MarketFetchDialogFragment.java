@@ -44,7 +44,7 @@ public class MarketFetchDialogFragment extends DialogFragment
         dialog.show(getActivity().getSupportFragmentManager(), "SolarSystemDialogFragment");
       } else
       {
-        price = new Task.Market(i,price.order,price.manual);
+        price = new Task.Market(i,price.order,price.manual,price.broker,price.transaction);
       }
     }
 
@@ -59,13 +59,34 @@ public class MarketFetchDialogFragment extends DialogFragment
     @Override
     public void valueChanged(int tag, BigDecimal new_value)
     {
-      price = new Task.Market(price.system,price.order,new_value);
+      price = new Task.Market(price.system,price.order,new_value,price.broker,price.transaction);
+    }
+  }
+
+  private class BrokerChangeWatcher implements BigDecimalEditText.ValueListener
+  {
+    @Override
+    public void valueChanged(int tag, BigDecimal new_value)
+    {
+      price = new Task.Market(price.system,price.order,price.manual,new_value,price.transaction);
+    }
+  }
+
+  private class TaxChangeWatcher implements BigDecimalEditText.ValueListener
+  {
+    @Override
+    public void valueChanged(int tag, BigDecimal new_value)
+    {
+      price = new Task.Market(price.system,price.order,price.manual,price.broker,new_value);
     }
   }
 
   private MarketFetchAcceptListener accept_listener;
 
   private Spinner sp_system;
+  private BigDecimalEditText ed_broker;
+  private BigDecimalEditText ed_tax;
+
   private BigDecimalEditText ed_manual;
 
   private Task.Market price;
@@ -108,7 +129,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     @Override
     public void onClick(View v)
     {
-      price = new Task.Market(price.system,Task.Market.Order.SELL,price.manual);
+      price = new Task.Market(price.system,Task.Market.Order.SELL,price.manual,price.broker,price.transaction);
       enableBuySell();
     }
   }
@@ -118,7 +139,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     @Override
     public void onClick(View v)
     {
-      price = new Task.Market(price.system,Task.Market.Order.BUY,price.manual);
+      price = new Task.Market(price.system,Task.Market.Order.BUY,price.manual,price.broker,price.transaction);
       enableBuySell();
     }
   }
@@ -128,7 +149,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     @Override
     public void onClick(View v)
     {
-      price = new Task.Market(price.system,Task.Market.Order.MANUAL,price.manual);
+      price = new Task.Market(price.system,Task.Market.Order.MANUAL,price.manual,price.broker,price.transaction);
       enableManual();
     }
   }
@@ -136,6 +157,8 @@ public class MarketFetchDialogFragment extends DialogFragment
   private void enableBuySell()
   {
     sp_system.setEnabled(true);
+    ed_broker.setEnabled(true);
+    ed_tax.setEnabled(true);
     ed_manual.setEnabled(false);
     
   }
@@ -143,6 +166,8 @@ public class MarketFetchDialogFragment extends DialogFragment
   private void enableManual()
   {
     sp_system.setEnabled(false);
+    ed_broker.setEnabled(false);
+    ed_tax.setEnabled(false);
     ed_manual.setEnabled(true);
   }
 
@@ -172,6 +197,8 @@ public class MarketFetchDialogFragment extends DialogFragment
     RadioButton rb_buy = (RadioButton) view.findViewById(R.id.rb_fetch_buy);
     RadioButton rb_manual = (RadioButton) view.findViewById(R.id.rb_fetch_manual);
     ed_manual = new BigDecimalEditText((EditText) view.findViewById(R.id.ed_fetch_manual), -1, BigDecimal.ZERO, new BigDecimal("1000000000000"), BigDecimal.ZERO, new PriceChangeWatcher());
+    ed_broker = new BigDecimalEditText((EditText) view.findViewById(R.id.ed_fetch_broker), -1, BigDecimal.ZERO, new BigDecimal("100"), BigDecimal.ZERO, new BrokerChangeWatcher());
+    ed_tax = new BigDecimalEditText((EditText) view.findViewById(R.id.ed_fetch_tax), -1, BigDecimal.ZERO, new BigDecimal("100"), BigDecimal.ZERO, new TaxChangeWatcher());
     LinearLayout ly_manual = (LinearLayout) view.findViewById(R.id.ly_fetch_manual);
 
     price = TaskHelper.PriceFromBundle(args);
@@ -185,11 +212,13 @@ public class MarketFetchDialogFragment extends DialogFragment
       ly_manual.setVisibility(View.GONE);
       if(price.order == Task.Market.Order.MANUAL)
       {
-        price = new Task.Market(price.system,Task.Market.Order.SELL,BigDecimal.ZERO);
+        price = new Task.Market(price.system,Task.Market.Order.SELL,BigDecimal.ZERO,price.broker,price.transaction);
       }
     }
 
     ed_manual.setValue(price.manual);
+    ed_broker.setValue(price.broker);
+    ed_tax.setValue(price.transaction);
 
     switch(price.order)
     {
@@ -221,7 +250,7 @@ public class MarketFetchDialogFragment extends DialogFragment
 
   public void setSystem(int id)
   {
-    price = new Task.Market(id,price.order,price.manual);
+    price = new Task.Market(id,price.order,price.manual,price.broker,price.transaction);
     updateSystem();
   }
 
@@ -251,5 +280,4 @@ public class MarketFetchDialogFragment extends DialogFragment
   {
     accept_listener = listener;
   }
-
 }

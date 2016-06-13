@@ -41,7 +41,7 @@ public class EveApiService extends IntentService
     }
     try
     {
-      URL url = new URL("https://public-crest.eveonline.com/market/prices/");
+      URL url = new URL("https://crest-tq.eveonline.com/market/prices/");
       Log.i("eic-url", url.toString());
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
       conn.setRequestProperty("User-Agent","EVE_IndCalc " + BuildConfig.VERSION_NAME);
@@ -74,7 +74,7 @@ public class EveApiService extends IntentService
     }
     try
     {
-      URL url = new URL("https://public-crest.eveonline.com/industry/systems/");
+      URL url = new URL("https://crest-tq.eveonline.com/industry/systems/");
       Log.i("eic-url", url.toString());
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
       conn.setRequestProperty("User-Agent","EVE_IndCalc3");
@@ -92,6 +92,7 @@ public class EveApiService extends IntentService
     } catch(IOException e)
     {
       SystemCostDA.retryUpdate(30);
+      e.printStackTrace();
     }
   }
 

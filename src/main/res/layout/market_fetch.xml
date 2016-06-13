@@ -60,28 +60,108 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Buy Orders" />
-
-        <TextView
-            android:id="@+id/textView1"
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:background="#80888888" />
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="0.5"
-            android:lines="1"
-            android:text="Solar System:" >
-        </TextView>
+            android:orientation="horizontal" >
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
+                android:text="Solar System:"
+                android:textSize="14sp"
+                android:layout_weight="1"/>
 
-        <Spinner
-            android:id="@+id/sp_fetch_system"
+            <Spinner
+                android:id="@+id/sp_fetch_system"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:entries="@array/skill_levels"
+                android:paddingBottom="0dp"
+                android:paddingTop="0dp"
+                >
+            </Spinner>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:background="#80888888" />
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="0.5"
-            android:entries="@array/skill_levels"
-            android:paddingBottom="0dp"
-            android:paddingTop="0dp" >
-        </Spinner>
+            android:orientation="horizontal" >
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
+                android:text="Broker Fee %:"
+                android:textSize="14sp"
+                android:layout_weight="1"/>
+
+            <EditText
+                android:id="@+id/ed_fetch_broker"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:inputType="numberDecimal"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:background="#80888888" />
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
+                android:text="Transaction Tax %:"
+                android:textSize="14sp"
+                android:layout_weight="1"/>
+
+            <EditText
+                android:id="@+id/ed_fetch_tax"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:inputType="numberDecimal"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:background="#80888888" />
 
         <LinearLayout
             android:id="@+id/ly_fetch_manual"

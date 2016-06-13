@@ -18,11 +18,11 @@ public class SettingsSolarSystemDialogFragment extends SolarSystemDialogFragment
      if(required)
      {
        Task.Market p = EveDatabase.getDefaultRequiredPrice();
-       EveDatabase.setDefaultRequiredPrice(new Task.Market(system_id, p.order, p.manual));
+       EveDatabase.setDefaultRequiredPrice(new Task.Market(system_id, p.order, p.manual,p.broker,p.transaction));
      } else
      {
-       Task.Market p = EveDatabase.GetDefaultProducedPrice();
-       EveDatabase.setDefaultProducedPrice(new Task.Market(system_id, p.order, p.manual));
+       Task.Market p = EveDatabase.getDefaultProducedPrice();
+       EveDatabase.setDefaultProducedPrice(new Task.Market(system_id, p.order, p.manual,p.broker,p.transaction));
      }
   }
 

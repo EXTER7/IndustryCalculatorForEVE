@@ -87,7 +87,7 @@ public class BaseCostDA
           while(reader.hasNext())
           {
             int id = -1;
-            double cost = -1;
+            BigDecimal cost = null;
             reader.beginObject();
             while(reader.hasNext())
             {
@@ -110,7 +110,7 @@ public class BaseCostDA
                   reader.endObject();
                   break;
                 case "adjustedPrice":
-                  cost = reader.nextDouble();
+                  cost = new BigDecimal(reader.nextString());
                   break;
                 default:
                   reader.skipValue();
@@ -118,7 +118,7 @@ public class BaseCostDA
               }
             }
             reader.endObject();
-            if(id > 0 && cost >= 0)
+            if(id > 0 && cost != null)
             {
               //Log.i("BaseCostDA","Added base cost " + id + ": " + cost);
               db.execSQL("insert or replace into base_cost (id,cost) values ("
@@ -133,19 +133,23 @@ public class BaseCostDA
           reader.endArray();
         } else
         {
-          reader.skipValue();
+          Log.w("eic-api","Unexpected token: " + name);
+          retryUpdate(30 * 60);
+          return;
         }
       }
     } catch(IOException e)
     {
+      e.printStackTrace();
       retryUpdate(30);
+      return;
     } catch(IllegalStateException e)
     {
+      e.printStackTrace();
       retryUpdate(30 * 60);
-    } finally
-    {
-      setExpire((System.currentTimeMillis() / 1000) + 24 * 60 * 60);
+      return;
     }
+    setExpire((System.currentTimeMillis() / 1000) + 24 * 60 * 60);
   }
 
   static public void retryUpdate(long time)
