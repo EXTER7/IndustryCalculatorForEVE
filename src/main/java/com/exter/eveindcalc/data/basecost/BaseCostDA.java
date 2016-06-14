@@ -118,9 +118,8 @@ public class BaseCostDA
               }
             }
             reader.endObject();
-            if(id > 0 && cost != null)
+            if(id > 0 && cost != null && cost.signum() > 0)
             {
-              //Log.i("BaseCostDA","Added base cost " + id + ": " + cost);
               db.execSQL("insert or replace into base_cost (id,cost) values ("
                   + String.valueOf(id) + ","
                   + String.valueOf(cost) + ");");
@@ -133,9 +132,7 @@ public class BaseCostDA
           reader.endArray();
         } else
         {
-          Log.w("eic-api","Unexpected token: " + name);
-          retryUpdate(30 * 60);
-          return;
+          reader.skipValue();
         }
       }
     } catch(IOException e)

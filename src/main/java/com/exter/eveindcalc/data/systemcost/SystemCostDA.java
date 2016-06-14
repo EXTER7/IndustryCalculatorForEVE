@@ -82,16 +82,16 @@ public class SystemCostDA
       while(reader.hasNext())
       {
         String name = reader.nextName();
-        if(name.equals("items"))
+        if (name.equals("items"))
         {
           reader.beginArray();
-          while(reader.hasNext())
+          while (reader.hasNext())
           {
             int id = -1;
             double man_cost = -1;
             double inv_cost = 0;
             reader.beginObject();
-            while(reader.hasNext())
+            while (reader.hasNext())
             {
               String val = reader.nextName();
               switch (val)
@@ -151,22 +151,19 @@ public class SystemCostDA
               }
             }
             reader.endObject();
-            if(id > 0 && man_cost >= 0)
+            if (id > 0 && man_cost >= 0)
             {
-              db.execSQL("insert or replace into system_cost (id,manufacturing,invention) values (" 
-                  + String.valueOf(id) + ","
-                  + String.valueOf(man_cost) +  ","
-                  + String.valueOf(inv_cost) + ");");
+              db.execSQL("insert or replace into system_cost (id,manufacturing,invention) values ("
+                      + String.valueOf(id) + ","
+                      + String.valueOf(man_cost) + ","
+                      + String.valueOf(inv_cost) + ");");
               cache.flush(id);
-              //Log.i("SystemCostDA","Added system cost " + id + ": " + cost);
             }
           }
           reader.endArray();
         } else
         {
-          Log.w("eic-api","Unexpected token: " + name);
-          retryUpdate(10 * 60);
-          return;
+          reader.skipValue();
         }
       }
     } catch(IllegalStateException e)
