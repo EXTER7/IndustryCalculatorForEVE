@@ -65,6 +65,8 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
 
   private int system;
 
+  private EveDatabase provider;
+
   private class MarketFetchClickListener implements DialogInterface.OnClickListener
   {
     @Override
@@ -74,12 +76,14 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     }
   }
 
+
   @NonNull
   @SuppressLint("InflateParams")
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
     FragmentActivity activity = getActivity();
+    provider = ((EICApplication)activity.getApplication()).provider;
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     LayoutInflater inflater = activity.getLayoutInflater();
     View view = inflater.inflate(R.layout.solarsystem, null);
@@ -97,7 +101,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     {
       region_names = new ArrayList<>();
       region_ids = new ArrayList<>();
-      Cursor c = EveDatabase.getDatabase().query("regions",new String[] { "id", "name" },null, null, null, null, "name");
+      Cursor c = provider.getDatabase().query("regions",new String[] { "id", "name" },null, null, null, null, "name");
       while(c.moveToNext())
       {
         region_ids.add(c.getInt(0));
@@ -107,7 +111,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     }
     ArrayAdapter<CharSequence> region_adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, region_names);
     region_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    int reg = EICApplication.getDataProvider().getSolarSystem(system).Region;
+    int reg = provider.getSolarSystem(system).Region;
     sp_region.setAdapter(region_adapter);
     sp_region.setSelection(region_ids.indexOf(reg), true);
     setRegionSystems(reg);
@@ -121,7 +125,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     Activity act = getActivity();
     system_ids = new ArrayList<>();
     ArrayList<CharSequence> system_names = new ArrayList<>();
-    Cursor c = EveDatabase.getDatabase().query("solar_systems",new String[] { "id", "name" },"rid = ?", new String[] {String.valueOf(region_id)}, null, null, "name");
+    Cursor c = provider.getDatabase().query("solar_systems",new String[] { "id", "name" },"rid = ?", new String[] {String.valueOf(region_id)}, null, null, "name");
     while(c.moveToNext())
     {
       system_ids.add(c.getInt(0));

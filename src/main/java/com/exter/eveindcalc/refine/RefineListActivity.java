@@ -30,6 +30,6 @@ public class RefineListActivity extends ItemListActivity
   @Override
   protected Index loadIndex()
   {
-    return EICApplication.getDataProvider().getRefinableIndex();
+    return ((EICApplication)getApplication()).provider.getRefinableIndex();
   }
 }

@@ -28,7 +28,6 @@ import android.widget.TextView;
 
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
-import com.exter.eveindcalc.TaskHelper;
 import com.exter.eveindcalc.data.EveDatabase;
 
 import java.util.ArrayList;
@@ -45,23 +44,21 @@ public class BlueprintListActivity extends FragmentActivity
   private TextView tx_category;
   private ImageButton bt_category_clear;
 
-  public ItemCategory filter_category;
-  public ItemGroup filter_group;
-  public String filter_name;
-  public ItemMetaGroup filter_metagroup;
+  private ItemCategory filter_category;
+  private ItemGroup filter_group;
+  private String filter_name;
+  private ItemMetaGroup filter_metagroup;
 
-  public List<Integer> bplist_filtered;
+  private List<Integer> bplist_filtered;
 
   public EveDatabase provider;
   private FilterTask task;
 
-  BlueprintGroupsAdapter groups_adapter;
-  
   private class BlueprintListAdapter extends BaseAdapter
   {
     private LayoutInflater inflater;
 
-    public BlueprintListAdapter(Context context)
+    BlueprintListAdapter(Context context)
     {
       inflater = LayoutInflater.from(context);
     }
@@ -98,9 +95,9 @@ public class BlueprintListActivity extends FragmentActivity
 
     private class ItemHolder
     {
-      public TextView tx_product;
-      public TextView tx_category;
-      public ImageView im_icon;
+      TextView tx_product;
+      TextView tx_category;
+      ImageView im_icon;
     }
 
     @Override
@@ -124,7 +121,7 @@ public class BlueprintListActivity extends FragmentActivity
         holder = (ItemHolder) convertView.getTag();
       }
       Item product = (Item)bp.Product.item;
-      TaskHelper.setImageViewItemIcon(holder.im_icon, product);
+      application.setImageViewItemIcon(holder.im_icon, product);
 
       holder.tx_product.setText(product.Name);
       holder.tx_category.setText(String.format("%s / %s", group.Name, cat.Name));
@@ -144,17 +141,17 @@ public class BlueprintListActivity extends FragmentActivity
     }
   }
 
-  public class BlueprintGroupsAdapter extends BaseExpandableListAdapter implements ExpandableListView.OnGroupClickListener,ExpandableListView.OnChildClickListener
+  private class BlueprintGroupsAdapter extends BaseExpandableListAdapter implements ExpandableListView.OnGroupClickListener,ExpandableListView.OnChildClickListener
   {
     private class Holder
     {
-      public TextView tx_name;
-      public ImageView im_icon;
+      TextView tx_name;
+      ImageView im_icon;
     }
 
     private LayoutInflater inflater;
 
-    public BlueprintGroupsAdapter(Context context)
+    BlueprintGroupsAdapter(Context context)
     {
       inflater = LayoutInflater.from(context);
     }
@@ -192,7 +189,7 @@ public class BlueprintListActivity extends FragmentActivity
         holder = (Holder) convertView.getTag();
       }
       ItemGroup group = (ItemGroup) getChild(groupPosition, childPosition);
-      TaskHelper.setImageViewItemIcon(holder.im_icon, group.Icon, 0.75f);
+      application.setImageViewItemIcon(holder.im_icon, group.Icon, 0.75f);
       holder.tx_name.setText(group.Name);
       return convertView;
     }
@@ -242,12 +239,12 @@ public class BlueprintListActivity extends FragmentActivity
       }
       if(groupPosition == 0)
       {
-        TaskHelper.setImageViewItemIcon(holder.im_icon, 9001);
+        application.setImageViewItemIcon(holder.im_icon, 9001);
         holder.tx_name.setText("All");
       } else
       {
         ItemCategory category = categories.get(groupPosition - 1);
-        TaskHelper.setImageViewItemIcon(holder.im_icon, category.Icon);
+        application.setImageViewItemIcon(holder.im_icon, category.Icon);
         holder.tx_name.setText(category.Name);
       }
 
@@ -304,7 +301,7 @@ public class BlueprintListActivity extends FragmentActivity
 
   private BlueprintListAdapter bpl_adapter;
 
-  public void updateFilter()
+  private void updateFilter()
   {
     Filter f = new Filter(filter_name, filter_category, filter_group, filter_metagroup);
     if(task != null)
@@ -321,9 +318,9 @@ public class BlueprintListActivity extends FragmentActivity
     public String name;
     public ItemCategory category;
     public ItemGroup group;
-    public ItemMetaGroup metagroup;
+    ItemMetaGroup metagroup;
 
-    public Filter(String nm, ItemCategory cat, ItemGroup grp, ItemMetaGroup mg)
+    Filter(String nm, ItemCategory cat, ItemGroup grp, ItemMetaGroup mg)
     {
       name = nm !=null?nm.toLowerCase():null;
       category = cat;
@@ -331,7 +328,7 @@ public class BlueprintListActivity extends FragmentActivity
       metagroup = mg;
     }
 
-    public Cursor query()
+    Cursor query()
     {
       String query = "SELECT blueprints.id FROM blueprints,groups WHERE groups.id = blueprints.gid";
       if(name != null && name.length() > 2)
@@ -359,7 +356,7 @@ public class BlueprintListActivity extends FragmentActivity
         query = query + " AND blueprints.mgid = " + String.valueOf(metagroup.ID);
       }
       query = query + " ORDER BY blueprints.name;";
-      return EveDatabase.getDatabase().rawQuery(query, null);
+      return provider.getDatabase().rawQuery(query, null);
     }
   }
 
@@ -370,7 +367,7 @@ public class BlueprintListActivity extends FragmentActivity
     // List of blueprint that match the filer.
     public final List<Integer> blueprints;
 
-    public FilterResult(Filter f, List<Integer> bps)
+    FilterResult(Filter f, List<Integer> bps)
     {
       filter = f;
       blueprints = bps;
@@ -556,11 +553,13 @@ public class BlueprintListActivity extends FragmentActivity
   static private List<ItemCategory> categories = null;
   static private List<ItemMetaGroup> metagroups = null;
 
+  private EICApplication application;
+
   private Spinner sp_groups;
 
   private SparseArray<List<ItemGroup>> category_groups = new SparseArray<>();
 
-  public List<ItemGroup> getGroups(ItemCategory category)
+  private List<ItemGroup> getGroups(ItemCategory category)
   {
     List<ItemGroup> group = category_groups.get(category.ID);
     if(group == null)
@@ -574,7 +573,7 @@ public class BlueprintListActivity extends FragmentActivity
   private List<ItemGroup> loadCategoryGroups(ItemCategory category)
   {
     List<ItemGroup> groups = new ArrayList<>();
-    Cursor c = EveDatabase.getDatabase().query("groups",new String[] {"id"},"cid = ?",new String[] {String.valueOf(category.ID)},null,null,"name");
+    Cursor c = provider.getDatabase().query("groups",new String[] {"id"},"cid = ?",new String[] {String.valueOf(category.ID)},null,null,"name");
     while(c.moveToNext())
     {
       groups.add(provider.getItemGroup(c.getInt(0)));
@@ -588,19 +587,20 @@ public class BlueprintListActivity extends FragmentActivity
   {
     super.onCreate(savedInstanceState);
 
-    provider = EICApplication.getDataProvider();
+    application = (EICApplication)getApplication();
+    provider = application.provider;
 
     if(categories == null)
     {
       categories = new ArrayList<>();
       metagroups = new ArrayList<>();
-      Cursor c = EveDatabase.getDatabase().query("categories",new String[] {"id"},null,null,null,null,"name");
+      Cursor c = provider.getDatabase().query("categories",new String[] {"id"},null,null,null,null,"name");
       while(c.moveToNext())
       {
         categories.add(provider.getItemCategory(c.getInt(0)));
       }
       c.close();
-      c = EveDatabase.getDatabase().query("metagroups",new String[] {"id"},null,null,null,null,null);
+      c = provider.getDatabase().query("metagroups",new String[] {"id"},null,null,null,null,null);
       while(c.moveToNext())
       {
         metagroups.add(provider.getItemMetaGroup(c.getInt(0)));
@@ -644,7 +644,7 @@ public class BlueprintListActivity extends FragmentActivity
       sp_categories.setOnItemSelectedListener(new CategorySelectedListener());
     } else
     {
-      groups_adapter = new BlueprintGroupsAdapter(this);
+      BlueprintGroupsAdapter groups_adapter = new BlueprintGroupsAdapter(this);
       ls_groups.setAdapter(groups_adapter);
       ls_groups.setOnChildClickListener(groups_adapter);
       ls_groups.setOnGroupClickListener(groups_adapter);
@@ -710,7 +710,7 @@ public class BlueprintListActivity extends FragmentActivity
     updateFilter();
   }
 
-  public void cancelTask()
+  private void cancelTask()
   {
     if(task != null)
     {

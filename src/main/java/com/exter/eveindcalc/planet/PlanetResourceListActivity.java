@@ -30,7 +30,7 @@ public class PlanetResourceListActivity extends ItemListActivity
   @Override
   protected Index loadIndex()
   {
-    Planet p = EICApplication.getDataProvider().getPlanet(getIntent().getIntExtra("planet", -1));
+    Planet p = ((EICApplication)getApplication()).provider.getPlanet(getIntent().getIntExtra("planet", -1));
     return new Index(p.TypeName,p.Resources);
   }
 }

@@ -1,21 +1,8 @@
 package com.exter.eveindcalc;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
+
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
-import com.exter.cache.Cache;
-import com.exter.cache.LFUCache;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -102,7 +89,7 @@ public class TaskHelper
       {
         return ((Item)m.iterator().next().item).Icon;
       }
-      return EICApplication.getDataProvider().getItem((((ReactionTask) task).getStarbaseTower().getID())).Icon;
+      return ((Item)Task.getDataProvider().getItem((((ReactionTask) task).getStarbaseTower().getID()))).Icon;
     }
 
     @Override
@@ -143,7 +130,7 @@ public class TaskHelper
       {
         return ((Item)m.iterator().next().item).Icon;
       }
-      return EICApplication.getDataProvider().getItem(((PlanetTask) task).getPlanet().getID()).Icon;
+      return ((Item)Task.getDataProvider().getItem(((PlanetTask) task).getPlanet().getID())).Icon;
     }
 
     @Override
@@ -234,95 +221,10 @@ public class TaskHelper
     bundle.putString("tax",p.transaction.toPlainString());
   }
 
-  static private class CacheMiss implements Cache.IMissListener<Integer, Bitmap>
-  {
 
-    @Override
-    public Bitmap onCacheMiss(Integer icon_id)
-    {
-      try
-      {
-        Context ctx = EICApplication.getContext();
-        InputStream istr = ctx.getAssets().open("icons/" + String.valueOf(icon_id) + ".png");
-        Bitmap bitmap = BitmapFactory.decodeStream(istr);
-        istr.close();
-        return bitmap;
-      } catch(IOException e)
-      {
-        return null;
-      }
-    }
-  }
-
-  static private Cache<Integer,Bitmap> cache = new LFUCache<>(64,new CacheMiss());
 
   static private Map<Class<? extends Task>,ITaskIconProvider> icon_providers;
   
-  static public void setImageViewItemIcon(ImageView view, Item item)
-  {
-    if(item != null)
-    {
-      setImageViewItemIcon(view, item.Icon);
-    }
-  }
-
-  static public void setImageViewItemIcon(ImageView view, int iconid)
-  {
-    setImageViewItemIcon(view, iconid, 1.0f);
-  }
-
-  static public void setImageViewItemIcon(ImageView view, int iconid, float scale)
-  {
-    Context ctx = EICApplication.getContext();
-    int density = ctx.getResources().getDisplayMetrics().densityDpi;
-    switch(density)
-    {
-      case DisplayMetrics.DENSITY_LOW:
-        scale *= 0.5f;
-        break;
-      case DisplayMetrics.DENSITY_MEDIUM:
-        scale *= 0.75f;
-        break;
-      default:
-    }
-    if(density > DisplayMetrics.DENSITY_XHIGH)
-    {
-      scale *= 2.0f;
-    }
-    int width, height;
-
-    Bitmap bitmap = cache.get(iconid);
-    if(bitmap != null)
-    {
-      view.setImageBitmap(bitmap);
-      width = (int) (bitmap.getWidth() * scale);
-      height = (int) (bitmap.getHeight() * scale);
-    } else
-    {
-      view.setImageResource(R.drawable.icon);
-      width = (int) (64 * scale);
-      height = (int) (64 * scale);
-    }
-    view.setScaleType(ScaleType.MATRIX);
-    view.setAdjustViewBounds(true);
-    Matrix mat = new Matrix();
-    mat.postScale(scale, scale);
-    view.setImageMatrix(mat);
-    Object params_obj = view.getLayoutParams();
-    if(params_obj instanceof RelativeLayout.LayoutParams)
-    {
-      RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) params_obj;
-      params.width = width;
-      params.height = height;
-      view.setLayoutParams(params);
-    } else
-    {
-      LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) params_obj;
-      params.width = width;
-      params.height = height;
-      view.setLayoutParams(params);
-    }
-  }
 
   static public int getTaskIcon(Task task)
   {

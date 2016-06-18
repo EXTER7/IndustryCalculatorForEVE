@@ -30,7 +30,7 @@ public class ReactionListActivity extends ItemListActivity
   @Override
   protected Index loadIndex()
   {
-    return EICApplication.getDataProvider().getReactionIndex();
+    return ((EICApplication)getApplication()).provider.getReactionIndex();
   }
 
 }

@@ -124,14 +124,13 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
   private Spinner sp_tower;
   private IntegerEditText ed_runtime;
 
-  public List<ViewHolderReactor> holders;
   private LinearLayout ly_process;
   private LayoutInflater ly_inflater;
 
   private EICFragmentActivity activity;
 
   private List<StarbaseTower> towers;
-  public ReactionTask reaction_task;
+  private ReactionTask reaction_task;
 
   private EveDatabase provider;
 
@@ -142,7 +141,7 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     reaction_task = (ReactionTask) activity.getCurrentTask();
     ly_inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    provider = EICApplication.getDataProvider();
+    provider = ((EICApplication)activity.getApplication()).provider;
 
     towers = new ArrayList<>(provider.allStarbaseTowers());
 
@@ -196,16 +195,15 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     StarbaseTower tower = (StarbaseTower) reaction_task.getStarbaseTower();
     sp_tower.setSelection(towers.indexOf(tower));
 
-    holders = new ArrayList<>();
+
 
     ly_process.removeAllViews();
 
     for(IReaction proc:reaction_task.getReactions())
     {
       View v = ly_inflater.inflate(R.layout.process, ly_process, false);
-      ViewHolderReactor proc_holder = new ViewHolderReactor(v, (Reaction)proc);
+      new ViewHolderReactor(v, (Reaction)proc);
       ly_process.addView(v);
-      holders.add(proc_holder);
     }
   }
 
@@ -246,7 +244,7 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
 
     private Reaction building;
     
-    public ViewHolderReactor(View view, Reaction proc)
+    ViewHolderReactor(View view, Reaction proc)
     {
       building = proc;
       tx_name = (TextView) view.findViewById(R.id.tx_process_name);

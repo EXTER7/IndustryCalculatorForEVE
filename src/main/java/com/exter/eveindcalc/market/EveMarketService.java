@@ -13,7 +13,7 @@ import android.util.SparseArray;
 
 import com.exter.eveindcalc.BuildConfig;
 import com.exter.eveindcalc.EICApplication;
-import com.exter.eveindcalc.data.market.MarketData;
+import com.exter.eveindcalc.data.EveDatabase;
 import com.exter.eveindcalc.data.market.MarketData.PriceValue;
 import com.exter.eveindcalc.data.market.MarketDataException;
 import com.exter.xml.XmlNode;
@@ -41,10 +41,10 @@ public class EveMarketService extends IntentService
   
   static private class FetchResult
   {
-    public final BigDecimal buy;
+    final BigDecimal buy;
     public final BigDecimal sell;
 
-    public FetchResult(BigDecimal b, BigDecimal s)
+    FetchResult(BigDecimal b, BigDecimal s)
     {
       buy = b;
       sell = s;
@@ -142,20 +142,21 @@ public class EveMarketService extends IntentService
   private void fetchPrice(List<Integer> items, int system) throws MarketDataException
   {
     SparseArray<FetchResult> fetched = new SparseArray<>();
-    ConnectivityManager cm = (ConnectivityManager) EICApplication.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+    ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
     if(activeNetwork == null || !activeNetwork.isConnectedOrConnecting())
     {      
       retry = System.currentTimeMillis() + 1000 * 60 * 5;
       return;
     }
+    EveDatabase provider = ((EICApplication) getApplication()).provider;
     try
     {
       String url_str = "http://api.eve-central.com/api/marketstat?typeid=";
       boolean rest = false;
       for(int item : items)
       {
-        if(EICApplication.getDataProvider().getItem(item).Market && !MarketData.hasLocalPrice(item, system))
+        if(provider.getItem(item).Market && !provider.da_market.hasLocalPrice(item, system))
         {
           if (rest)
           {
@@ -191,17 +192,17 @@ public class EveMarketService extends IntentService
       FetchResult fr = fetched.get(i);
       if(fr == null)
       {
-        PriceValue pv = MarketData.getLocalPrice(i, system);
+        PriceValue pv = provider.da_market.getLocalPrice(i, system);
         if(pv == null)
         {
-          MarketData.setLocalPriceFromCache(i, system, BigDecimal.ZERO, BigDecimal.ZERO);
+          provider.da_market.setLocalPriceFromCache(i, system, BigDecimal.ZERO, BigDecimal.ZERO);
         } else
         {
-          MarketData.setLocalPriceFromCache(i, system, pv.BuyPrice, pv.SellPrice);
+          provider.da_market.setLocalPriceFromCache(i, system, pv.BuyPrice, pv.SellPrice);
         }
       } else
       {
-        MarketData.setLocalPriceFromCache(i, system, fr.buy, fr.sell);
+        provider.da_market.setLocalPriceFromCache(i, system, fr.buy, fr.sell);
       }
     }
   }

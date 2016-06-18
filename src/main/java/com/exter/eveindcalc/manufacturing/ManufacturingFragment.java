@@ -26,7 +26,6 @@ import com.exter.eveindcalc.R;
 import com.exter.eveindcalc.SolarSystemDialogFragment;
 import com.exter.eveindcalc.data.EveDatabase;
 import com.exter.eveindcalc.data.blueprint.BlueprintHistoryDA;
-import com.exter.eveindcalc.data.starmap.RecentSystemsDA;
 import com.exter.eveindcalc.util.XUtil;
 
 import java.text.DecimalFormat;
@@ -85,13 +84,13 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
     private TextView tx_name;
     private Spinner sp_level;
 
-    public void Update()
+    void update()
     {
       tx_name.setText(String.format("%s skill:", getName()));
       sp_level.setSelection(getLevel());
     }
 
-    public ViewHolderSkill(View view, int id)
+    ViewHolderSkill(View view, int id)
     {
       skill = id;
       tx_name = (TextView) view.findViewById(R.id.tx_manufacturing_skillname);
@@ -312,7 +311,6 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
       {
         return;
       }
-      EveDatabase provider = EICApplication.getDataProvider();
       man_task.setInstallation(provider.getInstallationGroup(installation_group_ids.get(pos)));
       updateTime();
       activity.notiftyExtraExpenseChanged();
@@ -335,7 +333,6 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
       {
         return;
       }
-      EveDatabase provider = EICApplication.getDataProvider();
       man_task.getInvention().setInstallation(provider.getInventionInstallation(invention_installation_ids.get(pos)));
       updateTime();
       activity.notiftyExtraExpenseChanged();
@@ -432,8 +429,8 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
   private LayoutInflater ly_inflater;
 
   private List<Integer> relic_ids;
-  public ManufacturingTask man_task;
-  public BlueprintHistoryDA.Entry histent;
+  private ManufacturingTask man_task;
+  private BlueprintHistoryDA.Entry histent;
   private EveDatabase provider;
 
   static private List<Decryptor> decryptors = null;
@@ -442,7 +439,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity) getActivity();
-    provider = EICApplication.getDataProvider();
+    provider = ((EICApplication)activity.getApplication()).provider;
 
     if(decryptors == null)
     {
@@ -450,10 +447,10 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
     }
 
     man_task = (ManufacturingTask) activity.getCurrentTask();
-    histent = BlueprintHistoryDA.getEntry(man_task.getBlueprint().getID());
+    histent = provider.da_blueprinthistory.getEntry(man_task.getBlueprint().getID());
     if(histent == null)
     {
-      histent = new BlueprintHistoryDA.Entry(man_task.getBlueprint().getID(), man_task.getME(), man_task.getTE());
+      histent = provider.da_blueprinthistory.new Entry(man_task.getBlueprint().getID(), man_task.getME(), man_task.getTE());
       histent.update();
     }
 
@@ -497,11 +494,10 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
 
     ch_invention_enable.setOnCheckedChangeListener(new InventionEnableListener());
 
-    EveDatabase provider = EICApplication.getDataProvider();
 
     int group = man_task.getBlueprint().getProduct().item.getGroupID();
     List<String> installation_names = new ArrayList<>();
-    Cursor c = EveDatabase.getDatabase().query("group_installations",new String[] { "id", "installation" },"gid = ?", new String[] {String.valueOf(group)}, null, null, null);
+    Cursor c = provider.getDatabase().query("group_installations",new String[] { "id", "installation" },"gid = ?", new String[] {String.valueOf(group)}, null, null, null);
     while(c.moveToNext())
     {
       int id = c.getInt(0);
@@ -577,11 +573,11 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
     sp_hardwiring.setSelection(man_task.getHardwiring().value);
 
     int system = man_task.getSolarSystem();
-    RecentSystemsDA.putSystem(system);
+    provider.da_recentsystems.putSystem(system);
 
     system_ids = new ArrayList<>();
     List<String> system_names = new ArrayList<>();
-    for(int id : RecentSystemsDA.getSystems())
+    for(int id : provider.da_recentsystems.getSystems())
     {
       system_ids.add(id);
       system_names.add(provider.getSolarSystem(id).Name);
@@ -746,7 +742,7 @@ public class ManufacturingFragment extends Fragment implements IEveCalculatorFra
         {
           View v = ly_inflater.inflate(R.layout.manufacturing_skill, ly_skills, false);
           ViewHolderSkill skill_holder = new ViewHolderSkill(v, s);
-          skill_holder.Update();
+          skill_holder.update();
           ly_skills.addView(v);
         }
         break;

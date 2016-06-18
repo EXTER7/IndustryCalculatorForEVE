@@ -8,8 +8,6 @@ import android.util.Log;
 
 import com.exter.cache.Cache;
 import com.exter.cache.InfiniteCache;
-import com.exter.eveindcalc.EICApplication;
-import com.exter.eveindcalc.data.EveDatabase;
 import com.google.gson.stream.JsonReader;
 
 import java.io.IOException;
@@ -17,12 +15,11 @@ import java.io.IOException;
 
 public class SystemCostDA
 {
-  static private class CacheMissListener implements Cache.IMissListener<Integer, SystemCost>
+  private class CacheMissListener implements Cache.IMissListener<Integer, SystemCost>
   {
     @Override
     public SystemCost onCacheMiss(Integer key)
     {
-      SQLiteDatabase db = EveDatabase.getDatabase();
       Cursor c = db.rawQuery("SELECT manufacturing,invention FROM system_cost WHERE id=?", new String[] { String.valueOf(key) });
       if(c.getCount() != 1)
       {
@@ -40,17 +37,26 @@ public class SystemCostDA
   }
   
 
-  static private long expire = -1;
+  private long expire = -1;
 
-  static private final Cache<Integer, SystemCost> cache = new InfiniteCache<>(new CacheMissListener());
+  private final Cache<Integer, SystemCost> cache = new InfiniteCache<>(new CacheMissListener());
 
-  static public boolean IsExpired()
+  private SQLiteDatabase db;
+  private Context context;
+
+  public SystemCostDA(SQLiteDatabase db,Context context)
+  {
+    this.db = db;
+    this.context = context;
+  }
+
+  public boolean IsExpired()
   {
     synchronized(cache)
     {
       if(expire < 0)
       {
-        SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
         expire = sp.getLong("systemcost.exipire", 0);
       }
       long time = (System.currentTimeMillis() / 1000);
@@ -60,21 +66,20 @@ public class SystemCostDA
     }
   }
 
-  static private void SetExpire(long exp)
+  private void setExpire(long exp)
   {
     synchronized(cache)
     {
       expire = exp;
-      SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+      SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
       SharedPreferences.Editor ed = sp.edit();
       ed.putLong("systemcost.exipire", exp);
       ed.apply();
     }
   }
 
-  static public void update(JsonReader reader)
+  public void update(JsonReader reader)
   {
-    SQLiteDatabase db = EveDatabase.getDatabase();
     try
     {
 
@@ -177,15 +182,15 @@ public class SystemCostDA
       retryUpdate(30);
       return;
     }
-    SetExpire((System.currentTimeMillis() / 1000) + 2 * 60 * 60);
+    setExpire((System.currentTimeMillis() / 1000) + 2 * 60 * 60);
   }
 
-  static public void retryUpdate(long time)
+  public void retryUpdate(long time)
   {
-    SetExpire((System.currentTimeMillis() / 1000) + time);
+    setExpire((System.currentTimeMillis() / 1000) + time);
   }
 
-  static public SystemCost GetCost(int id)
+  public SystemCost getCost(int id)
   {
     return cache.get(id);
   }

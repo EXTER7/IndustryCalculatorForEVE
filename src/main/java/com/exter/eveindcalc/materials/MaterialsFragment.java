@@ -47,7 +47,7 @@ import exter.eveindustry.task.Task;
 public class MaterialsFragment extends Fragment implements IEveCalculatorFragment
 {
 
-  static public class MaterialHolderComparator implements Comparator<ViewHolderMaterial>
+  private static class MaterialHolderComparator implements Comparator<ViewHolderMaterial>
   {
     @Override
     public int compare(ViewHolderMaterial lhs, ViewHolderMaterial rhs)
@@ -191,8 +191,8 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
             t.setHardwiring(ManufacturingTask.Hardwiring.fromInt(sp.getInt("manufacturing.hardwiring", ManufacturingTask.Hardwiring.None.value)));
             t.setSolarSystem(sp.getInt("manufacturing.system", 30000142));
 
-            t.setRuns((int)XUtil.DivCeil(material.amount,t.getBlueprint().getProduct().amount * group.getScale()));
-            BlueprintHistoryDA.Entry histent = BlueprintHistoryDA.getEntry(t.getBlueprint().getID());
+            t.setRuns((int)XUtil.divCeil(material.amount,t.getBlueprint().getProduct().amount * group.getScale()));
+            BlueprintHistoryDA.Entry histent = provider.da_blueprinthistory.getEntry(t.getBlueprint().getID());
             if(histent != null)
             {
               t.setME(histent.getME());
@@ -209,7 +209,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
             PlanetTask t = new PlanetTask(provider.getPlanet(11));
             PlanetBuilding p = provider.getPlanetBuilding(material.item.getID());
             t.addBuilding(p);
-            t.setRunTime((int)XUtil.DivCeil( material.amount,p.ProductItem.amount * 24 * group.getScale()));
+            t.setRunTime((int)XUtil.divCeil( material.amount,p.ProductItem.amount * 24 * group.getScale()));
             SparseIntArray raw = new SparseIntArray();
             addPlanetSubProcess(t, p, raw);
             Planet pl = getPlanetFromResources(raw, p.Level == 4);
@@ -240,7 +240,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
             ReactionTask t = new ReactionTask(provider.allStarbaseTowers().iterator().next());
             Reaction r = provider.getReaction(material.item.getID());
             t.addReaction(r);
-            t.setRunTime((int)XUtil.DivCeil(material.amount,r.GetMainOutputAmount() * 24 * group.getScale()));
+            t.setRunTime((int)XUtil.divCeil(material.amount,r.GetMainOutputAmount() * 24 * group.getScale()));
             group.addTask(((Item)material.item).Name, t);
           }
           break;
@@ -249,7 +249,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           {
             PlanetTask t = (PlanetTask)calc.getCurrentTask();
             PlanetBuilding p = provider.getPlanetBuilding(material.item);
-            int times = (int)XUtil.DivCeil(material.amount, p.ProductItem.amount * t.getRunTime() * 24);
+            int times = (int)XUtil.divCeil(material.amount, p.ProductItem.amount * t.getRunTime() * 24);
             int i;
             for(i = 0; i < times; i++)
             {
@@ -262,7 +262,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           {
             ReactionTask t = (ReactionTask)calc.getCurrentTask();
             Reaction r = provider.getReaction(material.item.getID());
-            int times = (int)XUtil.DivCeil(material.amount, r.GetMainOutputAmount() * t.getRunTime() * 24);
+            int times = (int)XUtil.divCeil(material.amount, r.GetMainOutputAmount() * t.getRunTime() * 24);
             int i;
             for(i = 0; i < times; i++)
             {
@@ -288,10 +288,10 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
 
     public final ItemStack material;
     public final ItemType type;
-    public final View holder_view;
+    final View holder_view;
     public final Task task;
 
-    public void update()
+    void update()
     {
       Item item = (Item)material.item;
 
@@ -313,7 +313,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
       updatePriceValue();
     }
 
-    public void updatePriceValue()
+    void updatePriceValue()
     {
       BigDecimal price_value = task.getMaterialMarketPrice(material.item);
       if(price_value == null)
@@ -327,7 +327,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
       }
     }
 
-    public ViewHolderMaterial(View view, ItemStack mat, boolean required)
+    ViewHolderMaterial(View view, ItemStack mat, boolean required)
     {
       holder_view = view;
       material = mat;
@@ -341,7 +341,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
       bt_marketcost = (ImageButton) view.findViewById(R.id.bt_material_marketcost);
       bt_component = (ImageButton) view.findViewById(R.id.bt_material_cost);
 
-      TaskHelper.setImageViewItemIcon(im_icon, (Item) material.item);
+      application.setImageViewItemIcon(im_icon, (Item) material.item);
 
       bt_component.setOnClickListener(null);
       bt_component.setVisibility(View.GONE);
@@ -425,7 +425,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
       bt_marketcost.setOnClickListener(new MarketPriceClickListener());
     }
     
-    public ItemStack GetMaterial()
+    ItemStack getMaterial()
     {
       return material;
     }
@@ -435,11 +435,11 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
   private class ViewHolderGroup
   {
 
-    public TextView tx_name;
-    public TextView tx_totalprice;
-    public TextView tx_volume;
-    public TextView tx_extra;
-    public LinearLayout ly_extra;
+    TextView tx_name;
+    TextView tx_totalprice;
+    TextView tx_volume;
+    TextView tx_extra;
+    LinearLayout ly_extra;
     public Task task;
     public List<ItemStack> materials;
     public String name;
@@ -454,14 +454,14 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         Bundle args = new Bundle();
         MarketFetchDialogFragment dialog = new MarketFetchDialogFragment();
         args.putInt("type", produced?MarketFetchDialogFragment.TYPE_PRODUCED:MarketFetchDialogFragment.TYPE_REQUIRED);
-        TaskHelper.PriceToBundle(produced?EveDatabase.getDefaultProducedPrice():EveDatabase.getDefaultRequiredPrice(),args);
+        TaskHelper.PriceToBundle(produced?provider.getDefaultProducedPrice():provider.getDefaultRequiredPrice(),args);
         dialog.setArguments(args);
         dialog.setOnAcceptListener(calc.new EveCalculatorMarketFetchAcceptListener());
         dialog.show(calc.getSupportFragmentManager(), "MarketFetchDialogFragment");
       }
     }
 
-    public void update()
+    void update()
     {
       BigDecimal total_price = BigDecimal.ZERO;
       double total_volume = 0;
@@ -487,7 +487,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
       }
     }
 
-    public ViewHolderGroup(View view, List<ItemStack> mat, String n,boolean prod)
+    ViewHolderGroup(View view, List<ItemStack> mat, String n,boolean prod)
     {
       materials = mat;
       name = n;
@@ -521,11 +521,13 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
 
   private List<ViewHolderMaterial> req_holders;
   private List<ViewHolderMaterial> prod_holders;
-  ViewHolderGroup req_holder;
-  ViewHolderGroup prod_holder;
+  private ViewHolderGroup req_holder;
+  private ViewHolderGroup prod_holder;
   private LayoutInflater ly_inflater;
 
   private EveDatabase provider;
+
+  private EICApplication application;
 
   static private final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("###,###.##");
   static private final DecimalFormat INTEGER_FORMATTER = new DecimalFormat("###,###");
@@ -534,9 +536,10 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
     View rootView = inflater.inflate(R.layout.matlist, container, false);
-    provider = EICApplication.getDataProvider();
 
     calc = (EICFragmentActivity) getActivity();
+    application = (EICApplication) calc.getApplication();
+    provider = application.provider;
     ly_inflater = (LayoutInflater) calc.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     ly_materials = (LinearLayout) rootView.findViewById(R.id.ly_matlist_materials);
 
@@ -550,14 +553,14 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
   {
     for(ViewHolderMaterial m:prod_holders)
     {
-      if(m.GetMaterial().item.getID() == item)
+      if(m.getMaterial().item.getID() == item)
       {
         return m;
       }
     }
     for(ViewHolderMaterial m:req_holders)
     {
-      if(m.GetMaterial().item.getID() == item)
+      if(m.getMaterial().item.getID() == item)
       {
         return m;
       }

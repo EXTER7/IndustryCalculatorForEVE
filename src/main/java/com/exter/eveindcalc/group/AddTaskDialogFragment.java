@@ -18,11 +18,11 @@ import android.widget.Button;
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICFragmentActivity;
 import com.exter.eveindcalc.R;
+import com.exter.eveindcalc.data.EveDatabase;
 import com.exter.eveindcalc.data.blueprint.BlueprintHistoryDA;
 import com.exter.eveindcalc.manufacturing.BlueprintListActivity;
 import com.exter.eveindcalc.refine.RefineListActivity;
 
-import exter.eveindustry.dataprovider.EVEDataProvider;
 import exter.eveindustry.dataprovider.item.Item;
 import exter.eveindustry.task.GroupTask;
 import exter.eveindustry.task.ManufacturingTask;
@@ -100,7 +100,7 @@ public class AddTaskDialogFragment extends DialogFragment
           SharedPreferences sp = getActivity().getSharedPreferences("EIC", Context.MODE_PRIVATE);
           task.setHardwiring(ManufacturingTask.Hardwiring.fromInt(sp.getInt("manufacturing.hardwiring", ManufacturingTask.Hardwiring.None.value)));
           task.setSolarSystem(sp.getInt("manufacturing.system", 30000142));
-          BlueprintHistoryDA.Entry histent = BlueprintHistoryDA.getEntry(task.getBlueprint().getID());
+          BlueprintHistoryDA.Entry histent = provider.da_blueprinthistory.getEntry(task.getBlueprint().getID());
           if(histent != null)
           {
             task.setME(histent.getME());
@@ -129,7 +129,7 @@ public class AddTaskDialogFragment extends DialogFragment
   }
   
   private EICFragmentActivity activity;
-  private EVEDataProvider provider;
+  private EveDatabase provider;
 
   @NonNull
   @SuppressLint("InflateParams")
@@ -137,7 +137,7 @@ public class AddTaskDialogFragment extends DialogFragment
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity) getActivity();
-    provider = EICApplication.getDataProvider();
+    provider = ((EICApplication)activity.getApplication()).provider;
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     LayoutInflater inflater = getActivity().getLayoutInflater();
     View view = inflater.inflate(R.layout.add_task, null);

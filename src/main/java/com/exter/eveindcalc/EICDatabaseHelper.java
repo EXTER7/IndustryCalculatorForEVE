@@ -5,12 +5,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.exter.eveindcalc.data.EveDatabase;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import exter.eveindustry.dataprovider.EVEDataProvider;
 import exter.eveindustry.dataprovider.blueprint.InstallationGroup;
 import exter.eveindustry.dataprovider.item.Item;
 import exter.eveindustry.dataprovider.item.ItemCategory;
@@ -25,45 +24,45 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
   private static final String DATABASE_NAME = "eic.db";
 
   // Increment this if the data in the assets directory is changed (like when a new EVE expansion is released).
-  public static final int DATABASE_VERSION = 128;
+  private static final int DATABASE_VERSION = 128;
 
   // Change this to the value of DATABASE_VERSION the schema of non-static tables are changed (resets non-static data).
   private static final int NONSTATIC_VERSION = 120;
 
-  public static final String GROUPS_CREATE = "create table groups"
+  private static final String GROUPS_CREATE = "create table groups"
   +"( id integer primary key,"
   + " cid integer not null,"
   + " name varchar not null);";
 
-  public static final String CATEGORIES_CREATE = "create table categories"
+  private static final String CATEGORIES_CREATE = "create table categories"
   + "( id integer primary key,"
   + " name varchar not null);";
   
-  public static final String METAGROUPS_CREATE = "create table metagroups"
+  private static final String METAGROUPS_CREATE = "create table metagroups"
   +"( id integer primary key );";
 
-  public static final String BLUEPRINTS_CREATE = "create table blueprints"
+  private static final String BLUEPRINTS_CREATE = "create table blueprints"
   +"(id integer primary key,"
   + "name varchar not null,"
   + "gid integer not null,"
   + "mgid integer not null);";
 
-  public static final String GROUPINSTALLATIONS_CREATE = "create table group_installations"
+  private static final String GROUPINSTALLATIONS_CREATE = "create table group_installations"
   +"( id integer primary key,"
   + " gid integer not null,"
   + " installation integer not null);";
 
-  public static final String SOLARSYSTEMS_CREATE = "create table solar_systems"
+  private static final String SOLARSYSTEMS_CREATE = "create table solar_systems"
   +"( id integer primary key,"
   + " rid integer not null,"
   + " name varchar not null);";
 
-  public static final String REGIONS_CREATE = "create table regions"
+  private static final String REGIONS_CREATE = "create table regions"
   +"( id integer primary key,"
   + "name varchar not null);";
 
   // Non-static table
-  public static final String MARKETCACHE_CREATE = "create table market_cache"
+  private static final String MARKETCACHE_CREATE = "create table market_cache"
   +"( id integer primary key autoincrement,"
   + " time number(12) not null,"
   + " item integer not null,"
@@ -79,23 +78,26 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
   + "te integer not null);";
 
   // Non-static table
-  public static final String BASECOST_CREATE = "create table base_cost"
+  private static final String BASECOST_CREATE = "create table base_cost"
   +"( id integer primary key,"
   + "cost varchar not null);";
 
   // Non-static table
-  public static final String SYSTEMCOST_CREATE = "create table system_cost"
+  private static final String SYSTEMCOST_CREATE = "create table system_cost"
   +"( id integer primary key,"
   + "manufacturing varchar not null,"
   + "invention varchar not null);";
 
   // Non-static table
-  public static final String SAVED_SOLARSYSTEMS_CREATE = "create table saved_solar_systems"
+  private static final String SAVED_SOLARSYSTEMS_CREATE = "create table saved_solar_systems"
   +"( id integer primary key );";
 
-  public EICDatabaseHelper(Context context)
+  private EVEDataProvider provider;
+
+  public EICDatabaseHelper(Context context, EVEDataProvider provider)
   {
     super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    this.provider = provider;
   }
 
   @Override
@@ -128,13 +130,12 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
     db.execSQL(SOLARSYSTEMS_CREATE);
     db.execSQL(REGIONS_CREATE);
 
-    EveDatabase data = EICApplication.getDataProvider();
     Set<Integer> bp_groups = new HashSet<>();
     Set<Integer> bp_categories = new HashSet<>();
-    for(Iterator<Item> iter = data.allItems(); iter.hasNext();)
+    for(Iterator<Item> iter = provider.allItems(); iter.hasNext();)
     {
       Item item = iter.next();
-      if(data.getBlueprintIndex().getItemIDs().contains(item.ID))
+      if(provider.getBlueprintIndex().getItemIDs().contains(item.ID))
       {
         ContentValues cv = new ContentValues();
         cv.put("id", item.ID);
@@ -145,7 +146,7 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
         bp_groups.add(item.Group);
       }
     }
-    for(Iterator<ItemGroup> iter = data.allItemGroups(); iter.hasNext();)
+    for(Iterator<ItemGroup> iter = provider.allItemGroups(); iter.hasNext();)
     {
       ItemGroup group = iter.next();
       if(bp_groups.contains(group.ID))
@@ -158,7 +159,7 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
         bp_categories.add(group.Category);
       }
     }
-    for(Iterator<ItemCategory> iter = data.allItemCategories(); iter.hasNext();)
+    for(Iterator<ItemCategory> iter = provider.allItemCategories(); iter.hasNext();)
     {
       ItemCategory category = iter.next();
       if(bp_categories.contains(category.ID))
@@ -169,14 +170,14 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
         db.insert("categories", null, cv);
       }
     }
-    for(Iterator<ItemMetaGroup> iter = data.allItemMetaGroups(); iter.hasNext();)
+    for(Iterator<ItemMetaGroup> iter = provider.allItemMetaGroups(); iter.hasNext();)
     {
       ItemMetaGroup group = iter.next();
       ContentValues cv = new ContentValues();
       cv.put("id", group.ID);
       db.insert("metagroups", null, cv);
     }
-    for(Iterator<InstallationGroup> iter = data.allInstallationGroups(); iter.hasNext();)
+    for(Iterator<InstallationGroup> iter = provider.allInstallationGroups(); iter.hasNext();)
     {
       InstallationGroup group = iter.next();
       ContentValues values = new ContentValues();
@@ -186,7 +187,7 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
       db.insert("group_installations", null, values);
     }
 
-    for(Iterator<SolarSystem> iter = data.allSolarSystems(); iter.hasNext();)
+    for(Iterator<SolarSystem> iter = provider.allSolarSystems(); iter.hasNext();)
     {
       SolarSystem system = iter.next();
       ContentValues values = new ContentValues();
@@ -195,7 +196,7 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
       values.put("name", system.Name);
       db.insert("solar_systems", null, values);
     }
-    for(Iterator<Region> iter = data.allSolarSystemRegions(); iter.hasNext();)
+    for(Iterator<Region> iter = provider.allSolarSystemRegions(); iter.hasNext();)
     {
       Region region = iter.next();
       ContentValues values = new ContentValues();

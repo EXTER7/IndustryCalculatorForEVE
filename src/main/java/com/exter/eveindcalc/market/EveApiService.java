@@ -5,14 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Process;
 import android.util.Log;
 
 import com.exter.eveindcalc.BuildConfig;
 import com.exter.eveindcalc.EICApplication;
-import com.exter.eveindcalc.data.basecost.BaseCostDA;
-import com.exter.eveindcalc.data.systemcost.SystemCostDA;
+import com.exter.eveindcalc.data.EveDatabase;
 import com.google.gson.stream.JsonReader;
 
 import java.io.IOException;
@@ -30,9 +28,9 @@ public class EveApiService extends IntentService
     super("EIC_ApiService");
   }
 
-  private void fetchBaseCosts()
+  private void fetchBaseCosts(EveDatabase provider)
   {
-    ConnectivityManager cm = (ConnectivityManager) EICApplication.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+    ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
     if(activeNetwork == null || !activeNetwork.isConnectedOrConnecting())
@@ -48,7 +46,7 @@ public class EveApiService extends IntentService
       InputStreamReader reader = new InputStreamReader(conn.getInputStream());
       JsonReader json = new JsonReader(reader);
 
-      BaseCostDA.update(json);
+      provider.da_basecost.update(json);
       reader.close();
       
       Intent bin = new Intent();
@@ -57,15 +55,15 @@ public class EveApiService extends IntentService
       sendBroadcast(bin);
     } catch(IOException e)
     {
-      BaseCostDA.retryUpdate(30);
+      provider.da_basecost.retryUpdate(30);
       e.printStackTrace();
     }
   }
 
 
-  private void fetchSystemCosts()
+  private void fetchSystemCosts(EveDatabase provider)
   {
-    ConnectivityManager cm = (ConnectivityManager) EICApplication.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+    ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
     if(activeNetwork == null || !activeNetwork.isConnectedOrConnecting())
@@ -81,7 +79,7 @@ public class EveApiService extends IntentService
       InputStreamReader reader = new InputStreamReader(conn.getInputStream());
       JsonReader json = new JsonReader(reader);
 
-      SystemCostDA.update(json);
+      provider.da_systemconst.update(json);
       reader.close();
       
       Intent bin = new Intent();
@@ -91,14 +89,14 @@ public class EveApiService extends IntentService
 
     } catch(IOException e)
     {
-      SystemCostDA.retryUpdate(30);
+      provider.da_systemconst.retryUpdate(30);
       e.printStackTrace();
     }
   }
 
-  static public void updateBaseCosts(Context ctx)
+  static public void updateBaseCosts(EveDatabase provider,Context ctx)
   {
-    if(BaseCostDA.isExpired())
+    if(provider.da_basecost.isExpired())
     {
       Intent msg = new Intent(ctx, EveApiService.class);
       msg.putExtra("basecost", true);
@@ -106,9 +104,9 @@ public class EveApiService extends IntentService
     }
   }
 
-  static public void updateSystemCosts(Context ctx)
+  static public void updateSystemCosts(EveDatabase provider,Context ctx)
   {
-    if(SystemCostDA.IsExpired())
+    if(provider.da_systemconst.IsExpired())
     {
       Intent msg = new Intent(ctx, EveApiService.class);
       msg.putExtra("systemcost", true);
@@ -121,12 +119,13 @@ public class EveApiService extends IntentService
   {
     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
+    EveDatabase provider = ((EICApplication)this.getApplication()).provider;
     if(intent.getBooleanExtra("basecost",false))
     {
-      fetchBaseCosts();
+      fetchBaseCosts(provider);
     } else if(intent.getBooleanExtra("systemcost",false))
     {
-      fetchSystemCosts();
+      fetchSystemCosts(provider);
     }
   }
 }

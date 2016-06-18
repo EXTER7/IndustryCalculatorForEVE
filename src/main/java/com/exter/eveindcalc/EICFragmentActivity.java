@@ -128,9 +128,9 @@ public class EICFragmentActivity extends FragmentActivity
 
   private class PagerAdapter extends FragmentStatePagerAdapter
   {
-    public final IEveCalculatorFragment[] fragments;
+    final IEveCalculatorFragment[] fragments;
 
-    public PagerAdapter(FragmentManager fm)
+    PagerAdapter(FragmentManager fm)
     {
       super(fm);
       fragments = new IEveCalculatorFragment[2];
@@ -195,7 +195,7 @@ public class EICFragmentActivity extends FragmentActivity
   //Pager adapter for tablets
   private class LargePagerAdapter extends PagerAdapter
   {
-    public LargePagerAdapter(FragmentManager fm)
+    LargePagerAdapter(FragmentManager fm)
     {
       super(fm);
     }
@@ -216,7 +216,7 @@ public class EICFragmentActivity extends FragmentActivity
   {
     private WeakReference<EICFragmentActivity> activity;
 
-    public LoaderHandler(EICFragmentActivity act)
+    LoaderHandler(EICFragmentActivity act)
     {
       activity = new WeakReference<>(act);
     }
@@ -236,8 +236,11 @@ public class EICFragmentActivity extends FragmentActivity
           break;
         case 1:
           act.progress_dialog.setMessage("Loading Tasks");
-          EveApiService.updateBaseCosts(act);
-          EveApiService.updateSystemCosts(act);
+          {
+            EveDatabase provider = act.application.provider;
+            EveApiService.updateBaseCosts(provider,act);
+            EveApiService.updateSystemCosts(provider,act);
+          }
           break;
         case 2:
           act.onTaskLoaded();
@@ -312,13 +315,10 @@ public class EICFragmentActivity extends FragmentActivity
     public void run()
     {
       load_handler.sendEmptyMessage(0);
-      EICDatabaseHelper helper = new EICDatabaseHelper(getApplicationContext());
-      SQLiteDatabase db = helper.getWritableDatabase();
-      db.close();
-      helper.close();
+      application.provider.initDatabase();
 
       load_handler.sendEmptyMessage(1);
-      EICApplication.loadTasks();
+      application.loadTasks();
 
       Uri data = getIntent().getData();
       if(data == null)
@@ -364,6 +364,8 @@ public class EICFragmentActivity extends FragmentActivity
   private ProgressBar pb_market_fetch;
   private LinearLayout ly_market_fetch;
 
+  private EICApplication application;
+
   // Get the current task.
   public Task getCurrentTask()
   {
@@ -400,7 +402,7 @@ public class EICFragmentActivity extends FragmentActivity
     @Override
     public void onAcceptItem(int item, Task.Market p)
     {
-      getCurrentTask().setMaterialMarket(EICApplication.getDataProvider().getItem(item), p);
+      getCurrentTask().setMaterialMarket(application.provider.getItem(item), p);
       notifyMaterialChanged(item);
       onProfitChanged();
     }
@@ -449,6 +451,7 @@ public class EICFragmentActivity extends FragmentActivity
   protected final void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
+    application = (EICApplication) getApplication();
     setResult(RESULT_OK);
     setContentView(R.layout.task_main);
 
@@ -518,7 +521,7 @@ public class EICFragmentActivity extends FragmentActivity
 
   }
 
-  protected TaskListener listener;
+  private TaskListener listener;
 
   public Task.ITaskListener GetListener()
   {
@@ -638,8 +641,7 @@ public class EICFragmentActivity extends FragmentActivity
       t.unregisterListener(listener);
     }
     listener = null;
-    EICApplication.saveTasks();
-    EveDatabase.closeDatabase();
+    application.saveTasks();
     super.onDestroy();
   }
 
@@ -654,7 +656,7 @@ public class EICFragmentActivity extends FragmentActivity
       t.unregisterListener(listener);
     }
     ads.pause();
-    EICApplication.saveTasks();
+    application.saveTasks();
     super.onPause();
   }
 
@@ -741,7 +743,7 @@ public class EICFragmentActivity extends FragmentActivity
     }
   }
 
-  public void notifyTaskParameterChanged(int param)
+  private void notifyTaskParameterChanged(int param)
   {
     for(IEveCalculatorFragment frag : pager_adapter.fragments)
     {
@@ -790,13 +792,14 @@ public class EICFragmentActivity extends FragmentActivity
       tx_profit.setText("No profit");
       tx_profit.setTextColor(Color.YELLOW);
     }
-    
-    synchronized(MarketData.request_prices)
+
+    MarketData da_market = application.provider.da_market;
+    synchronized(da_market.request_prices)
     {
-      if(MarketData.request_prices.size() > 0)
+      if(da_market.request_prices.size() > 0)
       {
-        EveMarketService.requestMaterialPrices(EICFragmentActivity.this, MarketData.request_prices);
-        MarketData.request_prices.clear();
+        EveMarketService.requestMaterialPrices(EICFragmentActivity.this, da_market.request_prices);
+        da_market.request_prices.clear();
       }
     }
   }

@@ -63,7 +63,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
   {
     private String task_name;
 
-    public TaskMenuClickListener(String name)
+    TaskMenuClickListener(String name)
     {
       task_name = name;
     }
@@ -119,7 +119,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
   private class TaskProfitHourComparator implements Comparator<String>,Cache.IMissListener<String,BigDecimal>
   {
     private Cache<String,BigDecimal> cache;
-    public TaskProfitHourComparator()
+    TaskProfitHourComparator()
     {
       cache = new InfiniteCache<>(this);
     }
@@ -173,7 +173,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
   private class TaskProfitPercentComparator implements Comparator<String>,Cache.IMissListener<String,BigDecimal>
   {
     private Cache<String,BigDecimal> cache;
-    public TaskProfitPercentComparator()
+    TaskProfitPercentComparator()
     {
       cache = new InfiniteCache<>(this);
     }
@@ -258,14 +258,14 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     private LayoutInflater inflater;
     private List<String> task_names;
     
-    public TaskListAdapter(Context context)
+    TaskListAdapter(Context context)
     {
       inflater = LayoutInflater.from(context);
       task_names = new ArrayList<>();
     }
     
     
-    public void updateTaskList()
+    void updateTaskList()
     {
       task_names.clear();
       GroupTask g = (GroupTask)activity.getCurrentTask();
@@ -316,17 +316,17 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
       return position;
     }
     
-    protected final class TaskHolder
+    final class TaskHolder
     {
-      public TextView tx_name;
-      public TextView tx_description;
-      public TextView tx_profit;
-      public TextView tx_duration;
-      public TextView tx_profithour;
-      public ImageView im_icon;
-      public ImageButton bt_menu;
+      TextView tx_name;
+      TextView tx_description;
+      TextView tx_profit;
+      TextView tx_duration;
+      TextView tx_profithour;
+      ImageView im_icon;
+      ImageButton bt_menu;
       
-      public TaskHolder(View convertView)
+      TaskHolder(View convertView)
       {
         tx_name = (TextView)convertView.findViewById(R.id.tx_task_name);
         tx_description = (TextView)convertView.findViewById(R.id.tx_task_description);
@@ -385,7 +385,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
         }      
       }
     
-      public void update(int position)
+      void update(int position)
       {
         String name = task_names.get(position);
         Task t = activity.getCurrentTask();
@@ -401,7 +401,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
         }
         int icon = TaskHelper.getTaskIcon(task);
 
-        TaskHelper.setImageViewItemIcon(im_icon, icon);
+        application.setImageViewItemIcon(im_icon, icon);
 
         if(TaskHelper.taskHasBackground(task))
         {
@@ -461,6 +461,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
       return convertView;
     }
   }
+
 
   private void showTaskMenu(String task_name)
   {
@@ -586,7 +587,9 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
   
   private boolean long_pressed = false;
 
-  EICFragmentActivity activity;
+  private EICApplication application;
+
+  private EICFragmentActivity activity;
 
   @Override
   public void onCreate(Bundle savedInstanceState)
@@ -598,12 +601,14 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity)getActivity();
+    application = (EICApplication)activity.getApplication();
+
 
     View rootView;
     rootView = inflater.inflate(R.layout.group_fragment, container, false);
 
 
-    SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+    SharedPreferences sp = application.getApplicationContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
     sort_mode = SortMode.fromInt(sp.getInt("group.sort", SortMode.NAME.value));
 
     sp_sort = (Spinner) rootView.findViewById(R.id.sp_menu_sort);
@@ -689,7 +694,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
     super.onResume();
     if(sp_sort != null)
     {
-      SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+      SharedPreferences sp = application.getApplicationContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
       sort_mode = SortMode.fromInt(sp.getInt("group.sort", SortMode.NAME.value));
       sp_sort.setSelection(sort_mode.value);
     }

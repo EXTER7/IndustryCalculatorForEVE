@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
-import com.exter.eveindcalc.TaskHelper;
 import com.exter.eveindcalc.data.EveDatabase;
 
 
@@ -34,7 +33,7 @@ public class PlanetListActivity extends FragmentActivity
   {
     private LayoutInflater inflater;
 
-    public PlanetListAdapter(Context context)
+    PlanetListAdapter(Context context)
     {
       inflater = LayoutInflater.from(context);      
     }
@@ -72,9 +71,9 @@ public class PlanetListActivity extends FragmentActivity
     
     private class ItemHolder
     {
-      public TextView tx_name;
-      public LinearLayout ly_resources;
-      public ImageView im_icon;
+      TextView tx_name;
+      LinearLayout ly_resources;
+      ImageView im_icon;
     }
          
     @Override
@@ -94,7 +93,7 @@ public class PlanetListActivity extends FragmentActivity
       {
         holder = (ItemHolder)convertView.getTag();
       }
-      TaskHelper.setImageViewItemIcon(holder.im_icon, provider.getItem(planet.ID));
+      application.setImageViewItemIcon(holder.im_icon, provider.getItem(planet.ID));
 
       holder.tx_name.setText(planet.TypeName);
       holder.ly_resources.removeAllViews();
@@ -102,7 +101,7 @@ public class PlanetListActivity extends FragmentActivity
       {
         View v = inflater.inflate(R.layout.planet_info_resource, holder.ly_resources, false);
         ImageView res_icon = (ImageView)v.findViewById(R.id.im_planet_info_resource);
-        TaskHelper.setImageViewItemIcon(res_icon, (Item) res);
+        application.setImageViewItemIcon(res_icon, (Item) res);
         holder.ly_resources.addView(v);
       }
       return convertView;
@@ -124,12 +123,14 @@ public class PlanetListActivity extends FragmentActivity
 
   private List<Planet> planets;
   private EveDatabase provider;
+  private EICApplication application;
 
   @Override
   public void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
-    provider = EICApplication.getDataProvider();
+    application = (EICApplication)getApplication();
+    provider = application.provider;
     planets = new ArrayList<>(provider.allPlanets());
     setContentView(R.layout.planetlist);
 

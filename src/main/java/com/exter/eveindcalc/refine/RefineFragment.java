@@ -64,7 +64,7 @@ public class RefineFragment extends Fragment implements IEveCalculatorFragment
   private DoubleEditText ed_reftax;
   private IntegerEditText ed_amount;
   
-  public RefiningTask refine_task;
+  private RefiningTask refine_task;
 
 
   private class RefiningSkillItemSelectedListener implements Spinner.OnItemSelectedListener
@@ -199,13 +199,14 @@ public class RefineFragment extends Fragment implements IEveCalculatorFragment
     }
   }
 
-  
+  private EICApplication application;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
 
     activity = (EICFragmentActivity)getActivity();
+    application = (EICApplication)activity.getApplication();
     refine_task = (RefiningTask) activity.getCurrentTask();
     View rootView = inflater.inflate(R.layout.refine_main, container, false);
 
@@ -280,7 +281,7 @@ public class RefineFragment extends Fragment implements IEveCalculatorFragment
     }
 
     tx_skill.setText(String.format("%s skill:",
-            EICApplication.getDataProvider().getItem(refine_task.getRefinable().getSkill()).Name));
+            application.provider.getItem(refine_task.getRefinable().getSkill()).Name));
     tx_amount.setText(String.format("%s amount (units):",
             ((Item) refine_task.getRefinable().getRequiredItem().item).Name));
 

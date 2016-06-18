@@ -29,7 +29,7 @@ public class MoonMinerListActivity extends ItemListActivity
   @Override
   protected Index loadIndex()
   {
-    return EICApplication.getDataProvider().getMoonProductIndex();
+    return ((EICApplication)getApplication()).provider.getMoonProductIndex();
   }
 
 }

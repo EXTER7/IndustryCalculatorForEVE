@@ -38,7 +38,7 @@ public class GroupMenuDialogFragment extends DialogFragment
   {
     static private Map<CharSequence,Integer> weights = null;
     
-    public MoveToListComparator()
+    MoveToListComparator()
     {
       if(weights == null)
       {
@@ -71,7 +71,7 @@ public class GroupMenuDialogFragment extends DialogFragment
       private CharSequence[] choices;
       private boolean parent;
       
-      public MoveToClickListener(CharSequence[] ch,boolean has_parent)
+      MoveToClickListener(CharSequence[] ch, boolean has_parent)
       {
         choices = ch;
         parent = has_parent;
@@ -118,7 +118,7 @@ public class GroupMenuDialogFragment extends DialogFragment
       private final File file;
       private final Task task;
 
-      public ExportOverrideDialogClockListener(File f, Task t)
+      ExportOverrideDialogClockListener(File f, Task t)
       {
         file = f;
         task = t;

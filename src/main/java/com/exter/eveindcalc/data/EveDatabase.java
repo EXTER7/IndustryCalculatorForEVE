@@ -8,7 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICDatabaseHelper;
 import com.exter.eveindcalc.data.basecost.BaseCostDA;
+import com.exter.eveindcalc.data.blueprint.BlueprintHistoryDA;
 import com.exter.eveindcalc.data.market.MarketData;
+import com.exter.eveindcalc.data.starmap.RecentSystemsDA;
 import com.exter.eveindcalc.data.systemcost.SystemCostDA;
 
 import java.io.IOException;
@@ -28,14 +30,13 @@ import exter.eveindustry.task.Task.Market;
 
 public class EveDatabase extends EVEDataProvider
 {
-  static private EICDatabaseHelper dbhelper;
-  static private SQLiteDatabase database;
+
 
   static private class AssetsFileSystemHandler implements IFileSystemHandler
   {
     private AssetManager assets;
 
-    public AssetsFileSystemHandler(AssetManager assets)
+    AssetsFileSystemHandler(AssetManager assets)
     {
       this.assets = assets;
     }
@@ -77,20 +78,29 @@ public class EveDatabase extends EVEDataProvider
     }
   }
 
-  static public SQLiteDatabase getDatabase()
+  public SQLiteDatabase getDatabase()
+  {
+    return database;
+  }
+
+  public void initDatabase()
   {
     if(database == null)
     {
-      if(dbhelper == null)
+      if(db_helper == null)
       {
-        dbhelper = new EICDatabaseHelper(EICApplication.getContext());
+        db_helper = new EICDatabaseHelper(application.getApplicationContext(),this);
       }
-      database = dbhelper.getWritableDatabase();
+      database = db_helper.getWritableDatabase();
     }
-    return database;
+    da_market = new MarketData(database);
+    da_systemconst = new SystemCostDA(database,context);
+    da_basecost = new BaseCostDA(database,context);
+    da_recentsystems = new RecentSystemsDA(database);
+    da_blueprinthistory = new BlueprintHistoryDA(database);
   }
   
-  static public void closeDatabase()
+  public void closeDatabase()
   {
     if(database == null)
     {
@@ -101,21 +111,32 @@ public class EveDatabase extends EVEDataProvider
   }
 
 
+  private EICDatabaseHelper db_helper;
+  private SQLiteDatabase database;
+  private EICApplication application;
+  private Context context;
+  public SystemCostDA da_systemconst;
+  public BaseCostDA da_basecost;
+  public MarketData da_market;
+  public RecentSystemsDA da_recentsystems;
+  public BlueprintHistoryDA da_blueprinthistory;
 
   static private Task.Market def_required = null;
   static private Task.Market def_produced = null;
   static private int default_me = -1;
   static private int default_te = -1;
 
-  public EveDatabase(AssetManager assets)
+  public EveDatabase(EICApplication application)
   {
-    super(new AssetsFileSystemHandler(assets));
+    super(new AssetsFileSystemHandler(application.getApplicationContext().getAssets()));
+    this.application = application;
+    this.context = application.getApplicationContext();
   }
 
   @Override
   public int getDefaultSkillLevel(int skill)
   {
-    SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+    SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
     return sp.getInt("skill_" + String.valueOf(skill), 0);
   }  
 
@@ -125,11 +146,11 @@ public class EveDatabase extends EVEDataProvider
     return getDefaultProducedPrice();
   }
 
-  static public Market getDefaultProducedPrice()
+  public Market getDefaultProducedPrice()
   {
     if(def_produced == null)
     {
-      SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+      SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
       def_produced = new Task.Market(
           sp.getInt("market.produced.system", 30000142),
           Task.Market.Order.fromInt(sp.getInt("market.produced.source",Task.Market.Order.SELL.value)),
@@ -146,11 +167,11 @@ public class EveDatabase extends EVEDataProvider
     return getDefaultRequiredPrice();
   }
 
-  static public Market getDefaultRequiredPrice()
+  public Market getDefaultRequiredPrice()
   {
     if(def_required == null)
     {
-      SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+      SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
       def_required = new Task.Market(
           sp.getInt("market.required.system", 30000142),
           Task.Market.Order.fromInt(sp.getInt("market.required.source",Task.Market.Order.SELL.value)),
@@ -161,10 +182,10 @@ public class EveDatabase extends EVEDataProvider
     return def_required;
   }
 
-  static public void setDefaultProducedPrice(Task.Market p)
+  public void setDefaultProducedPrice(Task.Market p)
   {
     def_produced = p;
-    SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+    SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
     SharedPreferences.Editor ed = sp.edit();
     ed.putInt("market.produced.system", p.system);
     ed.putInt("market.produced.source", p.order.value);
@@ -173,10 +194,10 @@ public class EveDatabase extends EVEDataProvider
     ed.apply();
   }
 
-  static public void setDefaultRequiredPrice(Task.Market p)
+  public void setDefaultRequiredPrice(Task.Market p)
   {
     def_required = p;
-    SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+    SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
     SharedPreferences.Editor ed = sp.edit();
     ed.putInt("market.required.system", p.system);
     ed.putInt("market.required.source", p.order.value);
@@ -185,7 +206,7 @@ public class EveDatabase extends EVEDataProvider
     ed.apply();
   }
 
-  static public int getDefaultME(IBlueprint bp)
+  public int getDefaultME(IBlueprint bp)
   {
     if(bp != null && ((Item)bp.getProduct().item).MetaGroup != 1)
     {
@@ -193,7 +214,7 @@ public class EveDatabase extends EVEDataProvider
     }
     if(default_me < 0)
     {
-      SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+      SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
       default_me = sp.getInt("blueprint.default.me", 0);
     }
     return default_me;
@@ -206,7 +227,7 @@ public class EveDatabase extends EVEDataProvider
   }
 
 
-  static public int getDefaultTE(IBlueprint bp)
+  public int getDefaultTE(IBlueprint bp)
   {
     if(bp != null && ((Item)bp.getProduct().item).MetaGroup != 1)
     {
@@ -214,7 +235,7 @@ public class EveDatabase extends EVEDataProvider
     }
     if(default_te < 0)
     {
-      SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+      SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
       default_te = sp.getInt("blueprint.default.te", 0);
     }
     return default_te;
@@ -226,19 +247,19 @@ public class EveDatabase extends EVEDataProvider
     return getDefaultTE(bp);
   }
   
-  static public void SetDefaultBlueprintME(int me)
+  public void setDefaultBlueprintME(int me)
   {
     default_me = me;
-    SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+    SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
     SharedPreferences.Editor ed = sp.edit();
     ed.putInt("blueprint.default.me", me);
     ed.apply();
   }
 
-  static public void SetDefaultBlueprintTE(int te)
+  public void setDefaultBlueprintTE(int te)
   {
     default_te = te;
-    SharedPreferences sp = EICApplication.getContext().getSharedPreferences("EIC", Context.MODE_PRIVATE);
+    SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
     SharedPreferences.Editor ed = sp.edit();
     ed.putInt("blueprint.default.te", te);
     ed.apply();
@@ -247,19 +268,18 @@ public class EveDatabase extends EVEDataProvider
   @Override
   public BigDecimal getItemBaseCost(IItem item)
   {
-    return BaseCostDA.getCost(item);
+    return da_basecost.getCost(item);
   }
 
   @Override
   public ISolarSystemIndustryCost getSolarSystemIndustryCost(int system_id)
   {
-    return SystemCostDA.GetCost(system_id);
+    return da_systemconst.getCost(system_id);
   }
 
   @Override
   public BigDecimal getMarketPrice(IItem item, Market market)
   {
-    return MarketData.getMarketPrice(item, market);
+    return da_market.getMarketPrice(item, market);
   }
-
 }

@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
-import com.exter.eveindcalc.TaskHelper;
 
 import exter.eveindustry.dataprovider.index.Index;
 
@@ -30,7 +29,7 @@ public abstract class ItemListActivity extends FragmentActivity
   {
     private LayoutInflater inflater;
 
-    public GroupsAdapter(Context context)
+    GroupsAdapter(Context context)
     {
       inflater = LayoutInflater.from(context);      
     }
@@ -76,11 +75,12 @@ public abstract class ItemListActivity extends FragmentActivity
         holder = (ViewHolder)convertView.getTag();
       }
 
+      EICApplication application = (EICApplication)getApplication();
       for(Index.Entry e:index.getEntries())
       {
         if(e.Group == group.ID)
         {
-          TaskHelper.setImageViewItemIcon(holder.im_icon, EICApplication.getDataProvider().getItem(e.ItemID));
+          application.setImageViewItemIcon(holder.im_icon, application.provider.getItem(e.ItemID));
           break;
         }
       }
@@ -96,7 +96,7 @@ public abstract class ItemListActivity extends FragmentActivity
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
       view.setSelected(true);
-      item_list.SetGroup(index.getGroups().get(position).ID);
+      item_list.setGroup(index.getGroups().get(position).ID);
     }
   }
   private Index index;
@@ -110,11 +110,11 @@ public abstract class ItemListActivity extends FragmentActivity
 
   private PagerAdapter pager_adapter;
   private ItemListFragment item_list;
-  GroupsAdapter groups_adapter;
+  private GroupsAdapter groups_adapter;
   private class PagerAdapter extends FragmentStatePagerAdapter
   {
     private ItemListFragment[] fragments;
-    public PagerAdapter(FragmentManager fm)
+    PagerAdapter(FragmentManager fm)
     {
       super(fm);
       fragments = new ItemListFragment[getCount()];
@@ -153,7 +153,7 @@ public abstract class ItemListActivity extends FragmentActivity
     }
     
     
-    public void puaseFragments()
+    void puaseFragments()
     {
       int i;
       for(i = 0; i < getCount(); i++)
@@ -166,7 +166,7 @@ public abstract class ItemListActivity extends FragmentActivity
       }
     }
 
-    public void resumeFragments()
+    void resumeFragments()
     {
       int i;
       for(i = 0; i < getCount(); i++)
@@ -199,7 +199,7 @@ public abstract class ItemListActivity extends FragmentActivity
       groups_adapter = new GroupsAdapter(this);
       ls_groups.setAdapter(groups_adapter);
       ls_groups.setOnItemClickListener(new GroupsClickListener());
-      item_list.SetGroup(0);
+      item_list.setGroup(0);
       ls_groups.setSelection(0);
     } else
     {

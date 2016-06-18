@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
-import com.exter.eveindcalc.TaskHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ public class ItemListFragment extends Fragment
   {
     private LayoutInflater inflater;
 
-    public ItemListAdapter(Context context)
+    ItemListAdapter(Context context)
     {
       inflater = LayoutInflater.from(context);      
     }
@@ -61,7 +60,7 @@ public class ItemListFragment extends Fragment
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-      Item prod = EICApplication.getDataProvider().getItem(items.get(position));
+      Item prod = application.provider.getItem(items.get(position));
       ViewHolder holder;
       if (convertView == null)
       {
@@ -75,24 +74,25 @@ public class ItemListFragment extends Fragment
         holder = (ViewHolder)convertView.getTag();
       }
 
-      TaskHelper.setImageViewItemIcon(holder.im_icon, prod);
+      application.setImageViewItemIcon(holder.im_icon, prod);
       holder.tx_name.setText(prod.Name);
       return convertView;
     }
   }
 
   private ItemListActivity activity;
+  private EICApplication application;
 
   private ListView ls_items;
   private ItemListAdapter itemlist_adapter;
   private List<Integer> items;
   
-  public void onFragmentPause()
+  void onFragmentPause()
   {
     ls_items.setAdapter(null);
   }
   
-  public void onFragmentResume()
+  void onFragmentResume()
   {
     ls_items.setAdapter(itemlist_adapter);
   }
@@ -106,7 +106,7 @@ public class ItemListFragment extends Fragment
     }
   }
   
-  public void SetGroup(int group)
+  void setGroup(int group)
   {
     Index index = activity.getIndex();
     if(index == null)
@@ -128,6 +128,7 @@ public class ItemListFragment extends Fragment
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
     activity = (ItemListActivity)getActivity();
+    application = (EICApplication) activity.getApplication();
     View rootView = inflater.inflate(R.layout.itemlist_main, container, false);
 
     ls_items = (ListView)rootView.findViewById(R.id.ls_itemlist_items);
@@ -137,10 +138,10 @@ public class ItemListFragment extends Fragment
     Bundle args = getArguments();
     if(args != null)
     {
-      SetGroup(args.getInt("group",0));
+      setGroup(args.getInt("group",0));
     } else
     {
-      SetGroup(0);
+      setGroup(0);
     }
     ls_items.setOnItemClickListener(new ItemListClickListener());
     return rootView;

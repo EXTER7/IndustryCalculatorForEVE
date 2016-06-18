@@ -5,11 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.SparseArray;
 
-import com.exter.eveindcalc.data.EveDatabase;
-
 public class BlueprintHistoryDA
 {
-  static public class Entry
+  public class Entry
   {
     public final int product;
     private int me_level;
@@ -51,7 +49,6 @@ public class BlueprintHistoryDA
         cache = new SparseArray<>();
       }
       cache.put(product, this);
-      SQLiteDatabase db = EveDatabase.getDatabase();
       db.execSQL("insert or replace into blueprint_history (product,me,te) values ("
       + String.valueOf(product) + ","
       + String.valueOf(me_level) + ","
@@ -67,9 +64,16 @@ public class BlueprintHistoryDA
     }
   }
   
-  static private SparseArray<Entry> cache;
-  
-  static public Entry getEntry(int item)
+  private SparseArray<Entry> cache;
+
+  private SQLiteDatabase db;
+
+  public BlueprintHistoryDA(SQLiteDatabase db)
+  {
+    this.db = db;
+  }
+
+  public Entry getEntry(int item)
   {
     if(cache == null)
     {
@@ -80,7 +84,6 @@ public class BlueprintHistoryDA
     {
       return e;
     }
-    SQLiteDatabase db = EveDatabase.getDatabase();
     Cursor c = db.rawQuery("SELECT me,te FROM blueprint_history WHERE product="+String.valueOf(item)+";", null);
     if(c == null || c.getCount() != 1)
     {

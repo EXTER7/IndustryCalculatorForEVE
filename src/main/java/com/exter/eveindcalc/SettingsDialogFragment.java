@@ -19,7 +19,6 @@ import android.widget.Spinner;
 import com.exter.controls.BigDecimalEditText;
 import com.exter.controls.IntegerEditText;
 import com.exter.eveindcalc.data.EveDatabase;
-import com.exter.eveindcalc.data.starmap.RecentSystemsDA;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ public class SettingsDialogFragment extends DialogFragment
   {
     private boolean requirement;
     
-    public SystemSelectedListener(boolean req)
+    SystemSelectedListener(boolean req)
     {
       requirement = req;
     }
@@ -53,12 +52,12 @@ public class SettingsDialogFragment extends DialogFragment
       {
         if(requirement)
         {
-          Task.Market p = EveDatabase.getDefaultRequiredPrice();
-          EveDatabase.setDefaultRequiredPrice(new Task.Market(sys, p.order, p.manual,p.broker,p.transaction));
+          Task.Market p = provider.getDefaultRequiredPrice();
+          provider.setDefaultRequiredPrice(new Task.Market(sys, p.order, p.manual,p.broker,p.transaction));
         } else
         {
-          Task.Market p = EveDatabase.getDefaultProducedPrice();
-          EveDatabase.setDefaultProducedPrice(new Task.Market(sys, p.order, p.manual,p.broker,p.transaction));
+          Task.Market p = provider.getDefaultProducedPrice();
+          provider.setDefaultProducedPrice(new Task.Market(sys, p.order, p.manual,p.broker,p.transaction));
         }
       }
     }
@@ -85,13 +84,14 @@ public class SettingsDialogFragment extends DialogFragment
 
   
   private List<Integer> system_ids;
+  private EveDatabase provider;
 
 
   private class SellClickListener implements RadioButton.OnClickListener
   {
     private boolean requirement;
     
-    public SellClickListener(boolean req)
+    SellClickListener(boolean req)
     {
       requirement = req;
     }
@@ -101,12 +101,12 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Task.Market p = EveDatabase.getDefaultRequiredPrice();
-        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual,p.broker,p.transaction));
+        Task.Market p = provider.getDefaultRequiredPrice();
+        provider.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual,p.broker,p.transaction));
       } else
       {
-        Task.Market p = EveDatabase.getDefaultProducedPrice();
-        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual,p.broker,p.transaction));
+        Task.Market p = provider.getDefaultProducedPrice();
+        provider.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual,p.broker,p.transaction));
       }
     }
   }
@@ -115,7 +115,7 @@ public class SettingsDialogFragment extends DialogFragment
   {
     private boolean requirement;
     
-    public BuyClickListener(boolean req)
+    BuyClickListener(boolean req)
     {
       requirement = req;
     }
@@ -125,12 +125,12 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Task.Market p = EveDatabase.getDefaultRequiredPrice();
-        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual,p.broker,p.transaction));
+        Task.Market p = provider.getDefaultRequiredPrice();
+        provider.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual,p.broker,p.transaction));
       } else
       {
-        Task.Market p = EveDatabase.getDefaultProducedPrice();
-        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual,p.broker,p.transaction));
+        Task.Market p = provider.getDefaultProducedPrice();
+        provider.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual,p.broker,p.transaction));
       }
     }
   }
@@ -139,7 +139,7 @@ public class SettingsDialogFragment extends DialogFragment
   {
     private boolean requirement;
 
-    public BrokerChangeWatcher(boolean req)
+    BrokerChangeWatcher(boolean req)
     {
       requirement = req;
     }
@@ -149,12 +149,12 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Task.Market p = EveDatabase.getDefaultRequiredPrice();
-        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, p.order, p.manual,p.broker,new_value));
+        Task.Market p = provider.getDefaultRequiredPrice();
+        provider.setDefaultRequiredPrice(new Task.Market(p.system, p.order, p.manual,p.broker,new_value));
       } else
       {
-        Task.Market p = EveDatabase.getDefaultProducedPrice();
-        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, p.order, p.manual,p.broker,new_value));
+        Task.Market p = provider.getDefaultProducedPrice();
+        provider.setDefaultProducedPrice(new Task.Market(p.system, p.order, p.manual,p.broker,new_value));
       }
     }
   }
@@ -163,7 +163,7 @@ public class SettingsDialogFragment extends DialogFragment
   {
     private boolean requirement;
 
-    public TaxChangeWatcher(boolean req)
+    TaxChangeWatcher(boolean req)
     {
       requirement = req;
     }
@@ -172,12 +172,12 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Task.Market p = EveDatabase.getDefaultRequiredPrice();
-        EveDatabase.setDefaultRequiredPrice(new Task.Market(p.system, p.order, p.manual,new_value,p.transaction));
+        Task.Market p = provider.getDefaultRequiredPrice();
+        provider.setDefaultRequiredPrice(new Task.Market(p.system, p.order, p.manual,new_value,p.transaction));
       } else
       {
-        Task.Market p = EveDatabase.getDefaultProducedPrice();
-        EveDatabase.setDefaultProducedPrice(new Task.Market(p.system, p.order, p.manual,new_value,p.transaction));
+        Task.Market p = provider.getDefaultProducedPrice();
+        provider.setDefaultProducedPrice(new Task.Market(p.system, p.order, p.manual,new_value,p.transaction));
       }
     }
   }
@@ -187,7 +187,7 @@ public class SettingsDialogFragment extends DialogFragment
     @Override
     public void onValueChanged(int new_value)
     {
-      EveDatabase.SetDefaultBlueprintME(new_value);
+      provider.setDefaultBlueprintME(new_value);
     }
   }
 
@@ -196,7 +196,7 @@ public class SettingsDialogFragment extends DialogFragment
     @Override
     public void onValueChanged(int new_value)
     {
-      EveDatabase.SetDefaultBlueprintTE(new_value);
+      provider.setDefaultBlueprintTE(new_value);
     }
   }
 
@@ -215,6 +215,7 @@ public class SettingsDialogFragment extends DialogFragment
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
+    provider = ((EICApplication)getActivity().getApplication()).provider;
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     LayoutInflater inflater = getActivity().getLayoutInflater();
     View view = inflater.inflate(R.layout.settings, null);
@@ -249,13 +250,13 @@ public class SettingsDialogFragment extends DialogFragment
     return builder.create();
   }
   
-  public void updateSettings()
+  private void updateSettings()
   {
     sp_sellto_system.setOnItemSelectedListener(null);
     sp_buyfrom_system.setOnItemSelectedListener(null);
 
-    Task.Market req = EveDatabase.getDefaultRequiredPrice();
-    Task.Market prod = EveDatabase.getDefaultProducedPrice();
+    Task.Market req = provider.getDefaultRequiredPrice();
+    Task.Market prod = provider.getDefaultProducedPrice();
     
     if(req.order == Task.Market.Order.BUY)
     {
@@ -281,8 +282,8 @@ public class SettingsDialogFragment extends DialogFragment
 
     sp_sellto_system.setOnItemSelectedListener(new SystemSelectedListener(false));
     sp_buyfrom_system.setOnItemSelectedListener(new SystemSelectedListener(true));
-    ed_default_me.setValue(EveDatabase.getDefaultME(null));
-    ed_default_te.setValue(EveDatabase.getDefaultTE(null));
+    ed_default_me.setValue(provider.getDefaultME(null));
+    ed_default_te.setValue(provider.getDefaultTE(null));
 
   }
   
@@ -290,8 +291,8 @@ public class SettingsDialogFragment extends DialogFragment
   public void onResume()
   {
     super.onResume();
-    Task.Market req = EveDatabase.getDefaultRequiredPrice();
-    Task.Market prod = EveDatabase.getDefaultProducedPrice();
+    Task.Market req = provider.getDefaultRequiredPrice();
+    Task.Market prod = provider.getDefaultProducedPrice();
 
     sp_sellto_system.setOnItemSelectedListener(null);
     updateSystem(sp_sellto_system, prod.system);
@@ -304,14 +305,14 @@ public class SettingsDialogFragment extends DialogFragment
 
   private void updateSystem(Spinner spinner, int system)
   {
-    RecentSystemsDA.putSystem(system);
+    provider.da_recentsystems.putSystem(system);
 
     system_ids = new ArrayList<>();
     List<String> system_names = new ArrayList<>();
-    for(int id:RecentSystemsDA.getSystems())
+    for(int id:provider.da_recentsystems.getSystems())
     {
       system_ids.add(id);
-      system_names.add(EICApplication.getDataProvider().getSolarSystem(id).Name);
+      system_names.add(provider.getSolarSystem(id).Name);
     }
     system_ids.add(-1);
     system_names.add("[ Other ... ]");

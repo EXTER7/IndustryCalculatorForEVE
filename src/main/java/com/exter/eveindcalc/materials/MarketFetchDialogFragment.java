@@ -22,7 +22,7 @@ import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
 import com.exter.eveindcalc.SolarSystemDialogFragment;
 import com.exter.eveindcalc.TaskHelper;
-import com.exter.eveindcalc.data.starmap.RecentSystemsDA;
+import com.exter.eveindcalc.data.EveDatabase;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -93,13 +93,13 @@ public class MarketFetchDialogFragment extends DialogFragment
 
   private List<Integer> system_ids;
   
-  static public final int TYPE_ITEM = 0;
-  static public final int TYPE_PRODUCED = 1;
-  static public final int TYPE_REQUIRED = 2;
-  int type;
-  
-  
-  int item;
+  static final int TYPE_ITEM = 0;
+  static final int TYPE_PRODUCED = 1;
+  static final int TYPE_REQUIRED = 2;
+  private int type;
+  private int item;
+
+  private EveDatabase provider;
 
   private class MarketFetchClickListener implements DialogInterface.OnClickListener
   {
@@ -183,6 +183,7 @@ public class MarketFetchDialogFragment extends DialogFragment
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
+    provider = ((EICApplication)getActivity().getApplication()).provider;
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     LayoutInflater inflater = getActivity().getLayoutInflater();
     View view = inflater.inflate(R.layout.market_fetch, null);
@@ -241,7 +242,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     rb_buy.setOnClickListener(new BuyClickListener());
     rb_manual.setOnClickListener(new ManualClickListener());
 
-    RecentSystemsDA.putSystem(price.system);
+    provider.da_recentsystems.putSystem(price.system);
 
     updateSystem();
     
@@ -257,14 +258,14 @@ public class MarketFetchDialogFragment extends DialogFragment
   private void updateSystem()
   {
     sp_system.setOnItemSelectedListener(null);
-    RecentSystemsDA.putSystem(price.system);
+    provider.da_recentsystems.putSystem(price.system);
 
     system_ids = new ArrayList<>();
     List<String> system_names = new ArrayList<>();
-    for(int id:RecentSystemsDA.getSystems())
+    for(int id:provider.da_recentsystems.getSystems())
     {
       system_ids.add(id);
-      system_names.add(EICApplication.getDataProvider().getSolarSystem(id).Name);
+      system_names.add(provider.getSolarSystem(id).Name);
     }
     system_ids.add(-1);
     system_names.add("[ Other ... ]");
@@ -276,7 +277,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     sp_system.setOnItemSelectedListener(new SystemSelectedListener());
   }
   
-  public void setOnAcceptListener(MarketFetchAcceptListener listener)
+  void setOnAcceptListener(MarketFetchAcceptListener listener)
   {
     accept_listener = listener;
   }

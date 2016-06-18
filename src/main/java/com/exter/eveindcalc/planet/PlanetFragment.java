@@ -22,11 +22,7 @@ import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICFragmentActivity;
 import com.exter.eveindcalc.IEveCalculatorFragment;
 import com.exter.eveindcalc.R;
-import com.exter.eveindcalc.TaskHelper;
 import com.exter.eveindcalc.data.EveDatabase;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import exter.eveindustry.data.planet.IPlanetBuilding;
 import exter.eveindustry.dataprovider.item.Item;
@@ -112,16 +108,18 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
   private ImageView im_planet_icon;
   private IntegerEditText ed_runtime;
   private DoubleEditText ed_tax;
-  PlanetTask planet_task;
+  private PlanetTask planet_task;
 
   private EICFragmentActivity activity;
+  private EICApplication application;
   private EveDatabase provider;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity)getActivity();
-    provider = EICApplication.getDataProvider();
+    application = (EICApplication)activity.getApplication();
+    provider = application.provider;
     planet_task = (PlanetTask)activity.getCurrentTask();
     View rootView = inflater.inflate(R.layout.planet, container, false);
     
@@ -177,20 +175,18 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
     }
     Planet p = (Planet)planet_task.getPlanet();
     tx_planet_name.setText(p.TypeName);
-    TaskHelper.setImageViewItemIcon(im_planet_icon, provider.getItem(p.ID));
+    application.setImageViewItemIcon(im_planet_icon, provider.getItem(p.ID));
     ed_runtime.setValue(planet_task.getRunTime());
     ed_tax.setValue(planet_task.getCustomsOfficeTax());
 
-    holders = new ArrayList<>();
 
     ly_process.removeAllViews();
 
     for(IPlanetBuilding pr:planet_task.getBuildings())
     {
       View v = ly_inflater.inflate(R.layout.process, ly_process, false);
-      ViewHolderPlanetProcess proc_holder = new ViewHolderPlanetProcess(v,(PlanetBuilding)pr);
+      new ViewHolderPlanetProcess(v,(PlanetBuilding)pr);
       ly_process.addView(v);
-      holders.add(proc_holder);
     }
   }
 
@@ -233,7 +229,7 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
 
     private PlanetBuilding building;
 
-    public ViewHolderPlanetProcess(View view, PlanetBuilding proc)
+    ViewHolderPlanetProcess(View view, PlanetBuilding proc)
     {
       building = proc;
       tx_name = (TextView) view.findViewById(R.id.tx_process_name);
@@ -253,8 +249,6 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
   }
 
   private LinearLayout ly_process;
-
-  public List<ViewHolderPlanetProcess> holders;
 
   private LayoutInflater ly_inflater;
 

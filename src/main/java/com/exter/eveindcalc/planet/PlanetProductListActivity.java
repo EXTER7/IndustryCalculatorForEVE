@@ -32,7 +32,7 @@ public class PlanetProductListActivity extends ItemListActivity
   @Override
   protected Index loadIndex()
   {
-    EveDatabase provider = EICApplication.getDataProvider();
+    EveDatabase provider = ((EICApplication)getApplication()).provider;
     Planet planet = provider.getPlanet(getIntent().getIntExtra("planet", -1));
     return provider.getPlanetProductIndex(planet.Advanced);
   }
