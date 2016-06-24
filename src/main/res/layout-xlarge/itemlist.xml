@@ -5,7 +5,7 @@
     android:layout_height="fill_parent"
     android:orientation="horizontal"
     android:weightSum="1"
-              android:background="#000000">
+    android:theme="@style/eic">
 
     <LinearLayout
         android:layout_width="fill_parent"
