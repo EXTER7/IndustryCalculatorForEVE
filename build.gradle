@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-alpha3'
+        classpath 'com.android.tools.build:gradle:2.2.0-alpha4'
     }
 }
 
@@ -23,7 +23,6 @@ android {
         applicationId "com.exter.eveindcalc"
         minSdkVersion 10
         targetSdkVersion 24
-        multiDexEnabled true
         jackOptions {
             jackInProcess false
             enabled true
@@ -33,10 +32,17 @@ android {
         versionCode 108
     }
 
+    dexOptions {
+        maxProcessCount 1
+        javaMaxHeapSize "1538M"
+        threadCount 1
+    }
+
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
         }
     }
 
@@ -69,6 +75,5 @@ dependencies {
     compile project(':EVEIndustryData')
     compile 'com.android.support:support-v4:24.0.0'
     compile 'com.google.code.gson:gson:2.4'
-    compile 'com.google.android.gms:play-services:9.0.2'
-    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.google.android.gms:play-services-ads:9.0.2'
 }

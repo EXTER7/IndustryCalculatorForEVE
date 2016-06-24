@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Build;
-import android.support.multidex.MultiDexApplication;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.ImageView;
@@ -34,7 +33,7 @@ import exter.tsl.TSLObject;
 import exter.tsl.TSLReader;
 import exter.tsl.TSLWriter;
 
-public class EICApplication extends MultiDexApplication
+public class EICApplication extends Application
 {
   private class ImageCacheMiss implements Cache.IMissListener<Integer, Bitmap>
   {
