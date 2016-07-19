@@ -61,6 +61,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import exter.eveindustry.item.ItemStack;
+import exter.eveindustry.market.Market;
 import exter.eveindustry.task.GroupTask;
 import exter.eveindustry.task.ManufacturingTask;
 import exter.eveindustry.task.PlanetTask;
@@ -236,9 +237,9 @@ public class EICFragmentActivity extends FragmentActivity
         case 1:
           act.progress_dialog.setMessage("Loading Tasks");
           {
-            EveDatabase provider = act.application.provider;
-            EveApiService.updateBaseCosts(provider,act);
-            EveApiService.updateSystemCosts(provider,act);
+            EveDatabase database = act.application.database;
+            EveApiService.updateBaseCosts(database,act);
+            EveApiService.updateSystemCosts(database,act);
           }
           break;
         case 2:
@@ -289,7 +290,7 @@ public class EICFragmentActivity extends FragmentActivity
         Task t = null;
         try
         {
-          t = Task.loadPromTSL(tsl);
+          t = application.factory.fromTSL(tsl);
         } catch(TaskLoadException e)
         {
           e.printStackTrace();
@@ -314,7 +315,7 @@ public class EICFragmentActivity extends FragmentActivity
     public void run()
     {
       load_handler.sendEmptyMessage(0);
-      application.provider.initDatabase();
+      application.database.initDatabase();
 
       load_handler.sendEmptyMessage(1);
       application.loadTasks();
@@ -399,33 +400,33 @@ public class EICFragmentActivity extends FragmentActivity
   public class EveCalculatorMarketFetchAcceptListener implements MarketFetchDialogFragment.MarketFetchAcceptListener
   {
     @Override
-    public void onAcceptItem(int item, Task.Market p)
+    public void onAcceptItem(int item, Market p)
     {
-      getCurrentTask().setMaterialMarket(application.provider.getItem(item), p);
+      getCurrentTask().setMaterialMarket(application.factory.items.get(item), p);
       notifyMaterialChanged(item);
       onProfitChanged();
     }
 
     @Override
-    public void onAcceptRequired(Task.Market price)
+    public void onAcceptRequired(Market price)
     {
       Task task = getCurrentTask();
       for(ItemStack m:task.getRequiredMaterials())
       {
         task.setMaterialMarket(m.item, price);
-        notifyMaterialChanged(m.item.getID());
+        notifyMaterialChanged(m.item.id);
       }
       onProfitChanged();
     }
 
     @Override
-    public void onAcceptProduced(Task.Market price)
+    public void onAcceptProduced(Market price)
     {
       Task task = getCurrentTask();
       for(ItemStack m:task.getProducedMaterials())
       {
         task.setMaterialMarket(m.item, price);
-        notifyMaterialChanged(m.item.getID());
+        notifyMaterialChanged(m.item.id);
       }
       onProfitChanged();
     }
@@ -577,7 +578,7 @@ public class EICFragmentActivity extends FragmentActivity
         Task t = null;
         try
         {
-          t = Task.loadPromTSL(tsl);
+          t = application.factory.fromTSL(tsl);
         } catch(TaskLoadException e)
         {
           e.printStackTrace();
@@ -792,7 +793,7 @@ public class EICFragmentActivity extends FragmentActivity
       tx_profit.setTextColor(Color.YELLOW);
     }
 
-    MarketData da_market = application.provider.da_market;
+    MarketData da_market = application.database.da_market;
     synchronized(da_market.request_prices)
     {
       if(da_market.request_prices.size() > 0)

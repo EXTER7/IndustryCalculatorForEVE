@@ -22,6 +22,8 @@ import com.exter.eveindcalc.data.EveDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import exter.eveindustry.task.TaskFactory;
+
 
 public abstract class SolarSystemDialogFragment extends DialogFragment
 {
@@ -65,7 +67,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
 
   private int system;
 
-  private EveDatabase provider;
+  private EveDatabase database;
 
   private class MarketFetchClickListener implements DialogInterface.OnClickListener
   {
@@ -83,7 +85,9 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
     FragmentActivity activity = getActivity();
-    provider = ((EICApplication)activity.getApplication()).provider;
+    EICApplication application = (EICApplication)activity.getApplication();
+    TaskFactory factory = application.factory;
+    database = application.database;
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     LayoutInflater inflater = activity.getLayoutInflater();
     View view = inflater.inflate(R.layout.solarsystem, null);
@@ -101,7 +105,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     {
       region_names = new ArrayList<>();
       region_ids = new ArrayList<>();
-      Cursor c = provider.getDatabase().query("regions",new String[] { "id", "name" },null, null, null, null, "name");
+      Cursor c = database.getDatabase().query("regions",new String[] { "id", "name" },null, null, null, null, "name");
       while(c.moveToNext())
       {
         region_ids.add(c.getInt(0));
@@ -111,7 +115,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     }
     ArrayAdapter<CharSequence> region_adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, region_names);
     region_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    int reg = provider.getSolarSystem(system).Region;
+    int reg = factory.solarsystems.get(system).region;
     sp_region.setAdapter(region_adapter);
     sp_region.setSelection(region_ids.indexOf(reg), true);
     setRegionSystems(reg);
@@ -125,7 +129,7 @@ public abstract class SolarSystemDialogFragment extends DialogFragment
     Activity act = getActivity();
     system_ids = new ArrayList<>();
     ArrayList<CharSequence> system_names = new ArrayList<>();
-    Cursor c = provider.getDatabase().query("solar_systems",new String[] { "id", "name" },"rid = ?", new String[] {String.valueOf(region_id)}, null, null, "name");
+    Cursor c = database.getDatabase().query("solar_systems",new String[] { "id", "name" },"rid = ?", new String[] {String.valueOf(region_id)}, null, null, "name");
     while(c.moveToNext())
     {
       system_ids.add(c.getInt(0));

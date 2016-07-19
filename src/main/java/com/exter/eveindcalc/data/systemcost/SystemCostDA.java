@@ -12,23 +12,24 @@ import com.google.gson.stream.JsonReader;
 
 import java.io.IOException;
 
+import exter.eveindustry.data.systemcost.SolarSystemIndustryCost;
+
 
 public class SystemCostDA
 {
-  private class CacheMissListener implements Cache.IMissListener<Integer, SystemCost>
+  private class CacheMissListener implements Cache.IMissListener<Integer, SolarSystemIndustryCost>
   {
     @Override
-    public SystemCost onCacheMiss(Integer key)
+    public SolarSystemIndustryCost onCacheMiss(Integer key)
     {
       Cursor c = db.rawQuery("SELECT manufacturing,invention FROM system_cost WHERE id=?", new String[] { String.valueOf(key) });
       if(c.getCount() != 1)
       {
         c.close();
-        return new SystemCost(key,0,0);
+        return new SolarSystemIndustryCost(0,0);
       }
       c.moveToNext();
-      SystemCost sc = new SystemCost(
-          key,
+      SolarSystemIndustryCost sc = new SolarSystemIndustryCost(
           c.getDouble(0),
           c.getDouble(1));
       c.close();
@@ -39,7 +40,7 @@ public class SystemCostDA
 
   private long expire = -1;
 
-  private final Cache<Integer, SystemCost> cache = new InfiniteCache<>(new CacheMissListener());
+  private final Cache<Integer, SolarSystemIndustryCost> cache = new InfiniteCache<>(new CacheMissListener());
 
   private SQLiteDatabase db;
   private Context context;
@@ -190,7 +191,7 @@ public class SystemCostDA
     setExpire((System.currentTimeMillis() / 1000) + time);
   }
 
-  public SystemCost getCost(int id)
+  public SolarSystemIndustryCost getCost(int id)
   {
     return cache.get(id);
   }

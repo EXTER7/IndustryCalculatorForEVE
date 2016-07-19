@@ -1,2 +1,2 @@
-include ':EVEIndustry', ':EVEIndustryData', ':TSL'
+include ':EVEIndustry', ':TSL'
 

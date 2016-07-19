@@ -6,7 +6,8 @@ import android.support.annotation.NonNull;
 
 import com.exter.eveindcalc.data.EveDatabase;
 
-import exter.eveindustry.task.Task;
+import exter.eveindustry.market.Market;
+
 
 public class SettingsSolarSystemDialogFragment extends SolarSystemDialogFragment
 {
@@ -17,22 +18,22 @@ public class SettingsSolarSystemDialogFragment extends SolarSystemDialogFragment
   {
      if(required)
      {
-       Task.Market p = provider.getDefaultRequiredPrice();
-       provider.setDefaultRequiredPrice(new Task.Market(system_id, p.order, p.manual,p.broker,p.transaction));
+       Market p = database.getDefaultRequiredPrice();
+       database.setDefaultRequiredMarket(p.withSolarSystem(system_id));
      } else
      {
-       Task.Market p = provider.getDefaultProducedPrice();
-       provider.setDefaultProducedPrice(new Task.Market(system_id, p.order, p.manual,p.broker,p.transaction));
+       Market p = database.getDefaultProducedPrice();
+       database.setDefaultProducedMarket(p.withSolarSystem(system_id));
      }
   }
 
-  private EveDatabase provider;
+  private EveDatabase database;
 
   @NonNull
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
-    provider = ((EICApplication)getActivity().getApplication()).provider;
+    database = ((EICApplication)getActivity().getApplication()).database;
     Dialog d = super.onCreateDialog(savedInstanceState);
     required = getArguments().getBoolean("required");
     return d;

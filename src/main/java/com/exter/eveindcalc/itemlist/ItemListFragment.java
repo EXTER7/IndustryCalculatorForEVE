@@ -14,12 +14,13 @@ import android.widget.TextView;
 
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
+import com.exter.eveindcalc.data.Index;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import exter.eveindustry.dataprovider.index.Index;
-import exter.eveindustry.dataprovider.item.Item;
+import exter.eveindustry.data.item.Item;
+
 
 public class ItemListFragment extends Fragment
 {
@@ -60,7 +61,7 @@ public class ItemListFragment extends Fragment
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-      Item prod = application.provider.getItem(items.get(position));
+      Item prod = application.factory.items.get(items.get(position));
       ViewHolder holder;
       if (convertView == null)
       {
@@ -75,7 +76,7 @@ public class ItemListFragment extends Fragment
       }
 
       application.setImageViewItemIcon(holder.im_icon, prod);
-      holder.tx_name.setText(prod.Name);
+      holder.tx_name.setText(prod.name);
       return convertView;
     }
   }
@@ -116,9 +117,9 @@ public class ItemListFragment extends Fragment
     items = new ArrayList<>();
     for(Index.Entry e:index.getEntries())
     {
-      if(e.Group == group)
+      if(e.group == group)
       {
-        items.add(e.ItemID);
+        items.add(e.item_id);
       }
     }
     itemlist_adapter.notifyDataSetChanged();

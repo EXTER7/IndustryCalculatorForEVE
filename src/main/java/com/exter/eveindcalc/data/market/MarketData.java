@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import exter.eveindustry.data.inventory.IItem;
-import exter.eveindustry.dataprovider.item.Item;
-import exter.eveindustry.task.Task.Market;
+import exter.eveindustry.data.item.Item;
+import exter.eveindustry.market.Market;
+
 
 public class MarketData
 {
@@ -195,22 +195,22 @@ public class MarketData
     }
   }
 
-  public BigDecimal getMarketPrice(IItem item, Market market)
+  public BigDecimal getMarketPrice(Item item, Market market)
   {
     PriceValue pv;
     switch(market.order)
     {
       case BUY:
-        if(!((Item)item).Market)
+        if(!item.marketable)
         {
           return BigDecimal.ZERO;
         }
-        pv = getLocalPrice(item.getID(), market.system);
+        pv = getLocalPrice(item.id, market.system);
         if(pv == null)
         {
           synchronized(request_prices)
           {
-            request_prices.add(new Pair<>(item.getID(),market.system));
+            request_prices.add(new Pair<>(item.id,market.system));
           }
           return BigDecimal.ZERO;
         }
@@ -218,21 +218,21 @@ public class MarketData
         {
           synchronized(request_prices)
           {
-            request_prices.add(new Pair<>(item.getID(),market.system));
+            request_prices.add(new Pair<>(item.id,market.system));
           }
         }
         return pv.BuyPrice;
       case SELL:
-        if(!((Item)item).Market)
+        if(!item.marketable)
         {
           return BigDecimal.ZERO;
         }
-        pv = getLocalPrice(item.getID(), market.system);
+        pv = getLocalPrice(item.id, market.system);
         if(pv == null)
         {
           synchronized(request_prices)
           {
-            request_prices.add(new Pair<>(item.getID(),market.system));
+            request_prices.add(new Pair<>(item.id,market.system));
           }
           return BigDecimal.ZERO;
         }
@@ -240,7 +240,7 @@ public class MarketData
         {
           synchronized(request_prices)
           {
-            request_prices.add(new Pair<>(item.getID(),market.system));
+            request_prices.add(new Pair<>(item.id,market.system));
           }
         }
         return pv.SellPrice;

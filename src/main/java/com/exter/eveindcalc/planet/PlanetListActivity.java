@@ -17,15 +17,14 @@ import android.widget.TextView;
 
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
-import com.exter.eveindcalc.data.EveDatabase;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-import exter.eveindustry.data.inventory.IItem;
-import exter.eveindustry.dataprovider.item.Item;
-import exter.eveindustry.dataprovider.planet.Planet;
+import exter.eveindustry.data.item.Item;
+import exter.eveindustry.data.planet.Planet;
+import exter.eveindustry.task.TaskFactory;
 
 public class PlanetListActivity extends FragmentActivity
 {
@@ -41,25 +40,13 @@ public class PlanetListActivity extends FragmentActivity
     @Override
     public int getCount()
     {
-      if(planets == null)
-      {
-        return 0;
-      }
-      {
-        return planets.size();
-      }
+      return planets.size();
     }
        
     @Override
     public Object getItem(int position)
     {
-      if(planets == null)
-      {
-         return null;
-      } else
-      {
-        return planets.get(position);
-      }
+      return provider.planets.get(planets.get(position));
     }
        
     
@@ -79,7 +66,7 @@ public class PlanetListActivity extends FragmentActivity
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-      Planet planet = planets.get(position);
+      Planet planet = provider.planets.get(planets.get(position));
       ItemHolder holder;
       if (convertView == null)
       {
@@ -93,15 +80,15 @@ public class PlanetListActivity extends FragmentActivity
       {
         holder = (ItemHolder)convertView.getTag();
       }
-      application.setImageViewItemIcon(holder.im_icon, provider.getItem(planet.ID));
+      application.setImageViewItemIcon(holder.im_icon, provider.items.get(planet.id));
 
-      holder.tx_name.setText(planet.TypeName);
+      holder.tx_name.setText(planet.type_name);
       holder.ly_resources.removeAllViews();
-      for(IItem res:planet.Resources)
+      for(Item res:planet.resources)
       {
         View v = inflater.inflate(R.layout.planet_info_resource, holder.ly_resources, false);
         ImageView res_icon = (ImageView)v.findViewById(R.id.im_planet_info_resource);
-        application.setImageViewItemIcon(res_icon, (Item) res);
+        application.setImageViewItemIcon(res_icon, res);
         holder.ly_resources.addView(v);
       }
       return convertView;
@@ -115,14 +102,14 @@ public class PlanetListActivity extends FragmentActivity
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
       Intent i = new Intent();
-      i.putExtra("planet", ((Planet)parent.getItemAtPosition(position)).ID);
+      i.putExtra("planet", ((Planet)parent.getItemAtPosition(position)).id);
       setResult(Activity.RESULT_OK,i);
       finish();
     }
   }
 
-  private List<Planet> planets;
-  private EveDatabase provider;
+  private List<Integer> planets;
+  private TaskFactory provider;
   private EICApplication application;
 
   @Override
@@ -130,8 +117,8 @@ public class PlanetListActivity extends FragmentActivity
   {
     super.onCreate(savedInstanceState);
     application = (EICApplication)getApplication();
-    provider = application.provider;
-    planets = new ArrayList<>(provider.allPlanets());
+    provider = application.factory;
+    planets = new ArrayList<>(provider.planets.getIDs());
     setContentView(R.layout.planetlist);
 
 

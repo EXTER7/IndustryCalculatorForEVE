@@ -8,19 +8,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import exter.eveindustry.data.planet.IPlanetBuilding;
-import exter.eveindustry.data.reaction.IReaction;
-import exter.eveindustry.dataprovider.item.Item;
+import exter.eveindustry.data.planet.PlanetBuilding;
+import exter.eveindustry.data.reaction.Reaction;
 import exter.eveindustry.item.ItemStack;
+import exter.eveindustry.market.Market;
 import exter.eveindustry.task.GroupTask;
 import exter.eveindustry.task.ManufacturingTask;
 import exter.eveindustry.task.PlanetTask;
 import exter.eveindustry.task.ReactionTask;
 import exter.eveindustry.task.RefiningTask;
 import exter.eveindustry.task.Task;
+import exter.eveindustry.task.TaskFactory;
 
 public class TaskHelper
 {
+
+  private final TaskFactory factory;
 
   // Used to provide the task icon and description based on the type of task
   private interface ITaskIconProvider
@@ -30,12 +33,12 @@ public class TaskHelper
     String getDescription(Task task);
   }
 
-  static private class ManufacturingTaskDescriptionProvider implements ITaskIconProvider
+  private class ManufacturingTaskDescriptionProvider implements ITaskIconProvider
   {
     @Override
     public int getIcon(Task task)
     {
-       return ((Item)((ManufacturingTask)task).getBlueprint().getProduct().item).Icon;
+       return ((ManufacturingTask)task).getBlueprint().product.item.icon_id;
     }
 
     @Override
@@ -57,12 +60,12 @@ public class TaskHelper
     }
   }
 
-  static private class RefiningTaskIconProvider implements ITaskIconProvider
+  private class RefiningTaskIconProvider implements ITaskIconProvider
   {
     @Override
     public int getIcon(Task task)
     {
-      return ((Item)((RefiningTask)task).getRefinable().getRequiredItem().item).Icon;
+      return ((RefiningTask)task).getRefinable().item.item.icon_id;
     }
 
     @Override
@@ -79,7 +82,7 @@ public class TaskHelper
     }
   }
 
-  static private class ReactionTaskIconProvider implements ITaskIconProvider
+  private class ReactionTaskIconProvider implements ITaskIconProvider
   {
     @Override
     public int getIcon(Task task)
@@ -87,9 +90,9 @@ public class TaskHelper
       List<ItemStack> m = task.getProducedMaterials();
       if(m.size() == 1)
       {
-        return ((Item)m.iterator().next().item).Icon;
+        return m.iterator().next().item.icon_id;
       }
-      return ((Item)Task.getDataProvider().getItem((((ReactionTask) task).getStarbaseTower().getID()))).Icon;
+      return ((ReactionTask) task).getStarbaseTower().item.icon_id;
     }
 
     @Override
@@ -104,9 +107,9 @@ public class TaskHelper
       ReactionTask t = (ReactionTask)task;
       int reactors = 0;
       int miners = 0;
-      for(IReaction r:t.getReactions())
+      for(Reaction r:t.getReactions())
       {
-        if(r.getInputs().size() > 0)
+        if(r.inputs.size() > 0)
         {
           reactors++;
         } else
@@ -120,7 +123,7 @@ public class TaskHelper
     }
   }
 
-  static private class PlanetTaskIconProvider implements ITaskIconProvider
+  private class PlanetTaskIconProvider implements ITaskIconProvider
   {
     @Override
     public int getIcon(Task task)
@@ -128,9 +131,9 @@ public class TaskHelper
       List<ItemStack> m = task.getProducedMaterials();
       if(m.size() == 1)
       {
-        return ((Item)m.iterator().next().item).Icon;
+        return (m.iterator().next().item).icon_id;
       }
-      return ((Item)Task.getDataProvider().getItem(((PlanetTask) task).getPlanet().getID())).Icon;
+      return factory.items.get(((PlanetTask) task).getPlanet().id).icon_id;
     }
 
     @Override
@@ -145,9 +148,9 @@ public class TaskHelper
       PlanetTask t = (PlanetTask)task;
       int factories = 0;
       int extractors = 0;
-      for(IPlanetBuilding p:t.getBuildings())
+      for(PlanetBuilding p:t.getBuildings())
       {
-        if(p.getMaterials().size() > 0)
+        if(p.materials.size() > 0)
         {
           factories++;
         } else
@@ -169,7 +172,7 @@ public class TaskHelper
       List<ItemStack> m = task.getProducedMaterials();
       if(m.size() == 1)
       {
-        return ((Item)m.iterator().next().item).Icon;
+        return (m.iterator().next().item).icon_id;
       }
       return -1;
     }
@@ -202,17 +205,17 @@ public class TaskHelper
     }
   }
 
-  static public Task.Market PriceFromBundle(Bundle bundle)
+  static public Market priceFromBundle(Bundle bundle)
   {
     int system = bundle.getInt("system",30000142);
-    Task.Market.Order source = Task.Market.Order.fromInt(bundle.getInt("source",Task.Market.Order.SELL.value));
+    Market.Order source = Market.Order.fromInt(bundle.getInt("source",Market.Order.SELL.value));
     BigDecimal manual = getBigDecimal(bundle,"manual",BigDecimal.ZERO);
     BigDecimal broker = getBigDecimal(bundle,"broker",new BigDecimal("3"));
     BigDecimal tax = getBigDecimal(bundle,"tax",new BigDecimal("2"));
-    return new Task.Market(system, source, manual,broker,tax);
+    return new Market(system, source, manual,broker,tax);
   }
 
-  static public void PriceToBundle(Task.Market p, Bundle bundle)
+  static public void priceToBundle(Market p, Bundle bundle)
   {
     bundle.putInt("system", p.system);
     bundle.putInt("source", p.order.value);
@@ -235,12 +238,12 @@ public class TaskHelper
     return icon_providers.get(task.getClass()).getIcon(task);
   }
 
-  static public boolean taskHasBackground(Task task)
+  public boolean taskHasBackground(Task task)
   {
     return task != null && icon_providers.get(task.getClass()).hasBackground(task);
   }
   
-  static public String getTaskDescription(Task task)
+  public String getTaskDescription(Task task)
   {
     if(task == null)
     {
@@ -249,8 +252,9 @@ public class TaskHelper
     return icon_providers.get(task.getClass()).getDescription(task);
   }
 
-  static
+  public TaskHelper(TaskFactory factory)
   {
+    this.factory = factory;
     icon_providers = new HashMap<>();
     icon_providers.put(ManufacturingTask.class, new ManufacturingTaskDescriptionProvider());
     icon_providers.put(RefiningTask.class, new RefiningTaskIconProvider());

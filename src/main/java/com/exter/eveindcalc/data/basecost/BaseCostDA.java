@@ -13,7 +13,7 @@ import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 
-import exter.eveindustry.data.inventory.IItem;
+import exter.eveindustry.data.item.Item;
 
 public class BaseCostDA
 {
@@ -159,11 +159,11 @@ public class BaseCostDA
     setExpire((System.currentTimeMillis() / 1000) + time);
   }
 
-  public BigDecimal getCost(IItem item)
+  public BigDecimal getCost(Item item)
   {
     synchronized(cache)
     {
-      return cache.get(item.getID());
+      return cache.get(item.id);
     }
   }
 }

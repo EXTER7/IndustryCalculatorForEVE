@@ -1,22 +1,26 @@
 package com.exter.eveindcalc;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.exter.eveindcalc.data.Index;
+
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
-import exter.eveindustry.dataprovider.EVEDataProvider;
-import exter.eveindustry.dataprovider.blueprint.InstallationGroup;
-import exter.eveindustry.dataprovider.item.Item;
-import exter.eveindustry.dataprovider.item.ItemCategory;
-import exter.eveindustry.dataprovider.item.ItemGroup;
-import exter.eveindustry.dataprovider.item.ItemMetaGroup;
-import exter.eveindustry.dataprovider.starmap.Region;
-import exter.eveindustry.dataprovider.starmap.SolarSystem;
+import exter.eveindustry.data.blueprint.InstallationGroup;
+import exter.eveindustry.data.blueprint.InventionInstallation;
+import exter.eveindustry.data.item.Item;
+import exter.eveindustry.data.item.ItemCategory;
+import exter.eveindustry.data.item.ItemGroup;
+import exter.eveindustry.data.item.ItemMetaGroup;
+import exter.eveindustry.data.starmap.Region;
+import exter.eveindustry.data.starmap.SolarSystem;
+import exter.eveindustry.task.TaskFactory;
 
 
 public class EICDatabaseHelper extends SQLiteOpenHelper
@@ -24,7 +28,7 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
   private static final String DATABASE_NAME = "eic.db";
 
   // Increment this if the data in the assets directory is changed (like when a new EVE expansion is released).
-  private static final int DATABASE_VERSION = 128;
+  private static final int DATABASE_VERSION = 131;
 
   // Change this to the value of DATABASE_VERSION the schema of non-static tables are changed (resets non-static data).
   private static final int NONSTATIC_VERSION = 120;
@@ -51,6 +55,10 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
   +"( id integer primary key,"
   + " gid integer not null,"
   + " installation integer not null);";
+
+
+  private static final String INVENTIONNSTALLATIONS_CREATE = "create table invention_installations"
+  +"( id integer primary key);";
 
   private static final String SOLARSYSTEMS_CREATE = "create table solar_systems"
   +"( id integer primary key,"
@@ -92,12 +100,12 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
   private static final String SAVED_SOLARSYSTEMS_CREATE = "create table saved_solar_systems"
   +"( id integer primary key );";
 
-  private EVEDataProvider provider;
+  private EICApplication application;
 
-  public EICDatabaseHelper(Context context, EVEDataProvider provider)
+  public EICDatabaseHelper(EICApplication application)
   {
-    super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    this.provider = provider;
+    super(application.getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
+    this.application = application;
   }
 
   @Override
@@ -120,6 +128,32 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
     buildStaticData(db);
   }
 
+  private List<Integer> listIDs(String path)
+  {
+    List<Integer> result = new ArrayList<>();
+    try
+    {
+      String[] contents = application.getAssets().list(path);
+      for(String file: contents)
+      {
+        if(file.endsWith(".tsl"))
+        {
+          try
+          {
+            result.add(Integer.valueOf(file.replace(".tsl", "")));
+          } catch(NumberFormatException ignore)
+          {
+
+          }
+        }
+      }
+      return result;
+    } catch(IOException e1)
+    {
+      return result;
+    }
+  }
+
   private void buildStaticData(SQLiteDatabase db)
   {
     db.execSQL(GROUPS_CREATE);
@@ -127,83 +161,94 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
     db.execSQL(METAGROUPS_CREATE);
     db.execSQL(BLUEPRINTS_CREATE);
     db.execSQL(GROUPINSTALLATIONS_CREATE);
+    db.execSQL(INVENTIONNSTALLATIONS_CREATE);
     db.execSQL(SOLARSYSTEMS_CREATE);
     db.execSQL(REGIONS_CREATE);
 
+    TaskFactory factory = new TaskFactory(application.fs,application.database);
+
     Set<Integer> bp_groups = new HashSet<>();
     Set<Integer> bp_categories = new HashSet<>();
-    for(Iterator<Item> iter = provider.allItems(); iter.hasNext();)
+    Set<Integer> bp_metagroups = new HashSet<>();
+
+    Index blueprints = new Index(application.fs,"blueprint/index.tsl");
+
+    db.beginTransaction();
+    for(int id:blueprints.getItemIDs())
     {
-      Item item = iter.next();
-      if(provider.getBlueprintIndex().getItemIDs().contains(item.ID))
-      {
-        ContentValues cv = new ContentValues();
-        cv.put("id", item.ID);
-        cv.put("name", item.NameLowercase);
-        cv.put("gid", item.Group);
-        cv.put("mgid", item.MetaGroup);
-        db.insert("blueprints", null, cv);
-        bp_groups.add(item.Group);
-      }
-    }
-    for(Iterator<ItemGroup> iter = provider.allItemGroups(); iter.hasNext();)
-    {
-      ItemGroup group = iter.next();
-      if(bp_groups.contains(group.ID))
-      {
-        ContentValues cv = new ContentValues();
-        cv.put("id", group.ID);
-        cv.put("cid", group.Category);
-        cv.put("name", group.Name);
-        db.insert("groups", null, cv);
-        bp_categories.add(group.Category);
-      }
-    }
-    for(Iterator<ItemCategory> iter = provider.allItemCategories(); iter.hasNext();)
-    {
-      ItemCategory category = iter.next();
-      if(bp_categories.contains(category.ID))
-      {
-        ContentValues cv = new ContentValues();
-        cv.put("id", category.ID);
-        cv.put("name", category.Name);
-        db.insert("categories", null, cv);
-      }
-    }
-    for(Iterator<ItemMetaGroup> iter = provider.allItemMetaGroups(); iter.hasNext();)
-    {
-      ItemMetaGroup group = iter.next();
+      Item item = factory.items.get(id);
       ContentValues cv = new ContentValues();
-      cv.put("id", group.ID);
-      db.insert("metagroups", null, cv);
-    }
-    for(Iterator<InstallationGroup> iter = provider.allInstallationGroups(); iter.hasNext();)
-    {
-      InstallationGroup group = iter.next();
-      ContentValues values = new ContentValues();
-      values.put("id", group.ID);
-      values.put("gid", group.GroupID);
-      values.put("installation", group.InstallationID);
-      db.insert("group_installations", null, values);
+      cv.put("id", item.id);
+      cv.put("name", item.name.toLowerCase());
+      cv.put("gid", item.group_id);
+      cv.put("mgid", item.metagroup_id);
+      db.insert("blueprints", null, cv);
+      bp_groups.add(item.group_id);
+      bp_metagroups.add(item.metagroup_id);
     }
 
-    for(Iterator<SolarSystem> iter = provider.allSolarSystems(); iter.hasNext();)
+    for(int gid:bp_groups)
     {
-      SolarSystem system = iter.next();
+      ItemGroup group = factory.item_groups.get(gid);
+      ContentValues cv = new ContentValues();
+      cv.put("id", group.id);
+      cv.put("cid", group.category_id);
+      cv.put("name", group.name);
+      db.insert("groups", null, cv);
+      bp_categories.add(group.category_id);
+    }
+    for(int cid:bp_categories)
+    {
+      ItemCategory category = factory.item_categories.get(cid);
+      ContentValues cv = new ContentValues();
+      cv.put("id", category.id);
+      cv.put("name", category.name);
+      db.insert("categories", null, cv);
+    }
+    for(int mgid:bp_metagroups)
+    {
+      ItemMetaGroup metagroup = factory.item_metagroups.get(mgid);
+      ContentValues cv = new ContentValues();
+      cv.put("id", metagroup.id);
+      db.insert("metagroups", null, cv);
+    }
+
+    for(int id:listIDs("blueprint/installation/group"))
+    {
+      InstallationGroup group = factory.installation_groups.get(id);
       ContentValues values = new ContentValues();
-      values.put("id", system.ID);
-      values.put("rid", system.Region);
-      values.put("name", system.Name);
+      values.put("id", group.id);
+      values.put("gid", group.group_id);
+      values.put("installation", group.installation_id);
+      db.insert("group_installations", null, values);
+    }
+    for(int id:listIDs("blueprint/installation/invention"))
+    {
+      InventionInstallation inst = factory.invention_installations.get(id);
+      ContentValues values = new ContentValues();
+      values.put("id", inst.id);
+      db.insert("invention_installations", null, values);
+    }
+
+    for(int id:listIDs("solarsystem"))
+    {
+      SolarSystem system = factory.solarsystems.get(id);
+      ContentValues values = new ContentValues();
+      values.put("id", system.id);
+      values.put("rid", system.region);
+      values.put("name", system.name);
       db.insert("solar_systems", null, values);
     }
-    for(Iterator<Region> iter = provider.allSolarSystemRegions(); iter.hasNext();)
+    for(int id:listIDs("solarsystem/region"))
     {
-      Region region = iter.next();
+      Region region = factory.regions.get(id);
       ContentValues values = new ContentValues();
-      values.put("id", region.ID);
-      values.put("name", region.Name);
+      values.put("id", region.id);
+      values.put("name", region.name);
       db.insert("regions", null, values);
     }
+    db.setTransactionSuccessful();
+    db.endTransaction();
   }
 
   @Override
@@ -236,8 +281,8 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
     {
       db.execSQL("DROP TABLE IF EXISTS items");
       db.execSQL("DROP TABLE IF EXISTS installations");
-      db.execSQL("DROP TABLE IF EXISTS invention_installations");
     }
+    db.execSQL("DROP TABLE IF EXISTS invention_installations");
     db.execSQL("DROP TABLE IF EXISTS categories");
     db.execSQL("DROP TABLE IF EXISTS groups");
     db.execSQL("DROP TABLE IF EXISTS metagroups");

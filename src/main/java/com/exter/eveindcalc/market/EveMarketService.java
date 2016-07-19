@@ -33,6 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import exter.eveindustry.task.TaskFactory;
+
 public class EveMarketService extends IntentService
 {
   static public final String BROADCAST_PROGRESS = "com.exter.eveindcalc.response.FETCH_PROGRESS";
@@ -149,14 +151,15 @@ public class EveMarketService extends IntentService
       retry = System.currentTimeMillis() + 1000 * 60 * 5;
       return;
     }
-    EveDatabase provider = ((EICApplication) getApplication()).provider;
+    EveDatabase database = ((EICApplication) getApplication()).database;
+    TaskFactory provider = ((EICApplication) getApplication()).factory;
     try
     {
       String url_str = "http://api.eve-central.com/api/marketstat?typeid=";
       boolean rest = false;
       for(int item : items)
       {
-        if(provider.getItem(item).Market && !provider.da_market.hasLocalPrice(item, system))
+        if(provider.items.get(item).marketable && !database.da_market.hasLocalPrice(item, system))
         {
           if (rest)
           {
@@ -192,17 +195,17 @@ public class EveMarketService extends IntentService
       FetchResult fr = fetched.get(i);
       if(fr == null)
       {
-        PriceValue pv = provider.da_market.getLocalPrice(i, system);
+        PriceValue pv = database.da_market.getLocalPrice(i, system);
         if(pv == null)
         {
-          provider.da_market.setLocalPriceFromCache(i, system, BigDecimal.ZERO, BigDecimal.ZERO);
+          database.da_market.setLocalPriceFromCache(i, system, BigDecimal.ZERO, BigDecimal.ZERO);
         } else
         {
-          provider.da_market.setLocalPriceFromCache(i, system, pv.BuyPrice, pv.SellPrice);
+          database.da_market.setLocalPriceFromCache(i, system, pv.BuyPrice, pv.SellPrice);
         }
       } else
       {
-        provider.da_market.setLocalPriceFromCache(i, system, fr.buy, fr.sell);
+        database.da_market.setLocalPriceFromCache(i, system, fr.buy, fr.sell);
       }
     }
   }

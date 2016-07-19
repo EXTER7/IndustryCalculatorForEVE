@@ -27,15 +27,14 @@ import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICFragmentActivity;
 import com.exter.eveindcalc.IEveCalculatorFragment;
 import com.exter.eveindcalc.R;
-import com.exter.eveindcalc.data.EveDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import exter.eveindustry.data.reaction.IReaction;
-import exter.eveindustry.dataprovider.reaction.Reaction;
-import exter.eveindustry.dataprovider.starbase.StarbaseTower;
+import exter.eveindustry.data.reaction.Reaction;
+import exter.eveindustry.data.reaction.StarbaseTower;
 import exter.eveindustry.task.ReactionTask;
+import exter.eveindustry.task.TaskFactory;
 
 public class ReactionFragment extends Fragment implements IEveCalculatorFragment
 {
@@ -77,12 +76,10 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
         return;
       }
 
-      StarbaseTower tower = towers.get(pos);
-      reaction_task.setStarbaseTower(tower);
+      reaction_task.setStarbaseTower(tower_ids.get(pos));
       SharedPreferences sp = activity.getSharedPreferences("EIC", Context.MODE_PRIVATE);
       SharedPreferences.Editor ed = sp.edit();
-      assert tower.TowerItem != null;
-      ed.putInt("reaction.tower", tower.TowerItem.ID);
+      ed.putInt("reaction.tower", reaction_task.getStarbaseTower().item.id);
       ed.apply();
     }
 
@@ -129,10 +126,10 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
 
   private EICFragmentActivity activity;
 
-  private List<StarbaseTower> towers;
+  private List<Integer> tower_ids;
   private ReactionTask reaction_task;
 
-  private EveDatabase provider;
+  private TaskFactory factory;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -141,15 +138,15 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     reaction_task = (ReactionTask) activity.getCurrentTask();
     ly_inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    provider = ((EICApplication)activity.getApplication()).provider;
+    factory = ((EICApplication)activity.getApplication()).factory;
 
-    towers = new ArrayList<>(provider.allStarbaseTowers());
+    tower_ids = new ArrayList<>(factory.towers.getIDs());
 
     View root_view = inflater.inflate(R.layout.reaction, container, false);
     List<String> tower_names = new ArrayList<>();
-    for(StarbaseTower tower : towers)
+    for(int id : tower_ids)
     {
-      tower_names.add(tower.Name);
+      tower_names.add(factory.towers.get(id).name);
     }
     sp_tower = (Spinner) root_view.findViewById(R.id.sp_reaction_tower);
     ed_runtime = new IntegerEditText((EditText) root_view.findViewById(R.id.ed_reaction_runtime), 1, 99999, 0, new RunTimeChangeWatcher());
@@ -178,7 +175,7 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     if(resultCode == Activity.RESULT_OK)
     {
       activity.getCurrentTask().registerListener(activity.GetListener());
-      reaction_task.addReaction(provider.getReaction(data.getIntExtra("reaction", -1)));
+      reaction_task.addReaction(data.getIntExtra("reaction", -1));
       onTaskChanged();
     }
   }
@@ -192,17 +189,17 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     }
 
     ed_runtime.setValue(reaction_task.getRunTime());
-    StarbaseTower tower = (StarbaseTower) reaction_task.getStarbaseTower();
-    sp_tower.setSelection(towers.indexOf(tower));
+    StarbaseTower tower = reaction_task.getStarbaseTower();
+    sp_tower.setSelection(tower_ids.indexOf(tower.item.id));
 
 
 
     ly_process.removeAllViews();
 
-    for(IReaction proc:reaction_task.getReactions())
+    for(Reaction proc:reaction_task.getReactions())
     {
       View v = ly_inflater.inflate(R.layout.process, ly_process, false);
-      new ViewHolderReactor(v, (Reaction)proc);
+      new ViewHolderReactor(v, proc);
       ly_process.addView(v);
     }
   }
@@ -251,14 +248,14 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
       bt_remove = (ImageButton) view.findViewById(R.id.bt_process_remove);
       im_icon = (ImageView) view.findViewById(R.id.im_process_icon);
 
-      if(proc.Inputs.size() > 0)
+      if(proc.inputs.size() > 0)
       {
         im_icon.setImageResource(R.drawable.reactor);
       } else
       {
         im_icon.setImageResource(R.drawable.moonminer);
       }
-      tx_name.setText(provider.getItem(proc.ID).Name);
+      tx_name.setText(factory.items.get(proc.id).name);
       bt_remove.setOnClickListener(new RemoveListener());
     }
   }

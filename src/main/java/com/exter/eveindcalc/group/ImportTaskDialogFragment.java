@@ -11,6 +11,7 @@ import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICFragmentActivity;
 
 import java.io.File;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import exter.eveindustry.task.GroupTask;
 import exter.eveindustry.task.Task;
+import exter.eveindustry.task.TaskFactory;
 import exter.eveindustry.task.TaskLoadException;
 import exter.tsl.InvalidTSLException;
 import exter.tsl.TSLObject;
@@ -68,7 +70,7 @@ public class ImportTaskDialogFragment extends DialogFragment
         Task t = null;
         try
         {
-          t = Task.loadPromTSL(tsl);
+          t = factory.fromTSL(tsl);
         } catch(TaskLoadException e)
         {
           e.printStackTrace();
@@ -106,6 +108,7 @@ public class ImportTaskDialogFragment extends DialogFragment
   }
   
   private EICFragmentActivity activity;
+  private TaskFactory factory;
   private List<File> files;
   
   @NonNull
@@ -113,6 +116,7 @@ public class ImportTaskDialogFragment extends DialogFragment
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity)getActivity();
+    factory = ((EICApplication)activity.getApplication()).factory;
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     builder.setTitle("Task");
     files = new ArrayList<>();

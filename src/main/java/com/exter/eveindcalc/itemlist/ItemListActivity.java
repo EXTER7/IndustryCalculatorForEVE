@@ -18,8 +18,7 @@ import android.widget.TextView;
 
 import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.R;
-
-import exter.eveindustry.dataprovider.index.Index;
+import com.exter.eveindcalc.data.Index;
 
 
 public abstract class ItemListActivity extends FragmentActivity
@@ -78,9 +77,9 @@ public abstract class ItemListActivity extends FragmentActivity
       EICApplication application = (EICApplication)getApplication();
       for(Index.Entry e:index.getEntries())
       {
-        if(e.Group == group.ID)
+        if(e.group == group.ID)
         {
-          application.setImageViewItemIcon(holder.im_icon, application.provider.getItem(e.ItemID));
+          application.setImageViewItemIcon(holder.im_icon, application.factory.items.get(e.item_id));
           break;
         }
       }
@@ -110,7 +109,8 @@ public abstract class ItemListActivity extends FragmentActivity
 
   private PagerAdapter pager_adapter;
   private ItemListFragment item_list;
-  private GroupsAdapter groups_adapter;
+  protected EICApplication application;
+
   private class PagerAdapter extends FragmentStatePagerAdapter
   {
     private ItemListFragment[] fragments;
@@ -185,7 +185,7 @@ public abstract class ItemListActivity extends FragmentActivity
   public final void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
-
+    application = (EICApplication )getApplication();
     setContentView(R.layout.itemlist);
     
     
@@ -196,7 +196,7 @@ public abstract class ItemListActivity extends FragmentActivity
     {
       ListView ls_groups = (ListView) findViewById(R.id.ls_itemlist_categories);
       item_list = (ItemListFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_itemlist);
-      groups_adapter = new GroupsAdapter(this);
+      GroupsAdapter groups_adapter = new GroupsAdapter(this);
       ls_groups.setAdapter(groups_adapter);
       ls_groups.setOnItemClickListener(new GroupsClickListener());
       item_list.setGroup(0);

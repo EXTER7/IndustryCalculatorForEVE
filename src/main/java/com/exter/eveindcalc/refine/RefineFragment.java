@@ -19,7 +19,6 @@ import com.exter.eveindcalc.EICFragmentActivity;
 import com.exter.eveindcalc.IEveCalculatorFragment;
 import com.exter.eveindcalc.R;
 
-import exter.eveindustry.dataprovider.item.Item;
 import exter.eveindustry.task.RefiningTask;
 
 public class RefineFragment extends Fragment implements IEveCalculatorFragment
@@ -126,7 +125,7 @@ public class RefineFragment extends Fragment implements IEveCalculatorFragment
       refine_task.setOreProcessingSkillLevel(pos);
       SharedPreferences sp = activity.getSharedPreferences("EIC", Context.MODE_PRIVATE);
       SharedPreferences.Editor ed = sp.edit();
-      ed.putInt("refine.skill_" + String.valueOf(refine_task.getRefinable().getSkill()),refine_task.getOreProcessingSkillLevel());
+      ed.putInt("refine.skill_" + String.valueOf(refine_task.getRefinable().skill_id),refine_task.getOreProcessingSkillLevel());
       ed.apply();
     }
 
@@ -281,9 +280,9 @@ public class RefineFragment extends Fragment implements IEveCalculatorFragment
     }
 
     tx_skill.setText(String.format("%s skill:",
-            application.provider.getItem(refine_task.getRefinable().getSkill()).Name));
+            application.factory.items.get(refine_task.getRefinable().skill_id).name));
     tx_amount.setText(String.format("%s amount (units):",
-            ((Item) refine_task.getRefinable().getRequiredItem().item).Name));
+            refine_task.getRefinable().item.item.name));
 
     ed_amount.setValue((int) refine_task.getOreAmount());
     ed_reftax.setValue(refine_task.getRefineryTax());

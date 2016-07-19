@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import exter.eveindustry.task.Task;
+import exter.eveindustry.market.Market;
 
 public class SettingsDialogFragment extends DialogFragment
 {
@@ -52,12 +52,12 @@ public class SettingsDialogFragment extends DialogFragment
       {
         if(requirement)
         {
-          Task.Market p = provider.getDefaultRequiredPrice();
-          provider.setDefaultRequiredPrice(new Task.Market(sys, p.order, p.manual,p.broker,p.transaction));
+          Market p = database.getDefaultRequiredPrice();
+          database.setDefaultRequiredMarket(p.withSolarSystem(sys));
         } else
         {
-          Task.Market p = provider.getDefaultProducedPrice();
-          provider.setDefaultProducedPrice(new Task.Market(sys, p.order, p.manual,p.broker,p.transaction));
+          Market p = database.getDefaultProducedPrice();
+          database.setDefaultProducedMarket(p.withSolarSystem(sys));
         }
       }
     }
@@ -84,7 +84,8 @@ public class SettingsDialogFragment extends DialogFragment
 
   
   private List<Integer> system_ids;
-  private EveDatabase provider;
+  private EICApplication application;
+  private EveDatabase database;
 
 
   private class SellClickListener implements RadioButton.OnClickListener
@@ -101,12 +102,12 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Task.Market p = provider.getDefaultRequiredPrice();
-        provider.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual,p.broker,p.transaction));
+        Market p = database.getDefaultRequiredPrice();
+        database.setDefaultRequiredMarket(p.withOrder(Market.Order.SELL));
       } else
       {
-        Task.Market p = provider.getDefaultProducedPrice();
-        provider.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.SELL, p.manual,p.broker,p.transaction));
+        Market p = database.getDefaultProducedPrice();
+        database.setDefaultProducedMarket(p.withOrder(Market.Order.SELL));
       }
     }
   }
@@ -125,12 +126,12 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Task.Market p = provider.getDefaultRequiredPrice();
-        provider.setDefaultRequiredPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual,p.broker,p.transaction));
+        Market p = database.getDefaultRequiredPrice();
+        database.setDefaultRequiredMarket(p.withOrder(Market.Order.BUY));
       } else
       {
-        Task.Market p = provider.getDefaultProducedPrice();
-        provider.setDefaultProducedPrice(new Task.Market(p.system, Task.Market.Order.BUY, p.manual,p.broker,p.transaction));
+        Market p = database.getDefaultProducedPrice();
+        database.setDefaultProducedMarket(p.withOrder(Market.Order.BUY));
       }
     }
   }
@@ -149,12 +150,12 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Task.Market p = provider.getDefaultRequiredPrice();
-        provider.setDefaultRequiredPrice(new Task.Market(p.system, p.order, p.manual,p.broker,new_value));
+        Market p = database.getDefaultRequiredPrice();
+        database.setDefaultRequiredMarket(p.withBrokerFee(new_value));
       } else
       {
-        Task.Market p = provider.getDefaultProducedPrice();
-        provider.setDefaultProducedPrice(new Task.Market(p.system, p.order, p.manual,p.broker,new_value));
+        Market p = database.getDefaultProducedPrice();
+        database.setDefaultProducedMarket(p.withBrokerFee(new_value));
       }
     }
   }
@@ -172,12 +173,12 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Task.Market p = provider.getDefaultRequiredPrice();
-        provider.setDefaultRequiredPrice(new Task.Market(p.system, p.order, p.manual,new_value,p.transaction));
+        Market p = database.getDefaultRequiredPrice();
+        database.setDefaultRequiredMarket(p.withTransactionTax(new_value));
       } else
       {
-        Task.Market p = provider.getDefaultProducedPrice();
-        provider.setDefaultProducedPrice(new Task.Market(p.system, p.order, p.manual,new_value,p.transaction));
+        Market p = database.getDefaultProducedPrice();
+        database.setDefaultProducedMarket(p.withTransactionTax(new_value));
       }
     }
   }
@@ -187,7 +188,7 @@ public class SettingsDialogFragment extends DialogFragment
     @Override
     public void onValueChanged(int new_value)
     {
-      provider.setDefaultBlueprintME(new_value);
+      database.setDefaultBlueprintME(new_value);
     }
   }
 
@@ -196,7 +197,7 @@ public class SettingsDialogFragment extends DialogFragment
     @Override
     public void onValueChanged(int new_value)
     {
-      provider.setDefaultBlueprintTE(new_value);
+      database.setDefaultBlueprintTE(new_value);
     }
   }
 
@@ -215,7 +216,9 @@ public class SettingsDialogFragment extends DialogFragment
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
-    provider = ((EICApplication)getActivity().getApplication()).provider;
+    application = (EICApplication)getActivity().getApplication();
+    database = application.database;
+
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     LayoutInflater inflater = getActivity().getLayoutInflater();
     View view = inflater.inflate(R.layout.settings, null);
@@ -255,17 +258,17 @@ public class SettingsDialogFragment extends DialogFragment
     sp_sellto_system.setOnItemSelectedListener(null);
     sp_buyfrom_system.setOnItemSelectedListener(null);
 
-    Task.Market req = provider.getDefaultRequiredPrice();
-    Task.Market prod = provider.getDefaultProducedPrice();
+    Market req = database.getDefaultRequiredPrice();
+    Market prod = database.getDefaultProducedPrice();
     
-    if(req.order == Task.Market.Order.BUY)
+    if(req.order == Market.Order.BUY)
     {
       rg_buyfrom_source.check(R.id.rb_buyfrom_buy);
     } else
     {
       rg_buyfrom_source.check(R.id.rb_buyfrom_sell);
     }      
-    if(prod.order == Task.Market.Order.BUY)
+    if(prod.order == Market.Order.BUY)
     {
       rg_sellto_source.check(R.id.rb_sellto_buy);
     } else
@@ -282,8 +285,8 @@ public class SettingsDialogFragment extends DialogFragment
 
     sp_sellto_system.setOnItemSelectedListener(new SystemSelectedListener(false));
     sp_buyfrom_system.setOnItemSelectedListener(new SystemSelectedListener(true));
-    ed_default_me.setValue(provider.getDefaultME(null));
-    ed_default_te.setValue(provider.getDefaultTE(null));
+    ed_default_me.setValue(database.getDefaultME(null));
+    ed_default_te.setValue(database.getDefaultTE(null));
 
   }
   
@@ -291,8 +294,8 @@ public class SettingsDialogFragment extends DialogFragment
   public void onResume()
   {
     super.onResume();
-    Task.Market req = provider.getDefaultRequiredPrice();
-    Task.Market prod = provider.getDefaultProducedPrice();
+    Market req = database.getDefaultRequiredPrice();
+    Market prod = database.getDefaultProducedPrice();
 
     sp_sellto_system.setOnItemSelectedListener(null);
     updateSystem(sp_sellto_system, prod.system);
@@ -305,14 +308,14 @@ public class SettingsDialogFragment extends DialogFragment
 
   private void updateSystem(Spinner spinner, int system)
   {
-    provider.da_recentsystems.putSystem(system);
+    database.da_recentsystems.putSystem(system);
 
     system_ids = new ArrayList<>();
     List<String> system_names = new ArrayList<>();
-    for(int id:provider.da_recentsystems.getSystems())
+    for(int id: database.da_recentsystems.getSystems())
     {
       system_ids.add(id);
-      system_names.add(provider.getSolarSystem(id).Name);
+      system_names.add(application.factory.solarsystems.get(id).name);
     }
     system_ids.add(-1);
     system_names.add("[ Other ... ]");

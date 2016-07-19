@@ -22,13 +22,11 @@ import com.exter.eveindcalc.EICApplication;
 import com.exter.eveindcalc.EICFragmentActivity;
 import com.exter.eveindcalc.IEveCalculatorFragment;
 import com.exter.eveindcalc.R;
-import com.exter.eveindcalc.data.EveDatabase;
 
-import exter.eveindustry.data.planet.IPlanetBuilding;
-import exter.eveindustry.dataprovider.item.Item;
-import exter.eveindustry.dataprovider.planet.Planet;
-import exter.eveindustry.dataprovider.planet.PlanetBuilding;
+import exter.eveindustry.data.planet.Planet;
+import exter.eveindustry.data.planet.PlanetBuilding;
 import exter.eveindustry.task.PlanetTask;
+import exter.eveindustry.task.TaskFactory;
 
 public class PlanetFragment extends Fragment implements IEveCalculatorFragment
 {
@@ -57,7 +55,7 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
         return;
       }
       Intent in = new Intent(getActivity(), PlanetProductListActivity.class);
-      in.putExtra("planet", planet_task.getPlanet().getID());
+      in.putExtra("planet", planet_task.getPlanet().id);
       startActivityForResult(in, REQUEST_PROCESS);
     }
   }
@@ -72,7 +70,7 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
         return;
       }
       Intent in = new Intent(getActivity(), PlanetResourceListActivity.class);
-      in.putExtra("planet", planet_task.getPlanet().getID());
+      in.putExtra("planet", planet_task.getPlanet().id);
       startActivityForResult(in, REQUEST_PROCESS);
     }
   }
@@ -112,14 +110,14 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
 
   private EICFragmentActivity activity;
   private EICApplication application;
-  private EveDatabase provider;
+  private TaskFactory factory;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity)getActivity();
     application = (EICApplication)activity.getApplication();
-    provider = application.provider;
+    factory = application.factory;
     planet_task = (PlanetTask)activity.getCurrentTask();
     View rootView = inflater.inflate(R.layout.planet, container, false);
     
@@ -156,10 +154,10 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
       switch(requestCode)
       {
         case REQUEST_PLANET:
-          planet_task.setPlanet(provider.getPlanet(data.getIntExtra("planet", -1)));
+          planet_task.setPlanet(data.getIntExtra("planet", -1));
           break;
         case REQUEST_PROCESS:
-          planet_task.addBuilding(provider.getPlanetBuilding(data.getIntExtra("planetproduct", -1)));
+          planet_task.addBuilding(data.getIntExtra("planetproduct", -1));
           break;
       }
       onTaskChanged();
@@ -173,19 +171,19 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
     {
       return;
     }
-    Planet p = (Planet)planet_task.getPlanet();
-    tx_planet_name.setText(p.TypeName);
-    application.setImageViewItemIcon(im_planet_icon, provider.getItem(p.ID));
+    Planet p = planet_task.getPlanet();
+    tx_planet_name.setText(p.type_name);
+    application.setImageViewItemIcon(im_planet_icon, factory.items.get(p.id));
     ed_runtime.setValue(planet_task.getRunTime());
     ed_tax.setValue(planet_task.getCustomsOfficeTax());
 
 
     ly_process.removeAllViews();
 
-    for(IPlanetBuilding pr:planet_task.getBuildings())
+    for(PlanetBuilding pr:planet_task.getBuildings())
     {
       View v = ly_inflater.inflate(R.layout.process, ly_process, false);
-      new ViewHolderPlanetProcess(v,(PlanetBuilding)pr);
+      new ViewHolderPlanetProcess(v,pr);
       ly_process.addView(v);
     }
   }
@@ -236,14 +234,14 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
       bt_remove = (ImageButton) view.findViewById(R.id.bt_process_remove);
       im_icon = (ImageView) view.findViewById(R.id.im_process_icon);
 
-      if(proc.Materials.size() > 0)
+      if(proc.materials.size() > 0)
       {
         im_icon.setImageResource(R.drawable.planet_process);
       } else
       {
         im_icon.setImageResource(R.drawable.planet_extractor);
       }
-      tx_name.setText(((Item)proc.ProductItem.item).Name);
+      tx_name.setText(proc.product.item.name);
       bt_remove.setOnClickListener(new RemoveListener());
     }
   }

@@ -2,7 +2,6 @@ package com.exter.eveindcalc.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.exter.eveindcalc.EICApplication;
@@ -13,71 +12,17 @@ import com.exter.eveindcalc.data.market.MarketData;
 import com.exter.eveindcalc.data.starmap.RecentSystemsDA;
 import com.exter.eveindcalc.data.systemcost.SystemCostDA;
 
-import java.io.IOException;
-import java.io.InputStream;
+
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
-import exter.eveindustry.dataprovider.EVEDataProvider;
-import exter.eveindustry.data.blueprint.IBlueprint;
-import exter.eveindustry.data.inventory.IItem;
-import exter.eveindustry.data.systemcost.ISolarSystemIndustryCost;
-import exter.eveindustry.dataprovider.filesystem.IFileSystemHandler;
-import exter.eveindustry.dataprovider.item.Item;
-import exter.eveindustry.task.Task;
-import exter.eveindustry.task.Task.Market;
+import exter.eveindustry.data.IDynamicDataProvider;
+import exter.eveindustry.data.blueprint.Blueprint;
+import exter.eveindustry.data.item.Item;
+import exter.eveindustry.data.systemcost.SolarSystemIndustryCost;
+import exter.eveindustry.market.Market;
 
-public class EveDatabase extends EVEDataProvider
+public class EveDatabase implements IDynamicDataProvider
 {
-
-
-  static private class AssetsFileSystemHandler implements IFileSystemHandler
-  {
-    private AssetManager assets;
-
-    AssetsFileSystemHandler(AssetManager assets)
-    {
-      this.assets = assets;
-    }
-
-    @Override
-    public <T> T readFile(String path, IReadHandler<T> handler)
-    {
-      try
-      {
-        InputStream stream = assets.open(path);
-        T result = handler.readFile(stream);
-        stream.close();
-        return result;
-      } catch(IOException e)
-      {
-        return null;
-      }
-    }
-
-    @Override
-    public List<String> listDirectoryFiles(String path)
-    {
-      List<String> result = new ArrayList<>();
-      try
-      {
-        String[] contents = assets.list(path);
-        for(String file: contents)
-        {
-          if(file.endsWith(".tsl"))
-          {
-            result.add(path + "/" + file);
-          }
-        }
-        return result;
-      } catch(IOException e1)
-      {
-        return result;
-      }
-    }
-  }
-
   public SQLiteDatabase getDatabase()
   {
     return database;
@@ -89,7 +34,7 @@ public class EveDatabase extends EVEDataProvider
     {
       if(db_helper == null)
       {
-        db_helper = new EICDatabaseHelper(application.getApplicationContext(),this);
+        db_helper = new EICDatabaseHelper(application);
       }
       database = db_helper.getWritableDatabase();
     }
@@ -121,14 +66,13 @@ public class EveDatabase extends EVEDataProvider
   public RecentSystemsDA da_recentsystems;
   public BlueprintHistoryDA da_blueprinthistory;
 
-  static private Task.Market def_required = null;
-  static private Task.Market def_produced = null;
+  static private Market def_required = null;
+  static private Market def_produced = null;
   static private int default_me = -1;
   static private int default_te = -1;
 
   public EveDatabase(EICApplication application)
   {
-    super(new AssetsFileSystemHandler(application.getApplicationContext().getAssets()));
     this.application = application;
     this.context = application.getApplicationContext();
   }
@@ -151,9 +95,9 @@ public class EveDatabase extends EVEDataProvider
     if(def_produced == null)
     {
       SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
-      def_produced = new Task.Market(
+      def_produced = new Market(
           sp.getInt("market.produced.system", 30000142),
-          Task.Market.Order.fromInt(sp.getInt("market.produced.source",Task.Market.Order.SELL.value)),
+          Market.Order.fromInt(sp.getInt("market.produced.source",Market.Order.SELL.value)),
           BigDecimal.ZERO,
           new BigDecimal(sp.getString("market.produced.broker", "3")),
           new BigDecimal(sp.getString("market.produced.tax", "2")));
@@ -172,9 +116,9 @@ public class EveDatabase extends EVEDataProvider
     if(def_required == null)
     {
       SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
-      def_required = new Task.Market(
+      def_required = new Market(
           sp.getInt("market.required.system", 30000142),
-          Task.Market.Order.fromInt(sp.getInt("market.required.source",Task.Market.Order.SELL.value)),
+          Market.Order.fromInt(sp.getInt("market.required.source",Market.Order.SELL.value)),
           BigDecimal.ZERO,
           new BigDecimal(sp.getString("market.required.broker", "3")),
           new BigDecimal(sp.getString("market.required.tax", "2")));
@@ -182,7 +126,7 @@ public class EveDatabase extends EVEDataProvider
     return def_required;
   }
 
-  public void setDefaultProducedPrice(Task.Market p)
+  public void setDefaultProducedMarket(Market p)
   {
     def_produced = p;
     SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
@@ -194,7 +138,7 @@ public class EveDatabase extends EVEDataProvider
     ed.apply();
   }
 
-  public void setDefaultRequiredPrice(Task.Market p)
+  public void setDefaultRequiredMarket(Market p)
   {
     def_required = p;
     SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
@@ -206,9 +150,9 @@ public class EveDatabase extends EVEDataProvider
     ed.apply();
   }
 
-  public int getDefaultME(IBlueprint bp)
+  public int getDefaultME(Blueprint bp)
   {
-    if(bp != null && ((Item)bp.getProduct().item).MetaGroup != 1)
+    if(bp != null && (bp.product.item).metagroup_id != 1)
     {
       return 0;
     }
@@ -221,15 +165,15 @@ public class EveDatabase extends EVEDataProvider
   }
 
   @Override
-  public int getDefaultBlueprintME(IBlueprint bp)
+  public int getDefaultBlueprintME(Blueprint bp)
   {
     return getDefaultME(bp);
   }
 
 
-  public int getDefaultTE(IBlueprint bp)
+  public int getDefaultTE(Blueprint bp)
   {
-    if(bp != null && ((Item)bp.getProduct().item).MetaGroup != 1)
+    if(bp != null && (bp.product.item).metagroup_id != 1)
     {
       return 0;
     }
@@ -242,11 +186,11 @@ public class EveDatabase extends EVEDataProvider
   }
 
   @Override
-  public int getDefaultBlueprintTE(IBlueprint bp)
+  public int getDefaultBlueprintTE(Blueprint bp)
   {
     return getDefaultTE(bp);
   }
-  
+
   public void setDefaultBlueprintME(int me)
   {
     default_me = me;
@@ -266,19 +210,25 @@ public class EveDatabase extends EVEDataProvider
   }
 
   @Override
-  public BigDecimal getItemBaseCost(IItem item)
+  public int getDefaultSolarSystem()
+  {
+    return 30000142;
+  }
+
+  @Override
+  public BigDecimal getItemBaseCost(Item item)
   {
     return da_basecost.getCost(item);
   }
 
   @Override
-  public ISolarSystemIndustryCost getSolarSystemIndustryCost(int system_id)
+  public SolarSystemIndustryCost getSolarSystemIndustryCost(int system_id)
   {
     return da_systemconst.getCost(system_id);
   }
 
   @Override
-  public BigDecimal getMarketPrice(IItem item, Market market)
+  public BigDecimal getMarketPrice(Item item, Market market)
   {
     return da_market.getMarketPrice(item, market);
   }

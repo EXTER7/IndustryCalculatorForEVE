@@ -33,11 +33,12 @@ import com.exter.eveindcalc.data.EveDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import exter.eveindustry.dataprovider.blueprint.Blueprint;
-import exter.eveindustry.dataprovider.item.Item;
-import exter.eveindustry.dataprovider.item.ItemCategory;
-import exter.eveindustry.dataprovider.item.ItemGroup;
-import exter.eveindustry.dataprovider.item.ItemMetaGroup;
+import exter.eveindustry.data.blueprint.Blueprint;
+import exter.eveindustry.data.item.Item;
+import exter.eveindustry.data.item.ItemCategory;
+import exter.eveindustry.data.item.ItemGroup;
+import exter.eveindustry.data.item.ItemMetaGroup;
+import exter.eveindustry.task.TaskFactory;
 
 public class BlueprintListActivity extends FragmentActivity
 {
@@ -51,7 +52,8 @@ public class BlueprintListActivity extends FragmentActivity
 
   private List<Integer> bplist_filtered;
 
-  public EveDatabase provider;
+  public EveDatabase database;
+  public TaskFactory factory;
   private FilterTask task;
 
   private class BlueprintListAdapter extends BaseAdapter
@@ -103,10 +105,11 @@ public class BlueprintListActivity extends FragmentActivity
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-      Blueprint bp = provider.getBlueprint(bplist_filtered.get(position));
+      Blueprint bp = factory.blueprints.get(bplist_filtered.get(position));
       assert bp != null;
-      ItemGroup cat = provider.getItemGroup(bp.Product.item.getGroupID());
-      ItemCategory group = provider.getItemCategory(cat.Category);
+      Item product = bp.product.item;
+      ItemGroup cat = factory.item_groups.get(product.group_id);
+      ItemCategory group = factory.item_categories.get(cat.category_id);
       ItemHolder holder;
       if(convertView == null)
       {
@@ -120,11 +123,10 @@ public class BlueprintListActivity extends FragmentActivity
       {
         holder = (ItemHolder) convertView.getTag();
       }
-      Item product = (Item)bp.Product.item;
       application.setImageViewItemIcon(holder.im_icon, product);
 
-      holder.tx_product.setText(product.Name);
-      holder.tx_category.setText(String.format("%s / %s", group.Name, cat.Name));
+      holder.tx_product.setText(product.name);
+      holder.tx_category.setText(String.format("%s / %s", group.name, cat.name));
       return convertView;
     }
   }
@@ -189,8 +191,8 @@ public class BlueprintListActivity extends FragmentActivity
         holder = (Holder) convertView.getTag();
       }
       ItemGroup group = (ItemGroup) getChild(groupPosition, childPosition);
-      application.setImageViewItemIcon(holder.im_icon, group.Icon, 0.75f);
-      holder.tx_name.setText(group.Name);
+      application.setImageViewItemIcon(holder.im_icon, group.icon_id, 0.75f);
+      holder.tx_name.setText(group.name);
       return convertView;
     }
 
@@ -244,8 +246,8 @@ public class BlueprintListActivity extends FragmentActivity
       } else
       {
         ItemCategory category = categories.get(groupPosition - 1);
-        application.setImageViewItemIcon(holder.im_icon, category.Icon);
-        holder.tx_name.setText(category.Name);
+        application.setImageViewItemIcon(holder.im_icon, category.icon_id);
+        holder.tx_name.setText(category.name);
       }
 
       return convertView;
@@ -345,25 +347,25 @@ public class BlueprintListActivity extends FragmentActivity
       }
       if(group != null)
       {
-        query = query + " AND blueprints.gid = " + String.valueOf(group.ID);
+        query = query + " AND blueprints.gid = " + String.valueOf(group.id);
       }
       if(category != null)
       {
-        query = query + " AND groups.cid = " + String.valueOf(category.ID);
+        query = query + " AND groups.cid = " + String.valueOf(category.id);
       }
       if(metagroup != null)
       {
-        query = query + " AND blueprints.mgid = " + String.valueOf(metagroup.ID);
+        query = query + " AND blueprints.mgid = " + String.valueOf(metagroup.id);
       }
       query = query + " ORDER BY blueprints.name;";
-      return provider.getDatabase().rawQuery(query, null);
+      return database.getDatabase().rawQuery(query, null);
     }
   }
 
   private class FilterResult
   {
     // Filter used for this result.
-    public final Filter filter;
+    final Filter filter;
     // List of blueprint that match the filer.
     public final List<Integer> blueprints;
 
@@ -433,10 +435,10 @@ public class BlueprintListActivity extends FragmentActivity
         String text;
         if(c != null)
         {
-          text = c.Name;
+          text = c.name;
           if(g != null)
           {
-            text += " / " + g.Name;
+            text += " / " + g.name;
           }
           bt_category_clear.setEnabled(true);
         } else
@@ -561,11 +563,11 @@ public class BlueprintListActivity extends FragmentActivity
 
   private List<ItemGroup> getGroups(ItemCategory category)
   {
-    List<ItemGroup> group = category_groups.get(category.ID);
+    List<ItemGroup> group = category_groups.get(category.id);
     if(group == null)
     {
       group = loadCategoryGroups(category);
-      category_groups.put(category.ID,group);
+      category_groups.put(category.id,group);
     }
     return group;
   }
@@ -573,10 +575,10 @@ public class BlueprintListActivity extends FragmentActivity
   private List<ItemGroup> loadCategoryGroups(ItemCategory category)
   {
     List<ItemGroup> groups = new ArrayList<>();
-    Cursor c = provider.getDatabase().query("groups",new String[] {"id"},"cid = ?",new String[] {String.valueOf(category.ID)},null,null,"name");
+    Cursor c = database.getDatabase().query("groups",new String[] {"id"},"cid = ?",new String[] {String.valueOf(category.id)},null,null,"name");
     while(c.moveToNext())
     {
-      groups.add(provider.getItemGroup(c.getInt(0)));
+      groups.add(factory.item_groups.get(c.getInt(0)));
     }
     c.close();
     return groups;
@@ -588,22 +590,23 @@ public class BlueprintListActivity extends FragmentActivity
     super.onCreate(savedInstanceState);
 
     application = (EICApplication)getApplication();
-    provider = application.provider;
+    factory = application.factory;
+    database = application.database;
 
     if(categories == null)
     {
       categories = new ArrayList<>();
       metagroups = new ArrayList<>();
-      Cursor c = provider.getDatabase().query("categories",new String[] {"id"},null,null,null,null,"name");
+      Cursor c = database.getDatabase().query("categories",new String[] {"id"},null,null,null,null,"name");
       while(c.moveToNext())
       {
-        categories.add(provider.getItemCategory(c.getInt(0)));
+        categories.add(factory.item_categories.get(c.getInt(0)));
       }
       c.close();
-      c = provider.getDatabase().query("metagroups",new String[] {"id"},null,null,null,null,null);
+      c = database.getDatabase().query("metagroups",new String[] {"id"},null,null,null,null,null);
       while(c.moveToNext())
       {
-        metagroups.add(provider.getItemMetaGroup(c.getInt(0)));
+        metagroups.add(factory.item_metagroups.get(c.getInt(0)));
       }
       c.close();
     }
@@ -632,7 +635,7 @@ public class BlueprintListActivity extends FragmentActivity
       category_names.add("All");
       for(ItemCategory category:categories)
       {
-        category_names.add(category.Name);
+        category_names.add(category.name);
       }
       ArrayAdapter<CharSequence> category_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, category_names);
       category_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -660,7 +663,7 @@ public class BlueprintListActivity extends FragmentActivity
     metagroup_list.add("All");
     for(ItemMetaGroup m : metagroups)
     {
-      metagroup_list.add(m.Name);
+      metagroup_list.add(m.name);
     }
     ArrayAdapter<CharSequence> metagroup_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, metagroup_list);
     metagroup_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -686,7 +689,7 @@ public class BlueprintListActivity extends FragmentActivity
     {
       for (ItemGroup group : getGroups(filter_category))
       {
-        group_list.add(group.Name);
+        group_list.add(group.name);
       }
     }
     ArrayAdapter<CharSequence> group_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, group_list);

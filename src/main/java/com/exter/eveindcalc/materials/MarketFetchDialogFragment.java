@@ -28,7 +28,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import exter.eveindustry.task.Task;
+import exter.eveindustry.market.Market;
 
 public class MarketFetchDialogFragment extends DialogFragment
 {
@@ -44,7 +44,7 @@ public class MarketFetchDialogFragment extends DialogFragment
         dialog.show(getActivity().getSupportFragmentManager(), "SolarSystemDialogFragment");
       } else
       {
-        price = new Task.Market(i,price.order,price.manual,price.broker,price.transaction);
+        market = new Market(i, market.order, market.manual, market.broker, market.transaction);
       }
     }
 
@@ -59,7 +59,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     @Override
     public void valueChanged(int tag, BigDecimal new_value)
     {
-      price = new Task.Market(price.system,price.order,new_value,price.broker,price.transaction);
+      market = new Market(market.system, market.order,new_value, market.broker, market.transaction);
     }
   }
 
@@ -68,7 +68,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     @Override
     public void valueChanged(int tag, BigDecimal new_value)
     {
-      price = new Task.Market(price.system,price.order,price.manual,new_value,price.transaction);
+      market = new Market(market.system, market.order, market.manual,new_value, market.transaction);
     }
   }
 
@@ -77,7 +77,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     @Override
     public void valueChanged(int tag, BigDecimal new_value)
     {
-      price = new Task.Market(price.system,price.order,price.manual,price.broker,new_value);
+      market = new Market(market.system, market.order, market.manual, market.broker,new_value);
     }
   }
 
@@ -89,7 +89,7 @@ public class MarketFetchDialogFragment extends DialogFragment
 
   private BigDecimalEditText ed_manual;
 
-  private Task.Market price;
+  private Market market;
 
   private List<Integer> system_ids;
   
@@ -99,6 +99,7 @@ public class MarketFetchDialogFragment extends DialogFragment
   private int type;
   private int item;
 
+  private EICApplication application;
   private EveDatabase provider;
 
   private class MarketFetchClickListener implements DialogInterface.OnClickListener
@@ -111,13 +112,13 @@ public class MarketFetchDialogFragment extends DialogFragment
         switch(type)
         {
           case TYPE_ITEM:
-            accept_listener.onAcceptItem(item, price);
+            accept_listener.onAcceptItem(item, market);
             break;
           case TYPE_PRODUCED:
-            accept_listener.onAcceptProduced(price);
+            accept_listener.onAcceptProduced(market);
             break;
           case TYPE_REQUIRED:
-            accept_listener.onAcceptRequired(price);
+            accept_listener.onAcceptRequired(market);
             break;
         }
       }
@@ -129,7 +130,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     @Override
     public void onClick(View v)
     {
-      price = new Task.Market(price.system,Task.Market.Order.SELL,price.manual,price.broker,price.transaction);
+      market = new Market(market.system,Market.Order.SELL, market.manual, market.broker, market.transaction);
       enableBuySell();
     }
   }
@@ -139,7 +140,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     @Override
     public void onClick(View v)
     {
-      price = new Task.Market(price.system,Task.Market.Order.BUY,price.manual,price.broker,price.transaction);
+      market = new Market(market.system,Market.Order.BUY, market.manual, market.broker, market.transaction);
       enableBuySell();
     }
   }
@@ -149,7 +150,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     @Override
     public void onClick(View v)
     {
-      price = new Task.Market(price.system,Task.Market.Order.MANUAL,price.manual,price.broker,price.transaction);
+      market = new Market(market.system,Market.Order.MANUAL, market.manual, market.broker, market.transaction);
       enableManual();
     }
   }
@@ -173,9 +174,9 @@ public class MarketFetchDialogFragment extends DialogFragment
 
   public interface MarketFetchAcceptListener
   {
-    void onAcceptItem(int item, Task.Market price);
-    void onAcceptRequired(Task.Market price);
-    void onAcceptProduced(Task.Market price);
+    void onAcceptItem(int item, Market price);
+    void onAcceptRequired(Market price);
+    void onAcceptProduced(Market price);
   }
 
   @NonNull
@@ -183,7 +184,8 @@ public class MarketFetchDialogFragment extends DialogFragment
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
-    provider = ((EICApplication)getActivity().getApplication()).provider;
+    application = (EICApplication)getActivity().getApplication();
+    provider = application.database;
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     LayoutInflater inflater = getActivity().getLayoutInflater();
     View view = inflater.inflate(R.layout.market_fetch, null);
@@ -202,7 +204,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     ed_tax = new BigDecimalEditText((EditText) view.findViewById(R.id.ed_fetch_tax), -1, BigDecimal.ZERO, new BigDecimal("100"), BigDecimal.ZERO, new TaxChangeWatcher());
     LinearLayout ly_manual = (LinearLayout) view.findViewById(R.id.ly_fetch_manual);
 
-    price = TaskHelper.PriceFromBundle(args);
+    market = TaskHelper.priceFromBundle(args);
     type = args.getInt("type");
     if(type == TYPE_ITEM)
     {
@@ -211,17 +213,17 @@ public class MarketFetchDialogFragment extends DialogFragment
     {
       item = -1;
       ly_manual.setVisibility(View.GONE);
-      if(price.order == Task.Market.Order.MANUAL)
+      if(market.order == Market.Order.MANUAL)
       {
-        price = new Task.Market(price.system,Task.Market.Order.SELL,BigDecimal.ZERO,price.broker,price.transaction);
+        market = new Market(market.system,Market.Order.SELL,BigDecimal.ZERO, market.broker, market.transaction);
       }
     }
 
-    ed_manual.setValue(price.manual);
-    ed_broker.setValue(price.broker);
-    ed_tax.setValue(price.transaction);
+    ed_manual.setValue(market.manual);
+    ed_broker.setValue(market.broker);
+    ed_tax.setValue(market.transaction);
 
-    switch(price.order)
+    switch(market.order)
     {
       case SELL:
         rg_source.check(R.id.rb_fetch_sell);
@@ -242,7 +244,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     rb_buy.setOnClickListener(new BuyClickListener());
     rb_manual.setOnClickListener(new ManualClickListener());
 
-    provider.da_recentsystems.putSystem(price.system);
+    provider.da_recentsystems.putSystem(market.system);
 
     updateSystem();
     
@@ -251,21 +253,21 @@ public class MarketFetchDialogFragment extends DialogFragment
 
   public void setSystem(int id)
   {
-    price = new Task.Market(id,price.order,price.manual,price.broker,price.transaction);
+    market = new Market(id, market.order, market.manual, market.broker, market.transaction);
     updateSystem();
   }
 
   private void updateSystem()
   {
     sp_system.setOnItemSelectedListener(null);
-    provider.da_recentsystems.putSystem(price.system);
+    provider.da_recentsystems.putSystem(market.system);
 
     system_ids = new ArrayList<>();
     List<String> system_names = new ArrayList<>();
     for(int id:provider.da_recentsystems.getSystems())
     {
       system_ids.add(id);
-      system_names.add(provider.getSolarSystem(id).Name);
+      system_names.add(application.factory.solarsystems.get(id).name);
     }
     system_ids.add(-1);
     system_names.add("[ Other ... ]");
@@ -273,7 +275,7 @@ public class MarketFetchDialogFragment extends DialogFragment
     ArrayAdapter<String> sys_spinner_adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, system_names);
     sys_spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     sp_system.setAdapter(sys_spinner_adapter);
-    sp_system.setSelection(system_ids.indexOf(price.system));
+    sp_system.setSelection(system_ids.indexOf(market.system));
     sp_system.setOnItemSelectedListener(new SystemSelectedListener());
   }
   

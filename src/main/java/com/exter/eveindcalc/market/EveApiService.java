@@ -119,7 +119,7 @@ public class EveApiService extends IntentService
   {
     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
-    EveDatabase provider = ((EICApplication)this.getApplication()).provider;
+    EveDatabase provider = ((EICApplication)this.getApplication()).database;
     if(intent.getBooleanExtra("basecost",false))
     {
       fetchBaseCosts(provider);

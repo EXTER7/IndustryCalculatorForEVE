@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import com.exter.cache.Cache;
 import com.exter.cache.LFUCache;
 import com.exter.eveindcalc.data.EveDatabase;
+import com.exter.eveindcalc.data.AssetsFileSystemHandler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,14 +25,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import exter.eveindustry.dataprovider.item.Item;
+import exter.eveindustry.data.item.Item;
 import exter.eveindustry.task.GroupTask;
-import exter.eveindustry.task.Task;
+import exter.eveindustry.task.TaskFactory;
 import exter.eveindustry.task.TaskLoadException;
 import exter.tsl.InvalidTSLException;
 import exter.tsl.TSLObject;
 import exter.tsl.TSLReader;
 import exter.tsl.TSLWriter;
+
 
 public class EICApplication extends Application
 {
@@ -57,7 +59,10 @@ public class EICApplication extends Application
 
   static private GroupTask tasks;
 
-  public EveDatabase provider;
+  public TaskFactory factory;
+  public EveDatabase database;
+  public AssetsFileSystemHandler fs;
+  public TaskHelper helper;
 
   private Cache<Integer,Bitmap> icon_cache;
 
@@ -71,9 +76,11 @@ public class EICApplication extends Application
   public void onCreate()
   {
     super.onCreate();
-    provider = new EveDatabase(this);
+    fs = new AssetsFileSystemHandler(getAssets());
+    database = new EveDatabase(this);
+    factory = new TaskFactory(fs,database);
+    helper = new TaskHelper(factory);
     icon_cache = new LFUCache<>(64,new ImageCacheMiss());
-    Task.setDataProvider(provider);
   }
 
   // get the root group task.
@@ -117,7 +124,7 @@ public class EICApplication extends Application
 
   private void createTaskGroup()
   {
-    tasks = new GroupTask();
+    tasks = factory.newGroup();
     saveTasks();
   }
 
@@ -143,7 +150,7 @@ public class EICApplication extends Application
         TSLObject tsl = new TSLObject(r);
         synchronized(EICApplication.class)
         {
-          tasks = (GroupTask) Task.loadPromTSL(tsl);
+          tasks = (GroupTask) factory.fromTSL(tsl);
         }
       } catch(TaskLoadException | InvalidTSLException e)
       {
@@ -168,7 +175,7 @@ public class EICApplication extends Application
   @Override
   public void onTerminate()
   {
-    provider.closeDatabase();
+    database.closeDatabase();
     super.onTerminate();
   }
 
@@ -176,7 +183,7 @@ public class EICApplication extends Application
   {
     if(item != null)
     {
-      setImageViewItemIcon(view, item.Icon);
+      setImageViewItemIcon(view, item.icon_id);
     }
   }
 

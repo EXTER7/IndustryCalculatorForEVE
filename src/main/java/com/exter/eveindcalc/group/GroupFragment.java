@@ -271,10 +271,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
       GroupTask g = (GroupTask)activity.getCurrentTask();
       if(g != null)
       {
-        for(String n : g.getTaskList().keySet())
-        {
-          task_names.add(n);
-        }
+        task_names.addAll(g.getTaskList().keySet());
         switch(sort_mode)
         {
           case NAME:
@@ -403,7 +400,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
 
         application.setImageViewItemIcon(im_icon, icon);
 
-        if(TaskHelper.taskHasBackground(task))
+        if(application.helper.taskHasBackground(task))
         {
           im_icon.setBackgroundResource(R.drawable.item_background);
         } else
@@ -412,7 +409,7 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
         }
 
         tx_name.setText(name);
-        tx_description.setText(TaskHelper.getTaskDescription(task));
+        tx_description.setText(application.helper.getTaskDescription(task));
         BigDecimal s = new BigDecimal(group_task.getScale());
         BigDecimal income = task.getIncome().multiply(s);
         BigDecimal expense = task.getExpense().multiply(s);
@@ -490,8 +487,8 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
   public void addGroup()
   {
     GroupTask group_task = (GroupTask)activity.getCurrentTask();
-    GroupTask task = new GroupTask();
-    group_task.addTask("New Group",task);
+    GroupTask task = application.factory.newGroup();
+    group_task.addTask("New group",task);
     onTaskChanged();
     activity.notifyMaterialSetChanged();
   }

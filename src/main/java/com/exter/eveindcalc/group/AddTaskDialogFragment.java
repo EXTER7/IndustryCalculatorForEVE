@@ -23,12 +23,12 @@ import com.exter.eveindcalc.data.blueprint.BlueprintHistoryDA;
 import com.exter.eveindcalc.manufacturing.BlueprintListActivity;
 import com.exter.eveindcalc.refine.RefineListActivity;
 
-import exter.eveindustry.dataprovider.item.Item;
 import exter.eveindustry.task.GroupTask;
 import exter.eveindustry.task.ManufacturingTask;
 import exter.eveindustry.task.PlanetTask;
 import exter.eveindustry.task.ReactionTask;
 import exter.eveindustry.task.RefiningTask;
+import exter.eveindustry.task.TaskFactory;
 
 
 public class AddTaskDialogFragment extends DialogFragment
@@ -62,7 +62,7 @@ public class AddTaskDialogFragment extends DialogFragment
     public void onClick(View v)
     {
       GroupTask group_task = (GroupTask)activity.getCurrentTask();
-      ReactionTask task = new ReactionTask(provider.getStarbaseTower(16213));
+      ReactionTask task = factory.newReaction(16213);
       group_task.addTask("New Reaction Starbase",task);
       activity.notifyTaskChanged();
       activity.onProfitChanged();
@@ -76,7 +76,7 @@ public class AddTaskDialogFragment extends DialogFragment
     public void onClick(View v)
     {
       GroupTask group_task = (GroupTask)activity.getCurrentTask();
-      PlanetTask task = new PlanetTask(provider.getPlanet(11));
+      PlanetTask task = factory.newPlanet(11);
       group_task.addTask("New Planet",task);
       activity.notifyTaskChanged();
       activity.onProfitChanged();
@@ -95,19 +95,18 @@ public class AddTaskDialogFragment extends DialogFragment
         if(resultCode == Activity.RESULT_OK)
         {
           GroupTask group = (GroupTask)activity.getCurrentTask();
-          ManufacturingTask task = new ManufacturingTask(provider.getBlueprint(
-                  data.getIntExtra("product", -1)));
+          ManufacturingTask task = factory.newManufacturing(data.getIntExtra("product", -1));
           SharedPreferences sp = getActivity().getSharedPreferences("EIC", Context.MODE_PRIVATE);
           task.setHardwiring(ManufacturingTask.Hardwiring.fromInt(sp.getInt("manufacturing.hardwiring", ManufacturingTask.Hardwiring.None.value)));
           task.setSolarSystem(sp.getInt("manufacturing.system", 30000142));
-          BlueprintHistoryDA.Entry histent = provider.da_blueprinthistory.getEntry(task.getBlueprint().getID());
+          BlueprintHistoryDA.Entry histent = database.da_blueprinthistory.getEntry(task.getBlueprint().product.item.id);
           if(histent != null)
           {
             task.setME(histent.getME());
             task.setTE(histent.getTE());
           }
 
-          group.addTask(((Item)task.getBlueprint().getProduct().item).Name, task);
+          group.addTask(task.getBlueprint().product.item.name, task);
           activity.notifyTaskChanged();
           activity.onProfitChanged();
           dismiss();
@@ -117,9 +116,8 @@ public class AddTaskDialogFragment extends DialogFragment
         if(resultCode == Activity.RESULT_OK)
         {
           GroupTask group = (GroupTask)activity.getCurrentTask();
-          RefiningTask task = new RefiningTask(
-              provider.getRefinable(data.getIntExtra("refine", -1)));
-          group.addTask(((Item)task.getRefinable().getRequiredItem().item).Name, task);
+          RefiningTask task = factory.newRefining(data.getIntExtra("refine", -1));
+          group.addTask(task.getRefinable().item.item.name, task);
           activity.notifyTaskChanged();
           activity.onProfitChanged();
           dismiss();
@@ -129,7 +127,8 @@ public class AddTaskDialogFragment extends DialogFragment
   }
   
   private EICFragmentActivity activity;
-  private EveDatabase provider;
+  private TaskFactory factory;
+  private EveDatabase database;
 
   @NonNull
   @SuppressLint("InflateParams")
@@ -137,7 +136,8 @@ public class AddTaskDialogFragment extends DialogFragment
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity) getActivity();
-    provider = ((EICApplication)activity.getApplication()).provider;
+    factory = ((EICApplication)activity.getApplication()).factory;
+    database = ((EICApplication)activity.getApplication()).database;
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     LayoutInflater inflater = getActivity().getLayoutInflater();
     View view = inflater.inflate(R.layout.add_task, null);

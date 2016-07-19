@@ -27,6 +27,7 @@ import java.util.Map;
 
 import exter.eveindustry.task.GroupTask;
 import exter.eveindustry.task.Task;
+import exter.eveindustry.task.TaskFactory;
 import exter.eveindustry.task.TaskLoadException;
 import exter.eveindustry.util.Utils;
 import exter.tsl.TSLObject;
@@ -43,8 +44,8 @@ public class GroupMenuDialogFragment extends DialogFragment
       if(weights == null)
       {
         weights = new HashMap<>();
-        weights.put(" [Parent Group]", 1);
-        weights.put(" [New Group]", 2);
+        weights.put(" [Parent group]", 1);
+        weights.put(" [New group]", 2);
       }
     }
     
@@ -97,7 +98,7 @@ public class GroupMenuDialogFragment extends DialogFragment
         if(which == 0)
         {
           group.removeTask(name);
-          GroupTask newgroup = new GroupTask();
+          GroupTask newgroup = factory.newGroup();
           newgroup.addTask(name, t);
           group.addTask(name, newgroup);
           activity.notifyTaskChanged();
@@ -248,10 +249,10 @@ public class GroupMenuDialogFragment extends DialogFragment
             int start = (parent?2:1);
             CharSequence[] choices = new CharSequence[groups.keySet().size() + start];
             
-            choices[0] = " [New Group]";
+            choices[0] = " [New group]";
             if(parent)
             {
-              choices[1] = " [Parent Group]";
+              choices[1] = " [Parent group]";
             }
             
             int i = start;
@@ -274,7 +275,7 @@ public class GroupMenuDialogFragment extends DialogFragment
             Task nt = null;
             try
             {
-              nt = Task.loadPromTSL(tsl);
+              nt = factory.fromTSL(tsl);
             } catch(TaskLoadException e)
             {
               e.printStackTrace();
@@ -301,6 +302,7 @@ public class GroupMenuDialogFragment extends DialogFragment
   }
   
   private EICFragmentActivity activity;
+  private TaskFactory factory;
   private String name;
 
 
@@ -309,6 +311,7 @@ public class GroupMenuDialogFragment extends DialogFragment
   public Dialog onCreateDialog(Bundle savedInstanceState)
   {
     activity = (EICFragmentActivity)getActivity();
+    factory = ((EICApplication)activity.getApplication()).factory;
     name = getArguments().getString("name");
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     builder.setTitle("Task");
