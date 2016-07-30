@@ -52,11 +52,11 @@ public class SettingsDialogFragment extends DialogFragment
       {
         if(requirement)
         {
-          Market p = database.getDefaultRequiredPrice();
+          Market p = database.getDefaultRequiredMarket();
           database.setDefaultRequiredMarket(p.withSolarSystem(sys));
         } else
         {
-          Market p = database.getDefaultProducedPrice();
+          Market p = database.getDefaultProducedMarket();
           database.setDefaultProducedMarket(p.withSolarSystem(sys));
         }
       }
@@ -102,11 +102,11 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Market p = database.getDefaultRequiredPrice();
+        Market p = database.getDefaultRequiredMarket();
         database.setDefaultRequiredMarket(p.withOrder(Market.Order.SELL));
       } else
       {
-        Market p = database.getDefaultProducedPrice();
+        Market p = database.getDefaultProducedMarket();
         database.setDefaultProducedMarket(p.withOrder(Market.Order.SELL));
       }
     }
@@ -126,11 +126,11 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Market p = database.getDefaultRequiredPrice();
+        Market p = database.getDefaultRequiredMarket();
         database.setDefaultRequiredMarket(p.withOrder(Market.Order.BUY));
       } else
       {
-        Market p = database.getDefaultProducedPrice();
+        Market p = database.getDefaultProducedMarket();
         database.setDefaultProducedMarket(p.withOrder(Market.Order.BUY));
       }
     }
@@ -150,11 +150,11 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Market p = database.getDefaultRequiredPrice();
+        Market p = database.getDefaultRequiredMarket();
         database.setDefaultRequiredMarket(p.withBrokerFee(new_value));
       } else
       {
-        Market p = database.getDefaultProducedPrice();
+        Market p = database.getDefaultProducedMarket();
         database.setDefaultProducedMarket(p.withBrokerFee(new_value));
       }
     }
@@ -173,11 +173,11 @@ public class SettingsDialogFragment extends DialogFragment
     {
       if(requirement)
       {
-        Market p = database.getDefaultRequiredPrice();
+        Market p = database.getDefaultRequiredMarket();
         database.setDefaultRequiredMarket(p.withTransactionTax(new_value));
       } else
       {
-        Market p = database.getDefaultProducedPrice();
+        Market p = database.getDefaultProducedMarket();
         database.setDefaultProducedMarket(p.withTransactionTax(new_value));
       }
     }
@@ -258,8 +258,8 @@ public class SettingsDialogFragment extends DialogFragment
     sp_sellto_system.setOnItemSelectedListener(null);
     sp_buyfrom_system.setOnItemSelectedListener(null);
 
-    Market req = database.getDefaultRequiredPrice();
-    Market prod = database.getDefaultProducedPrice();
+    Market req = database.getDefaultRequiredMarket();
+    Market prod = database.getDefaultProducedMarket();
     
     if(req.order == Market.Order.BUY)
     {
@@ -294,8 +294,8 @@ public class SettingsDialogFragment extends DialogFragment
   public void onResume()
   {
     super.onResume();
-    Market req = database.getDefaultRequiredPrice();
-    Market prod = database.getDefaultProducedPrice();
+    Market req = database.getDefaultRequiredMarket();
+    Market prod = database.getDefaultProducedMarket();
 
     sp_sellto_system.setOnItemSelectedListener(null);
     updateSystem(sp_sellto_system, prod.system);

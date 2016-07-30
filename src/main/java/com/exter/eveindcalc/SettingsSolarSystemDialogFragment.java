@@ -18,11 +18,11 @@ public class SettingsSolarSystemDialogFragment extends SolarSystemDialogFragment
   {
      if(required)
      {
-       Market p = database.getDefaultRequiredPrice();
+       Market p = database.getDefaultRequiredMarket();
        database.setDefaultRequiredMarket(p.withSolarSystem(system_id));
      } else
      {
-       Market p = database.getDefaultProducedPrice();
+       Market p = database.getDefaultProducedMarket();
        database.setDefaultProducedMarket(p.withSolarSystem(system_id));
      }
   }

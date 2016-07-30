@@ -449,7 +449,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         Bundle args = new Bundle();
         MarketFetchDialogFragment dialog = new MarketFetchDialogFragment();
         args.putInt("type", produced?MarketFetchDialogFragment.TYPE_PRODUCED:MarketFetchDialogFragment.TYPE_REQUIRED);
-        TaskHelper.priceToBundle(produced? database.getDefaultProducedPrice(): database.getDefaultRequiredPrice(),args);
+        TaskHelper.priceToBundle(produced? database.getDefaultProducedMarket(): database.getDefaultRequiredMarket(),args);
         dialog.setArguments(args);
         dialog.setOnAcceptListener(calc.new EveCalculatorMarketFetchAcceptListener());
         dialog.show(calc.getSupportFragmentManager(), "MarketFetchDialogFragment");

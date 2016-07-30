@@ -87,20 +87,15 @@ public class EveDatabase implements IDynamicDataProvider
   @Override
   public Market getDefaultProducedMarket()
   {
-    return getDefaultProducedPrice();
-  }
-
-  public Market getDefaultProducedPrice()
-  {
     if(def_produced == null)
     {
       SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
       def_produced = new Market(
-          sp.getInt("market.produced.system", 30000142),
-          Market.Order.fromInt(sp.getInt("market.produced.source",Market.Order.SELL.value)),
-          BigDecimal.ZERO,
-          new BigDecimal(sp.getString("market.produced.broker", "3")),
-          new BigDecimal(sp.getString("market.produced.tax", "2")));
+              sp.getInt("market.produced.system", 30000142),
+              Market.Order.fromInt(sp.getInt("market.produced.source",Market.Order.SELL.value)),
+              BigDecimal.ZERO,
+              new BigDecimal(sp.getString("market.produced.broker", "3")),
+              new BigDecimal(sp.getString("market.produced.tax", "2")));
     }
     return def_produced;
   }
@@ -108,20 +103,15 @@ public class EveDatabase implements IDynamicDataProvider
   @Override
   public Market getDefaultRequiredMarket()
   {
-    return getDefaultRequiredPrice();
-  }
-
-  public Market getDefaultRequiredPrice()
-  {
     if(def_required == null)
     {
       SharedPreferences sp = context.getSharedPreferences("EIC", Context.MODE_PRIVATE);
       def_required = new Market(
-          sp.getInt("market.required.system", 30000142),
-          Market.Order.fromInt(sp.getInt("market.required.source",Market.Order.SELL.value)),
-          BigDecimal.ZERO,
-          new BigDecimal(sp.getString("market.required.broker", "3")),
-          new BigDecimal(sp.getString("market.required.tax", "2")));
+              sp.getInt("market.required.system", 30000142),
+              Market.Order.fromInt(sp.getInt("market.required.source",Market.Order.SELL.value)),
+              BigDecimal.ZERO,
+              new BigDecimal(sp.getString("market.required.broker", "3")),
+              new BigDecimal(sp.getString("market.required.tax", "2")));
     }
     return def_required;
   }
