@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/task_bg"
-    android:orientation="horizontal"
-    android:paddingBottom="2dp"
-    android:paddingLeft="3dp"
-    android:paddingRight="3dp"
-    android:paddingTop="2dp" >
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/task_bg"
+              android:orientation="horizontal"
+              android:paddingBottom="2dp"
+              android:paddingLeft="3dp"
+              android:paddingRight="3dp"
+              android:paddingTop="2dp">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -24,7 +25,7 @@
             android:layout_marginTop="1dp"
             android:adjustViewBounds="true"
             android:background="@drawable/item_background"
-            android:contentDescription="icon"
+            android:contentDescription="@string/icon"
             android:scaleType="matrix"
             android:src="@drawable/item_unknown" />
     </RelativeLayout>
@@ -38,12 +39,12 @@
         <TextView
             android:id="@+id/tx_task_name"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:linksClickable="false"
             android:padding="2dp"
-            android:text="Product Product Product Product Product Product Product"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            tools:text="Item name"/>
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -53,20 +54,20 @@
                 android:id="@+id/tx_task_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_marginLeft="2dp"
-                android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:padding="1dp"
-                android:text="description"
-                android:textSize="12sp" />
+                tools:text="1 run\n1 copy"
+                android:textSize="12sp"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_weight="1"
-                android:orientation="vertical" >
+                android:layout_toRightOf="@id/tx_task_description"
+                android:orientation="vertical">
+
+
 
                 <TextView
                     android:id="@+id/tx_task_duration"
@@ -76,7 +77,8 @@
                     android:layout_weight="1"
                     android:gravity="right|center_vertical"
                     android:padding="2dp"
-                    android:text="Duration:"
+                    tools:text="Duration:"
+                    android:maxLines="1"
                     android:textSize="12sp" />
 
                 <TextView
@@ -87,7 +89,8 @@
                     android:layout_weight="1"
                     android:gravity="right|center_vertical"
                     android:padding="2dp"
-                    android:text="No Profit ---------------"
+                    tools:text="No Profit ---------------"
+                    android:maxLines="1"
                     android:textSize="12sp" />
 
                 <TextView
@@ -98,7 +101,8 @@
                     android:layout_weight="1"
                     android:gravity="right|center_vertical"
                     android:padding="2dp"
-                    android:text="No Profit ---------------"
+                    android:maxLines="1"
+                    tools:text="No Profit ---------------"
                     android:textSize="12sp" />
             </LinearLayout>
         </RelativeLayout>

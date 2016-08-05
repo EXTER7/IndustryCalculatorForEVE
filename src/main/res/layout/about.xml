@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:src="@drawable/icon"
-        android:contentDescription="icon"/>
+        android:contentDescription="@string/icon"/>
 
     <TextView
         android:layout_width="fill_parent"

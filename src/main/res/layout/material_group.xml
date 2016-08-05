@@ -1,97 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:focusable="false"
-    android:focusableInTouchMode="false"
-    android:orientation="vertical"
-    android:paddingTop="5dp" >
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:focusable="false"
+              android:focusableInTouchMode="false"
+              android:orientation="vertical"
+              android:paddingTop="5dp">
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="2dp"
-        android:background="#33b5e5" />
+        android:background="#33b5e5"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:orientation="horizontal"
         android:paddingLeft="1dp"
         android:paddingRight="4dp"
-        android:paddingTop="2dp" >
+        android:paddingTop="2dp">
 
         <TextView
             android:id="@+id/tx_materialgroup_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|left"
+            android:layout_gravity="bottom"
             android:gravity="center_vertical"
             android:paddingBottom="5dp"
             android:paddingRight="2dp"
             android:paddingTop="5dp"
-            android:text="[GROUP]"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:layout_weight="1"
+            tools:text="[GROUP]"/>
 
-        <RelativeLayout
-            android:layout_width="fill_parent"
+
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="10dp"
             android:focusable="false"
-            android:focusableInTouchMode="false" >
+            android:focusableInTouchMode="false"
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:orientation="horizontal" >
+                android:layout_height="fill_parent"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="4dp"
+                android:gravity="bottom"
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="bottom"
-                    android:layout_marginBottom="4dp"
-                    android:gravity="bottom"
-                    android:orientation="vertical" >
-
-                    <TextView
-                        android:id="@+id/tx_materialgroup_volume"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="right"
-                        android:gravity="right"
-                        android:text="9,001 m3:"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tx_materialgroup_totalprice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="right"
-                        android:gravity="right"
-                        android:text="9002 ISK:"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <ImageButton
-                    android:id="@+id/bt_materialgroup_marketcost"
+                <TextView
+                    android:id="@+id/tx_materialgroup_volume"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:adjustViewBounds="true"
-                    android:baselineAlignBottom="false"
-                    android:contentDescription="market"
-                    android:cropToPadding="true"
-                    android:focusable="false"
-                    android:paddingBottom="5dp"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:paddingTop="5dp"
-                    android:src="@drawable/cost_market" />
+                    android:layout_gravity="right"
+                    android:gravity="right"
+                    tools:text="9,001 m3:"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tx_materialgroup_totalprice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:gravity="right"
+                    tools:text="9002 ISK:"
+                    android:textSize="12sp"/>
             </LinearLayout>
-        </RelativeLayout>
+
+            <ImageButton
+                android:id="@+id/bt_materialgroup_marketcost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:adjustViewBounds="true"
+                android:baselineAlignBottom="false"
+                android:contentDescription="@string/set_group_market"
+                android:cropToPadding="true"
+                android:focusable="false"
+                android:paddingBottom="5dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="5dp"
+                android:src="@drawable/cost_market"/>
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -101,14 +96,14 @@
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:orientation="vertical"
-        android:paddingTop="3dp"
         android:paddingBottom="4dp"
-        android:visibility="gone" >
+        android:paddingTop="3dp"
+        android:visibility="gone">
 
         <View
             android:layout_width="fill_parent"
             android:layout_height="1px"
-            android:background="#B0999999" />
+            android:background="#B0999999"/>
 
         <TextView
             android:id="@+id/tx_materialgroup_extra"
@@ -117,14 +112,13 @@
             android:layout_gravity="right"
             android:layout_marginRight="5dp"
             android:gravity="right"
-            android:text="Additional expense: 9,001 ISK"
-            android:textSize="12sp" />
-
+            tools:text="Additional expense: 9,001 ISK"
+            android:textSize="12sp"/>
     </LinearLayout>
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="1px"
-        android:background="#E0999999" />
+        android:background="#E0999999"/>
 
 </LinearLayout>

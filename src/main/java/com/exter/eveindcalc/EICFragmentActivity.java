@@ -767,7 +767,7 @@ public class EICFragmentActivity extends FragmentActivity
 
     if(profit.compareTo(BigDecimal.ZERO) < 0)
     {
-      String text = "Loss: " + formatter.format(profit.negate()) + " ISK";
+      String text = String.format(getString(R.string.eic_activity_loss), formatter.format(profit.negate()));
       if(income.compareTo(BigDecimal.ZERO) > 0)
       {
         DecimalFormat pformatter = new DecimalFormat("#.#");
@@ -778,7 +778,7 @@ public class EICFragmentActivity extends FragmentActivity
       tx_profit.setTextColor(Color.RED);
     } else if(profit.compareTo(BigDecimal.ZERO) > 0)
     {
-      String text = "Profit: " + formatter.format(profit) + " ISK";
+      String text = String.format(getString(R.string.eic_activity_profit), formatter.format(profit));
       if(expense.compareTo(BigDecimal.ZERO) > 0)
       {
         DecimalFormat pformatter = new DecimalFormat("#.#");
@@ -789,7 +789,7 @@ public class EICFragmentActivity extends FragmentActivity
       tx_profit.setTextColor(Color.GREEN);
     } else
     {
-      tx_profit.setText("No profit");
+      tx_profit.setText(R.string.no_profit);
       tx_profit.setTextColor(Color.YELLOW);
     }
 

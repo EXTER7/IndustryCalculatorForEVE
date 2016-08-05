@@ -17,7 +17,7 @@
             android:layout_weight="0.75"
             android:gravity="center_vertical"
             android:paddingRight="2dp"
-            android:text="Filter:" >
+            android:text="@string/filter" >
         </TextView>
 
         <EditText
@@ -48,7 +48,7 @@
             android:layout_weight="0.75"
             android:gravity="center_vertical"
             android:paddingRight="2dp"
-            android:text="Category:" >
+            android:text="@string/category" >
         </TextView>
 
         <LinearLayout
@@ -71,8 +71,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="/"
-                android:textSize="25dp" >
+                android:text="@string/slash"
+                android:textSize="25sp" >
             </TextView>
 
             <Spinner
@@ -106,7 +106,7 @@
             android:layout_weight="0.75"
             android:gravity="center_vertical"
             android:paddingRight="2dp"
-            android:text="Meta Group:" >
+            android:text="@string/meta_group" >
         </TextView>
 
         <LinearLayout
@@ -117,7 +117,7 @@
 
             <Spinner
                 android:id="@+id/sp_itemfilter_metagroup"
-                android:layout_width="fill_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingBottom="1dp"
@@ -134,7 +134,7 @@
     <ListView
         android:id="@+id/ls_itemfilter_items"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:choiceMode="singleChoice"
         android:divider="#7F7F7F9F"

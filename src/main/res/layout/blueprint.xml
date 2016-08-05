@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal">
 
     <ImageView
         android:id="@+id/im_blueprint_icon"
@@ -16,7 +17,8 @@
         android:adjustViewBounds="true"
         android:background="@drawable/item_background"
         android:scaleType="matrix"
-        android:src="@drawable/item_unknown" >
+        android:src="@drawable/item_unknown"
+        android:contentDescription="@string/icon">
     </ImageView>
 
     <LinearLayout
@@ -28,11 +30,11 @@
         <TextView
             android:id="@+id/tx_blueprint_product"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:linksClickable="false"
             android:padding="2dp"
-            android:text="Product Product Product Product Product Product Product"
+            tools:text="Item name"
             android:textSize="14sp" >
         </TextView>
 
@@ -43,8 +45,8 @@
             android:layout_marginLeft="2dp"
             android:gravity="center_vertical"
             android:padding="2dp"
-            android:text="Group / Category"
-            android:textSize="10dp" >
+            tools:text="Group / Category"
+            android:textSize="10sp" >
         </TextView>
     </LinearLayout>
 

@@ -14,7 +14,7 @@
         android:layout_marginTop="1dp"
         android:layout_weight="1"
         android:drawableLeft="@drawable/add_task"
-        android:text="Add Task"
+        android:text="@string/add_task"
         android:textSize="12sp" />
 
     <Button
@@ -27,7 +27,7 @@
         android:layout_marginTop="1dp"
         android:layout_weight="1"
         android:drawableLeft="@drawable/add_task"
-        android:text="Add Group"
+        android:text="@string/add_group"
         android:textSize="12sp" />
     
 </LinearLayout>

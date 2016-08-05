@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_weight="1">
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -21,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
                 android:lines="1"
-                android:text="Munufacturing time:"
+                android:text="@string/munufacturing_time"
                 android:textSize="14sp" />
 
             <TextView
@@ -30,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
                 android:lines="1"
-                android:text="time"
+                tools:text="time"
                 android:textSize="14sp" />
         </LinearLayout>
 
@@ -48,11 +49,11 @@
             <CheckBox
                 android:id="@+id/ch_bpcalc_invention_enable"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_weight="0.5"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:text="Calculate invention" />
+                android:text="@string/calculate_invention" />
 
             <LinearLayout
                 android:id="@+id/ly_bpcalc_invention_enable"
@@ -71,7 +72,7 @@
                     android:paddingBottom="1px"
                     android:paddingLeft="5dp"
                     android:paddingTop="3dp"
-                    android:text="Invention:"
+                    android:text="@string/invention"
                     android:textSize="16sp" />
 
                 <View
@@ -91,7 +92,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1.0"
                         android:lines="1"
-                        android:text="Success chance:"
+                        android:text="@string/success_chance"
                         android:textSize="14sp" />
 
                     <TextView
@@ -100,7 +101,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1.0"
                         android:lines="1"
-                        android:text="succ"
+                        tools:text="succ"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -121,7 +122,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1.0"
                         android:lines="1"
-                        android:text="Invention time:"
+                        android:text="@string/invention_time"
                         android:textSize="14sp" />
 
                     <TextView
@@ -130,7 +131,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1.0"
                         android:lines="1"
-                        android:text="time"
+                        tools:text="time"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -159,7 +160,7 @@
                             android:layout_gravity="center_vertical"
                             android:layout_weight="0.5"
                             android:lines="1"
-                            android:text="Relic:" >
+                            android:text="@string/relic" >
                         </TextView>
 
                         <Spinner
@@ -189,7 +190,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
-                        android:text="Attempts:" >
+                        android:text="@string/attempts" >
                     </TextView>
 
                     <EditText
@@ -198,7 +199,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
                         android:inputType="number"
-                        android:text="10" >
+                        tools:text="10" >
                     </EditText>
                 </LinearLayout>
 
@@ -219,7 +220,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
-                        android:text="Runs/attempt:" >
+                        android:text="@string/runs_attempt" >
                     </TextView>
 
                     <EditText
@@ -228,7 +229,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
                         android:inputType="number"
-                        android:text="10" >
+                        tools:text="10" >
                     </EditText>
                 </LinearLayout>
                 
@@ -251,7 +252,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight="0.5"
                         android:lines="1"
-                        android:text="Decryptor:" >
+                        android:text="@string/decryptor" >
                     </TextView>
 
                     <Spinner
@@ -276,7 +277,7 @@
             android:paddingBottom="1px"
             android:paddingLeft="5dp"
             android:paddingTop="3dp"
-            android:text="Blueprint:"
+            android:text="@string/blueprint"
             android:textSize="16sp" />
 
         <View
@@ -296,7 +297,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
-                android:text="ME level %:" >
+                android:text="@string/me_level" >
             </TextView>
 
             <EditText
@@ -305,7 +306,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:inputType="number"
-                android:text="0" >
+                tools:text="0" >
             </EditText>
         </LinearLayout>
 
@@ -326,7 +327,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
-                android:text="TE level %:" >
+                android:text="@string/te_level" >
             </TextView>
 
             <EditText
@@ -335,7 +336,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:inputType="number"
-                android:text="0" >
+                tools:text="0" >
             </EditText>
         </LinearLayout>
 
@@ -356,7 +357,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
-                android:text="Runs:" >
+                android:text="@string/runs" >
             </TextView>
 
             <EditText
@@ -365,7 +366,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:inputType="number"
-                android:text="1" >
+                tools:text="1" >
             </EditText>
         </LinearLayout>
 
@@ -386,7 +387,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
-                android:text="Copies:" >
+                android:text="@string/copies" >
             </TextView>
 
             <EditText
@@ -395,7 +396,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:inputType="number"
-                android:text="1" >
+                tools:text="1" >
             </EditText>
         </LinearLayout>
 
@@ -410,7 +411,7 @@
             android:paddingBottom="1px"
             android:paddingLeft="5dp"
             android:paddingTop="3dp"
-            android:text="Character:"
+            android:text="@string/character"
             android:textSize="16sp" />
 
         <View
@@ -432,7 +433,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="0.5"
                 android:lines="1"
-                android:text="Slot 8 Hardwiring:" >
+                android:text="@string/char_hardwiring" >
             </TextView>
 
             <Spinner
@@ -462,7 +463,7 @@
             android:paddingBottom="1px"
             android:paddingLeft="5dp"
             android:paddingTop="3dp"
-            android:text="Installation:"
+            android:text="@string/installation"
             android:textSize="16sp" />
 
         <View
@@ -484,7 +485,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="0.5"
                 android:lines="1"
-                android:text="Solar System:" >
+                android:text="@string/solar_system" >
             </TextView>
 
             <Spinner
@@ -514,7 +515,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="0.5"
                 android:lines="1"
-                android:text="Manufacturing:" >
+                android:text="@string/inst_manufacturing" >
             </TextView>
 
             <Spinner
@@ -550,7 +551,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_weight="0.5"
                     android:lines="1"
-                    android:text="Invention:" >
+                    android:text="@string/inst_invention" >
                 </TextView>
 
                 <Spinner
@@ -580,7 +581,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="0.5"
-                android:text="Installation Tax %:" >
+                android:text="@string/installation_tax" >
             </TextView>
 
             <EditText
@@ -590,7 +591,7 @@
                 android:layout_weight="0.5"
                 android:inputType="numberDecimal"
                 android:maxLength="10"
-                android:text="0" >
+                tools:text="0" >
             </EditText>
         </LinearLayout>
     </LinearLayout>

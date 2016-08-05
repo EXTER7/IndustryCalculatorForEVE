@@ -186,6 +186,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           {
             GroupTask group = (GroupTask)calc.getCurrentTask();
             ManufacturingTask t = factory.newManufacturing(material.item.id);
+            assert t != null;
             SharedPreferences sp = getActivity().getSharedPreferences("EIC", Context.MODE_PRIVATE);
             t.setHardwiring(ManufacturingTask.Hardwiring.fromInt(sp.getInt("manufacturing.hardwiring", ManufacturingTask.Hardwiring.None.value)));
             t.setSolarSystem(sp.getInt("manufacturing.system", 30000142));
@@ -206,6 +207,7 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
             GroupTask group = (GroupTask)calc.getCurrentTask();
             int i;
             PlanetTask t = factory.newPlanet(11);
+            assert t != null;
             PlanetBuilding p = factory.planetbuildings.get(material.item.id);
             t.addBuilding(material.item.id);
             t.setRunTime((int)XUtil.divCeil( material.amount,p.product.amount * 24 * group.getScale()));
@@ -233,9 +235,13 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           {
             GroupTask group = (GroupTask)calc.getCurrentTask();
             ReactionTask t = factory.newReaction(factory.towers.getIDs().iterator().next());
+            assert t != null;
             Reaction r = factory.reactions.get(material.item.id);
+            assert r != null;
+            ItemStack out = r.getMainOutput();
+            assert out != null;
             t.addReaction(material.item.id);
-            t.setRunTime((int)XUtil.divCeil(material.amount,r.getMainOutput().amount * 24 * group.getScale()));
+            t.setRunTime((int)XUtil.divCeil(material.amount,out.amount * 24 * group.getScale()));
             group.addTask(material.item.name, t);
           }
           break;
@@ -257,7 +263,9 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
           {
             ReactionTask t = (ReactionTask)calc.getCurrentTask();
             Reaction r = factory.reactions.get(material.item.id);
-            int times = (int)XUtil.divCeil(material.amount, r.getMainOutput().amount * t.getRunTime() * 24);
+            ItemStack out = r.getMainOutput();
+            assert out != null;
+            int times = (int)XUtil.divCeil(material.amount, out.amount * t.getRunTime() * 24);
             int i;
             for(i = 0; i < times; i++)
             {
@@ -295,13 +303,13 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
       switch(price.order)
       {
         case SELL:
-          tx_source.setText(String.format("Sell orders: %s", factory.solarsystems.get(price.system).name));
+          tx_source.setText(String.format(getString(R.string.materials_sell_orders), factory.solarsystems.get(price.system).name));
           break;
         case BUY:
-          tx_source.setText(String.format("Buy orders: %s", factory.solarsystems.get(price.system).name));
+          tx_source.setText(String.format(getString(R.string.materials_buy_orders), factory.solarsystems.get(price.system).name));
           break;
         case MANUAL:
-          tx_source.setText("Manual");
+          tx_source.setText(R.string.manual);
           break;
       }
       tx_material.setText(String.format("%s × %s", item.name, INTEGER_FORMATTER.format(material.amount)));
@@ -317,8 +325,8 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         tx_price.setText("--");
       } else
       {
-        tx_material_totalprice.setText(String.format("%s ISK", DECIMAL_FORMATTER.format(price_value.multiply(new BigDecimal(material.amount)))));
-        tx_price.setText(String.format("%s ISK/unit", DECIMAL_FORMATTER.format(price_value)));
+        tx_material_totalprice.setText(String.format(getString(R.string.material_isk), DECIMAL_FORMATTER.format(price_value.multiply(new BigDecimal(material.amount)))));
+        tx_price.setText(String.format(getString(R.string.material_isk_unit), DECIMAL_FORMATTER.format(price_value)));
       }
     }
 
@@ -472,13 +480,13 @@ public class MaterialsFragment extends Fragment implements IEveCalculatorFragmen
         total_volume += m.amount * i.volume;
       }
       DecimalFormat formatter_decimal = new DecimalFormat("###,###.##");
-      tx_volume.setText(String.format("%s m3", formatter_decimal.format(total_volume)));
-      tx_totalprice.setText(String.format("%s ISK", formatter_decimal.format(total_price)));
+      tx_volume.setText(String.format(getString(R.string.material_m3), formatter_decimal.format(total_volume)));
+      tx_totalprice.setText(String.format(getString(R.string.material_isk), formatter_decimal.format(total_price)));
 
       tx_name.setText(name);
       if(!produced)
       {
-        tx_extra.setText(String.format("Additional expense: %s ISK", formatter_decimal.format(calc.getCurrentTask().getExtraExpense())));
+        tx_extra.setText(String.format(getString(R.string.material_additional_expense), formatter_decimal.format(calc.getCurrentTask().getExtraExpense())));
       }
     }
 

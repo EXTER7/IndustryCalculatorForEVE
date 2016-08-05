@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingLeft="1dp"
-    android:paddingRight="5dp"
-    android:paddingTop="2dp" >
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:paddingLeft="1dp"
+              android:paddingRight="5dp"
+              android:paddingTop="2dp">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -15,12 +16,12 @@
 
         <TextView
             android:id="@+id/tx_material_bill"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_marginRight="2dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="Material Name II × 42:"
+            tools:text="Material Name II × 42:"
             android:textSize="13sp" />
 
         <LinearLayout
@@ -34,8 +35,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:gravity="right"
-                android:text="9,001 m3:"
-                android:textSize="11dp" />
+                tools:text="9,001 m3:"
+                android:textSize="11sp" />
 
             <TextView
                 android:id="@+id/tx_material_totalprice"
@@ -43,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:gravity="right"
-                android:text="9002 ISK:"
+                tools:text="9002 ISK:"
                 android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>

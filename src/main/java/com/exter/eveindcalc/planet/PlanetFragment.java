@@ -30,7 +30,6 @@ import exter.eveindustry.task.TaskFactory;
 
 public class PlanetFragment extends Fragment implements IEveCalculatorFragment
 {
-
   private class PlanetSetClickListener implements OnClickListener
   {
     @Override

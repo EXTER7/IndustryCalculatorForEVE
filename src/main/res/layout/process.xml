@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" >
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
 
     <View
         android:layout_width="fill_parent"
@@ -29,17 +30,18 @@
             android:layout_marginRight="1dp"
             android:layout_marginTop="1dp"
             android:scaleType="fitXY"
-            android:src="@drawable/planet_process" />
+            android:src="@drawable/planet_process"
+            android:contentDescription="@string/processor"/>
 
         <TextView
             android:id="@+id/tx_process_name"
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="2dp"
             android:layout_weight="1"
-            android:text="[Nothing]"
-            android:textSize="14dp" />
+            tools:text="[Nothing]"
+            android:textSize="14sp" />
 
         <ImageButton
             android:id="@+id/bt_process_remove"
@@ -55,7 +57,8 @@
             android:paddingRight="1dp"
             android:paddingTop="1dp"
             android:scaleType="center"
-            android:src="@drawable/remove" />
+            android:src="@drawable/remove"
+            android:contentDescription="@string/remove"/>
 
     </LinearLayout>
 

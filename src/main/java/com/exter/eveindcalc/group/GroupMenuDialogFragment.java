@@ -35,17 +35,17 @@ import exter.tsl.TSLWriter;
 
 public class GroupMenuDialogFragment extends DialogFragment
 { 
-  static private class MoveToListComparator implements Comparator<CharSequence>
+  private class MoveToListComparator implements Comparator<CharSequence>
   {
-    static private Map<CharSequence,Integer> weights = null;
+    private Map<CharSequence,Integer> weights = null;
     
     MoveToListComparator()
     {
       if(weights == null)
       {
         weights = new HashMap<>();
-        weights.put(" [Parent group]", 1);
-        weights.put(" [New group]", 2);
+        weights.put(String.format(" [%s]",getString(R.string.group_parent)), 1);
+        weights.put(String.format(" [%s]",getString(R.string.group_new)), 2);
       }
     }
     
@@ -130,12 +130,12 @@ public class GroupMenuDialogFragment extends DialogFragment
       {
         if(which == DialogInterface.BUTTON_POSITIVE)
         {
-          ExportTask(task, file);
+          exportTask(task, file);
         }
       }
     }
 
-    private void ExportTask(Task t, File f)
+    private void exportTask(Task t, File f)
     {
       try
       {
@@ -153,7 +153,7 @@ public class GroupMenuDialogFragment extends DialogFragment
       }
     }
 
-    private void Export(GroupTask group)
+    private void export(GroupTask group)
     {
       {
         Task t = group.getTask(name);
@@ -176,7 +176,7 @@ public class GroupMenuDialogFragment extends DialogFragment
           builder.setMessage("File exists, overwrite?").setPositiveButton("Yes", l).setNegativeButton("No", l).show();
         } else
         {
-          ExportTask(t,export);
+          exportTask(t,export);
         }
       }
     }
@@ -291,7 +291,7 @@ public class GroupMenuDialogFragment extends DialogFragment
             share(group);
           } else
           {
-            Export(group);
+            export(group);
           }
           break;
         case 5:

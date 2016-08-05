@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools">
 
     <ImageView
         android:id="@+id/im_material_icon"
@@ -14,7 +15,7 @@
         android:cropToPadding="false"
         android:scaleType="fitXY"
         android:src="@drawable/item_unknown"
-        android:contentDescription="item" >
+        android:contentDescription="@string/desc_item" >
     </ImageView>
     <LinearLayout
         android:layout_width="fill_parent"
@@ -39,7 +40,7 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:paddingRight="2dp"
-                android:text="0.00 ISK/unit"
+                tools:text="0.00 ISK/unit"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -50,7 +51,7 @@
             android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
             android:paddingRight="2dp"
-            android:text="Jita (Sell Orders)"
+            tools:text="Jita (Sell Orders)"
             android:textSize="12sp" />
     </LinearLayout>
 

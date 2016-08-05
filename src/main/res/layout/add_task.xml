@@ -24,7 +24,7 @@
             android:paddingTop="5dp"
             android:layout_weight="1"
             android:drawableTop="@drawable/blueprint"
-            android:text="Manufacturing"
+            android:text="@string/manufacturing"
             android:textSize="14sp" />
 
         <Button
@@ -41,7 +41,7 @@
             android:paddingTop="5dp"
             android:layout_weight="1"
             android:drawableTop="@drawable/ore"
-            android:text="Refining"
+            android:text="@string/refining"
             android:textSize="14sp" />
 
         </LinearLayout>
@@ -66,7 +66,7 @@
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:paddingTop="5dp"
-            android:text="Reactions"
+            android:text="@string/reactions"
             android:textSize="14sp" />
         
         <Button
@@ -83,7 +83,7 @@
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:paddingTop="5dp"
-            android:text="Planet"
+            android:text="@string/planet"
             android:textSize="14sp" />
 
     </LinearLayout>

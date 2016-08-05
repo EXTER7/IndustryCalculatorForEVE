@@ -252,7 +252,7 @@ public class TaskHelper
     return icon_providers.get(task.getClass()).getDescription(task);
   }
 
-  public TaskHelper(TaskFactory factory)
+  TaskHelper(TaskFactory factory)
   {
     this.factory = factory;
     icon_providers = new HashMap<>();
