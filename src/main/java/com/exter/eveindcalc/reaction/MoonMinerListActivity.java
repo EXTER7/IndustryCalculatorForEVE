@@ -28,7 +28,7 @@ public class MoonMinerListActivity extends ItemListActivity
   @Override
   protected Index loadIndex()
   {
-    return new Index(application.fs,"planet/index_moon.tsl");
+    return new Index(application.fs,"reaction/index_moon.tsl");
   }
 
 }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Industry Calculator for EVE Online</string>
+    <string name="app_name" translatable="false">Industry Calculator for EVE Online</string>
     <string name="about">
         Industry Calculator for EVE Online version 3.2.9.1 © 2016 EXTER Software.
         All EVE-Online related materials are property of CCP.
     </string>
-    <string name="app_github_url">https://github.com/EXTER7/IndustryCalculatorForEVE</string>
+    <string name="app_github_url" translatable="false">https://github.com/EXTER7/IndustryCalculatorForEVE</string>
     <string name="icon">icon</string>
     <string name="task_options">task options</string>
     <string name="updating_market_prices">Updating market prices</string>
@@ -21,7 +21,7 @@
     <string name="group_scale">Group Scale:</string>
     <string name="sort_by">Sort by:</string>
     <string name="category">Category:</string>
-    <string name="slash">/</string>
+    <string name="slash" translatable="false">/</string>
     <string name="munufacturing_time">Munufacturing time:</string>
     <string name="calculate_invention">Calculate invention</string>
     <string name="invention">Invention:</string>

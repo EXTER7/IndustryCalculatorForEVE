@@ -31,7 +31,7 @@ public class PlanetProductListActivity extends ItemListActivity
   protected Index loadIndex()
   {
     Planet planet = application.factory.planets.get(getIntent().getIntExtra("planet", -1));
-    String path = planet.advanced?"planet/index_advancel.tsl":"planet/index.tsl";
+    String path = planet.advanced?"planet/index_advanced.tsl":"planet/index.tsl";
     return new Index(application.fs,path);
   }
 
