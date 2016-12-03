@@ -27,8 +27,8 @@ android {
             enabled true
         }
 
-        versionName "3.2.10.0"
-        versionCode 110
+        versionName "3.2.11.0"
+        versionCode 111
     }
 
 
