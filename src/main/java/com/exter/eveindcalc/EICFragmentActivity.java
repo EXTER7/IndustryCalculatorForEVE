@@ -301,7 +301,7 @@ public class EICFragmentActivity extends FragmentActivity
           return false;
         }
 
-        EICApplication.getTasks().addTask(name, t);
+        application.tasks.addTask(name, t);
         return true;
       } catch(IOException | InvalidTSLException ignored)
       {
@@ -375,7 +375,7 @@ public class EICFragmentActivity extends FragmentActivity
     }
     if(task_path.isEmpty())
     {
-      return EICApplication.getTasks();
+      return application.tasks;
     }
     return task_path.peek().second;
   }
@@ -389,7 +389,7 @@ public class EICFragmentActivity extends FragmentActivity
     }
     if(task_path.isEmpty())
     {
-      return EICApplication.getTasks();
+      return application.tasks;
     }
     Pair<String,Task> top = task_path.pop();
     GroupTask result = (GroupTask) getCurrentTask();
@@ -523,7 +523,7 @@ public class EICFragmentActivity extends FragmentActivity
 
   private TaskListener listener;
 
-  public Task.ITaskListener GetListener()
+  public Task.ITaskListener getListener()
   {
     return listener;
   }

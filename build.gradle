@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-beta1'
+        classpath 'com.android.tools.build:gradle:2.2.2'
     }
 }
 
@@ -24,18 +24,11 @@ android {
         minSdkVersion 10
         targetSdkVersion 24
         jackOptions {
-            jackInProcess false
             enabled true
         }
 
         versionName "3.2.10.0"
         versionCode 110
-    }
-
-    dexOptions {
-        maxProcessCount 1
-        javaMaxHeapSize "1538M"
-        threadCount 1
     }
 
 
@@ -74,5 +67,5 @@ dependencies {
     compile project(':EVEIndustry')
     compile 'com.android.support:support-v4:24.1.1'
     compile 'com.google.code.gson:gson:2.4'
-    compile 'com.google.android.gms:play-services-ads:9.4.0'
+    compile 'com.google.android.gms:play-services-ads:10.0.1'
 }

@@ -174,7 +174,7 @@ public class ReactionFragment extends Fragment implements IEveCalculatorFragment
     super.onActivityResult(requestCode, resultCode, data);
     if(resultCode == Activity.RESULT_OK)
     {
-      activity.getCurrentTask().registerListener(activity.GetListener());
+      activity.getCurrentTask().registerListener(activity.getListener());
       reaction_task.addReaction(data.getIntExtra("reaction", -1));
       onTaskChanged();
     }

@@ -149,7 +149,7 @@ public class PlanetFragment extends Fragment implements IEveCalculatorFragment
     super.onActivityResult(requestCode, resultCode, data);
     if(resultCode == Activity.RESULT_OK)
     {
-      activity.getCurrentTask().registerListener(activity.GetListener());
+      activity.getCurrentTask().registerListener(activity.getListener());
       switch(requestCode)
       {
         case REQUEST_PLANET:

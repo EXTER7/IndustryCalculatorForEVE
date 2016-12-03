@@ -57,7 +57,7 @@ public class EICApplication extends Application
     }
   }
 
-  static private GroupTask tasks;
+  public GroupTask tasks;
 
   public TaskFactory factory;
   public EveDatabase database;
@@ -83,11 +83,6 @@ public class EICApplication extends Application
     icon_cache = new LFUCache<>(64,new ImageCacheMiss());
   }
 
-  // get the root group task.
-  static GroupTask getTasks()
-  {
-    return tasks;
-  }
 
   // write all tasks to storage.
   void saveTasks()
