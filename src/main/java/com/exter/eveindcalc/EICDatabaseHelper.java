@@ -28,7 +28,7 @@ public class EICDatabaseHelper extends SQLiteOpenHelper
   private static final String DATABASE_NAME = "eic.db";
 
   // Increment this if the data in the assets directory is changed (like when a new EVE expansion is released).
-  private static final int DATABASE_VERSION = 133;
+  private static final int DATABASE_VERSION = 134;
 
   // Change this to the value of DATABASE_VERSION the schema of non-static tables are changed (resets non-static data).
   private static final int NONSTATIC_VERSION = 120;
