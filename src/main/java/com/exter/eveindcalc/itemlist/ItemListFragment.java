@@ -66,7 +66,14 @@ public class ItemListFragment extends Fragment
       if (convertView == null)
       {
         holder = new ViewHolder();
-        convertView = inflater.inflate(R.layout.item, parent, false);
+        if(application.useTableUI())
+        {
+          convertView = inflater.inflate(R.layout.item_xlarge, parent, false);
+        } else
+        {
+          convertView = inflater.inflate(R.layout.item, parent, false);
+        }
+
         holder.tx_name = (TextView)convertView.findViewById(R.id.tx_item_name);
         holder.im_icon = (ImageView)convertView.findViewById(R.id.im_item_icon);
         convertView.setTag(holder);
@@ -130,6 +137,7 @@ public class ItemListFragment extends Fragment
   {
     activity = (ItemListActivity)getActivity();
     application = (EICApplication) activity.getApplication();
+
     View rootView = inflater.inflate(R.layout.itemlist_main, container, false);
 
     ls_items = (ListView)rootView.findViewById(R.id.ls_itemlist_items);

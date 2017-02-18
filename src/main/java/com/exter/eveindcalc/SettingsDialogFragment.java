@@ -3,7 +3,9 @@ package com.exter.eveindcalc;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -11,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -82,7 +86,6 @@ public class SettingsDialogFragment extends DialogFragment
   private IntegerEditText ed_default_me;
   private IntegerEditText ed_default_te;
 
-  
   private List<Integer> system_ids;
   private EICApplication application;
   private EveDatabase database;
@@ -183,6 +186,18 @@ public class SettingsDialogFragment extends DialogFragment
     }
   }
 
+  private class TableModeCheckedChangeListener implements CompoundButton.OnCheckedChangeListener
+  {
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+    {
+      SharedPreferences sp = application.getSharedPreferences("EIC", Context.MODE_PRIVATE);
+      SharedPreferences.Editor ed = sp.edit();
+      ed.putBoolean("ui.tablet", isChecked);
+      ed.apply();
+    }
+  }
+
   private class MeResearchChangeWatcher implements IntegerEditText.ValueListener
   {
     @Override
@@ -243,12 +258,16 @@ public class SettingsDialogFragment extends DialogFragment
     ed_default_me = new IntegerEditText((EditText) view.findViewById(R.id.ed_settings_melevel), 0, 10, 0, new MeResearchChangeWatcher());
     ed_default_te = new IntegerEditText((EditText) view.findViewById(R.id.ed_settings_pelevel), 0, 20, 0, new TeResearchChangeWatcher());
 
+    CheckBox cb_tablemode = (CheckBox) view.findViewById(R.id.cb_settings_tabletmode);
+
     updateSettings();
     
     rb_sellto_sell.setOnClickListener(new SellClickListener(false));
     rb_sellto_buy.setOnClickListener(new BuyClickListener(false));
     rb_buyfrom_sell.setOnClickListener(new SellClickListener(true));
     rb_buyfrom_buy.setOnClickListener(new BuyClickListener(true));
+
+    cb_tablemode.setOnCheckedChangeListener(new TableModeCheckedChangeListener());
 
     return builder.create();
   }

@@ -2,6 +2,7 @@ package com.exter.eveindcalc;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -166,7 +167,12 @@ public class EICApplication extends Application
       throw new RuntimeException(e);
     }
   }
-  
+
+  public boolean useTableUI()
+  {
+    SharedPreferences sp = getSharedPreferences("EIC",Context.MODE_PRIVATE);
+    return sp.getBoolean("ui.tablet",false);
+  }
   @Override
   public void onTerminate()
   {

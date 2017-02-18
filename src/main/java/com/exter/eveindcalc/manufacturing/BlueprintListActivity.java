@@ -113,7 +113,13 @@ public class BlueprintListActivity extends FragmentActivity
       ItemHolder holder;
       if(convertView == null)
       {
-        convertView = inflater.inflate(R.layout.blueprint, parent, false);
+        if(application.useTableUI())
+        {
+          convertView = inflater.inflate(R.layout.blueprint_xlarge, parent, false);
+        } else
+        {
+          convertView = inflater.inflate(R.layout.blueprint, parent, false);
+        }
         holder = new ItemHolder();
         holder.tx_product = (TextView) convertView.findViewById(R.id.tx_blueprint_product);
         holder.tx_category = (TextView) convertView.findViewById(R.id.tx_blueprint_category);
@@ -616,7 +622,13 @@ public class BlueprintListActivity extends FragmentActivity
     filter_category = null;
     filter_metagroup = null;
 
-    setContentView(R.layout.itemfilter);
+    if(application.useTableUI())
+    {
+      setContentView(R.layout.itemfilter_xlarge);
+    } else
+    {
+      setContentView(R.layout.itemfilter);
+    }
 
 
     TextView tx_search = (TextView) findViewById(R.id.tx_itemfilter_search);

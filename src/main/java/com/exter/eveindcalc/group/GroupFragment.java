@@ -445,7 +445,13 @@ public class GroupFragment extends Fragment implements IEveCalculatorFragment
 
       if (convertView == null)
       {
-        convertView = inflater.inflate(R.layout.task, ls_tasks,false);
+        if(application.useTableUI())
+        {
+          convertView = inflater.inflate(R.layout.task_xlarge, ls_tasks,false);
+        } else
+        {
+          convertView = inflater.inflate(R.layout.task, ls_tasks,false);
+        }
         holder = new TaskHolder(convertView);
         convertView.setTag(holder);
       } else

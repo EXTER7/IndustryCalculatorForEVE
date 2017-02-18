@@ -186,8 +186,14 @@ public abstract class ItemListActivity extends FragmentActivity
   {
     super.onCreate(savedInstanceState);
     application = (EICApplication )getApplication();
-    setContentView(R.layout.itemlist);
-    
+    if(application.useTableUI())
+    {
+      setContentView(R.layout.itemlist_xlarge);
+    } else
+    {
+      setContentView(R.layout.itemlist);
+    }
+
     
     index = loadIndex();
 

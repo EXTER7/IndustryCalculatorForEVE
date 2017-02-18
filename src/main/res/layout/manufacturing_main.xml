@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
                 android:lines="1"
-                android:text="@string/munufacturing_time"
+                android:text="@string/manufacturing_time"
                 android:textSize="14sp" />
 
             <TextView

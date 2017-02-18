@@ -453,7 +453,13 @@ public class EICFragmentActivity extends FragmentActivity
     super.onCreate(savedInstanceState);
     application = (EICApplication) getApplication();
     setResult(RESULT_OK);
-    setContentView(R.layout.task_main);
+    if(application.useTableUI())
+    {
+      setContentView(R.layout.task_main_xlarge);
+    } else
+    {
+      setContentView(R.layout.task_main);
+    }
 
     if(task_fragments == null)
     {
