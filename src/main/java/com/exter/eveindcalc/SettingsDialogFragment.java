@@ -86,6 +86,8 @@ public class SettingsDialogFragment extends DialogFragment
   private IntegerEditText ed_default_me;
   private IntegerEditText ed_default_te;
 
+  private CheckBox cb_tablemode;
+
   private List<Integer> system_ids;
   private EICApplication application;
   private EveDatabase database;
@@ -258,7 +260,7 @@ public class SettingsDialogFragment extends DialogFragment
     ed_default_me = new IntegerEditText((EditText) view.findViewById(R.id.ed_settings_melevel), 0, 10, 0, new MeResearchChangeWatcher());
     ed_default_te = new IntegerEditText((EditText) view.findViewById(R.id.ed_settings_pelevel), 0, 20, 0, new TeResearchChangeWatcher());
 
-    CheckBox cb_tablemode = (CheckBox) view.findViewById(R.id.cb_settings_tabletmode);
+    cb_tablemode = (CheckBox) view.findViewById(R.id.cb_settings_tabletmode);
 
     updateSettings();
     
@@ -306,7 +308,8 @@ public class SettingsDialogFragment extends DialogFragment
     sp_buyfrom_system.setOnItemSelectedListener(new SystemSelectedListener(true));
     ed_default_me.setValue(database.getDefaultME(null));
     ed_default_te.setValue(database.getDefaultTE(null));
-
+    SharedPreferences sp = application.getSharedPreferences("EIC", Context.MODE_PRIVATE);
+    cb_tablemode.setChecked(application.useTableUI());
   }
   
   @Override
