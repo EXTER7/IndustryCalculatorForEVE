@@ -1,4 +1,7 @@
 # IndustryCalculatorForEVE
+
+##### Note: This repository is no longer maintained.
+
 Android app that calculates profit from industry in EVE Online.
 
 [Google Play Store Page](https://play.google.com/store/apps/details?id=com.exter.eveindcalc)
